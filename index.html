@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber Terminal</title>
+    <title>ORA Terminal Shell</title>
     <style>
         * {
             margin: 0;
@@ -50,32 +50,6 @@
             margin-bottom: 10px;
             font-size: 14px;
             text-align: center;
-        }
-        
-        .color-picker {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-        
-        .color-option {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.3s;
-        }
-        
-        .color-option:hover {
-            transform: scale(1.1);
-            border-color: white;
-        }
-        
-        .color-option.active {
-            border-color: white;
-            box-shadow: 0 0 10px currentColor;
         }
         
         .panel-btn {
@@ -211,6 +185,7 @@
         .system { color: #bd93f9; }
         .warning { color: #ffb86c; }
         .matrix { color: #00ff9d; }
+        .hacker { color: #00ff00; }
         
         /* Cursor */
         .cursor {
@@ -268,6 +243,84 @@
             border-bottom: 2px solid #444;
         }
         
+        /* Boot Screen */
+        .boot-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1000;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            color: #00ff00;
+            padding: 20px;
+        }
+        
+        .boot-line {
+            white-space: pre;
+            font-size: 12px;
+            line-height: 1.2;
+            padding: 2px 0;
+            animation: flicker 0.3s infinite;
+        }
+        
+        @keyframes flicker {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+        
+        .progress-bar {
+            width: 80%;
+            height: 4px;
+            background: rgba(0, 255, 0, 0.1);
+            margin: 20px 0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #00ff00;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        /* Login Screen */
+        .login-input {
+            background: transparent;
+            border: none;
+            color: transparent;
+            text-shadow: 0 0 0 #00ff00;
+            outline: none;
+            font-family: inherit;
+            font-size: 16px;
+            width: 200px;
+            caret-color: transparent;
+        }
+        
+        /* File List */
+        .file-item {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(0, 255, 0, 0.1);
+            cursor: pointer;
+        }
+        
+        .file-item:hover {
+            background: rgba(0, 255, 0, 0.05);
+        }
+        
+        /* File Mode */
+        .file-mode-header {
+            background: rgba(0, 255, 0, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #00ff00;
+        }
+        
         /* Mobile Optimizations */
         @media (max-width: 768px) {
             .terminal-container {
@@ -288,15 +341,6 @@
                 padding: 10px;
             }
             
-            .color-picker {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            
-            .color-option {
-                width: 25px;
-                height: 25px;
-            }
-            
             .terminal-header {
                 padding: 10px 15px;
             }
@@ -315,21 +359,6 @@
         .terminal-start-animation {
             animation: terminalStart 0.5s ease-out;
         }
-        
-        /* Welcome Animation */
-        .welcome-text {
-            background: linear-gradient(90deg, #4af626, #00ff9d, #4af626);
-            background-size: 200% auto;
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradient 3s linear infinite;
-        }
-        
-        @keyframes gradient {
-            0% { background-position: 0% center; }
-            100% { background-position: 200% center; }
-        }
     </style>
 </head>
 <body>
@@ -338,20 +367,9 @@
     
     <!-- Control Panel -->
     <div class="control-panel">
-        <div class="control-title">MATRIX CONTROLS</div>
-        <div class="color-picker">
-            <div class="color-option active" style="background-color: #00ff9d;" data-color="#00ff9d"></div>
-            <div class="color-option" style="background-color: #4af626;" data-color="#4af626"></div>
-            <div class="color-option" style="background-color: #00ffff;" data-color="#00ffff"></div>
-            <div class="color-option" style="background-color: #ff00ff;" data-color="#ff00ff"></div>
-            <div class="color-option" style="background-color: #ffaa00;" data-color="#ffaa00"></div>
-            <div class="color-option" style="background-color: #ff5555;" data-color="#ff5555"></div>
-            <div class="color-option" style="background-color: #ffffff;" data-color="#ffffff"></div>
-            <div class="color-option" style="background-color: #9d00ff;" data-color="#9d00ff"></div>
-        </div>
+        <div class="control-title">TERMINAL CONTROLS</div>
         <button class="panel-btn" id="hide-panel">Hide Panel</button>
         <button class="panel-btn" id="reset-terminal">Reset Terminal</button>
-        <button class="panel-btn" id="change-bg">Change Matrix</button>
     </div>
     
     <!-- Terminal Window -->
@@ -363,18 +381,19 @@
                     <div class="terminal-button minimize" id="minimize-btn"></div>
                     <div class="terminal-button maximize" id="maximize-btn"></div>
                 </div>
-                <div class="terminal-title">cyber-terminal — ora-shell</div>
+                <div class="terminal-title">ora terminal shell</div>
             </div>
         </div>
         
         <div class="terminal-body" id="terminal-output">
             <div class="output">
-                <div class="welcome-text" style="font-size: 18px; margin-bottom: 10px;">=== CYBER TERMINAL v2.0 ===</div>
-                <span class="system">Type 'help' for available commands</span><br>
-                <span class="system">Type 'clear' to clear terminal</span><br>
-                <span class="system">Type 'matrix' for matrix effects</span><br>
-                <span class="system">Drag header to move • Drag corner to resize</span><br><br>
-                <span class="matrix">Matrix animation running...</span><br><br>
+                <span class="system">system 0.1 is running</span><br>
+                <span class="system">> ora terminal shell</span><br>
+                <span class="system">> made by Bertrand</span><br>
+                <span class="system">> 2025</span><br><br>
+                <span class="info">Type 'help' to see functions</span><br>
+                <span class="info">Type 'orastart' to launch ORA Tool</span><br>
+                <span class="info">Type 'color 1-12' to change matrix color</span><br><br>
             </div>
         </div>
         
@@ -388,6 +407,22 @@
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         let matrixColor = '#00ff9d';
+        
+        // Color definitions for 12 colors
+        const matrixColors = [
+            '#00ff9d', // 1 - Matrix Green
+            '#4af626', // 2 - Neon Green
+            '#00ffff', // 3 - Cyan
+            '#ff00ff', // 4 - Magenta
+            '#ffaa00', // 5 - Orange
+            '#ff5555', // 6 - Red
+            '#ffffff', // 7 - White
+            '#9d00ff', // 8 - Purple
+            '#00aaff', // 9 - Blue
+            '#ffff00', // 10 - Yellow
+            '#ff6b8b', // 11 - Pink
+            '#00ff00'  // 12 - Pure Green
+        ];
         
         // Set canvas size
         function resizeCanvas() {
@@ -444,26 +479,586 @@
         }
         
         // ==============================
+        // ORA TOOL SYSTEM
+        // ==============================
+        class ORATool {
+            constructor() {
+                this.mode = 'normal'; // normal, boot, login, ora-tool, file-mode
+                this.currentPath = '/';
+                this.currentFile = null;
+                this.loggedIn = false;
+                this.username = 'bertrand';
+                this.password = 'karekezi@2';
+                this.oraFiles = this.initializeFiles();
+            }
+            
+            initializeFiles() {
+                return {
+                    '/files': {
+                        type: 'dir',
+                        children: ['document1.pdf', 'image.png', 'report.docx', 'notes.txt', 
+                                   'secure_data.txt', 'config.ora', 'backup.zip', 'project_specs.md']
+                    },
+                    '/files/document1.pdf': {
+                        type: 'file',
+                        description: 'Project Documentation',
+                        size: '2.4 MB',
+                        content: 'This is a PDF document containing project documentation.'
+                    },
+                    '/files/image.png': {
+                        type: 'file',
+                        description: 'System Architecture',
+                        size: '1.8 MB',
+                        content: 'This is an image file showing system architecture.'
+                    },
+                    '/files/report.docx': {
+                        type: 'file',
+                        description: 'Quarterly Report',
+                        size: '3.1 MB',
+                        content: 'This is a Word document containing quarterly report.'
+                    },
+                    '/files/notes.txt': {
+                        type: 'file',
+                        description: 'Meeting Notes',
+                        size: '45 KB',
+                        content: 'Meeting Notes\n=============\n\nDate: 2024-01-15\nAttendees: Team ORA\n\nAgenda:\n1. Security protocols\n2. New tool development\n3. User authentication system\n\nNotes:\n- Implement two-factor auth\n- Add file encryption\n- Schedule next meeting\n\nAction Items:\n1. Bertrand: Review security\n2. Team: Test login flow'
+                    },
+                    '/files/secure_data.txt': {
+                        type: 'file',
+                        description: 'Encrypted Data',
+                        size: '128 KB',
+                        content: 'ENCRYPTED DATA - ACCESS RESTRICTED\n\nThis file contains encrypted system data.\nRequires security clearance level 3.'
+                    },
+                    '/files/config.ora': {
+                        type: 'file',
+                        description: 'System Configuration',
+                        size: '12 KB',
+                        content: 'ORA System Configuration\n=======================\n\nVersion: 2.1.0\nMode: Secure\n\n[Security]\nauth_method = enhanced\nencryption = enabled\nlog_level = debug\n\n[Network]\nport = 8080\nssl = true\n\n[User]\ndefault = bertrand\nsession_timeout = 3600'
+                    },
+                    '/files/backup.zip': {
+                        type: 'file',
+                        description: 'System Backup',
+                        size: '45 MB',
+                        content: 'This is a compressed backup file containing system data.'
+                    },
+                    '/files/project_specs.md': {
+                        type: 'file',
+                        description: 'Project Specifications',
+                        size: '89 KB',
+                        content: '# ORA Project Specifications\n\n## Overview\nAdvanced terminal environment with secure file management.\n\n## Features\n- Secure authentication\n- File encryption\n- Real-time monitoring\n- Backup systems\n\n## Security Protocols\n- Two-factor authentication\n- End-to-end encryption\n- Audit logging\n- Intrusion detection'
+                    }
+                };
+            }
+            
+            // ==============================
+            // BOOT SEQUENCE
+            // ==============================
+            async startBootSequence() {
+                this.mode = 'boot';
+                const output = document.getElementById('terminal-output');
+                output.innerHTML = '';
+                
+                const bootDiv = document.createElement('div');
+                bootDiv.className = 'output hacker';
+                bootDiv.textContent = '[BOOT] Starting ORA Secure Boot Sequence...';
+                output.appendChild(bootDiv);
+                
+                const bootMessages = [
+                    "[BOOT] Initializing ORA Core v1.0...",
+                    "[OK] Memory test passed",
+                    "[OK] CPU: 8 cores detected",
+                    "[OK] RAM: 16GB available",
+                    "[LOAD] Loading kernel modules...",
+                    "   -> module_security.ko [LOADED]",
+                    "   -> module_encryption.ko [LOADED]",
+                    "   -> module_network.ko [LOADED]",
+                    "   -> module_filesystem.ko [LOADED]",
+                    "[OK] All modules loaded",
+                    "[CRYPTO] Initializing encryption...",
+                    "   Generating RSA-4096 keys...",
+                    "   Setting up AES-256...",
+                    "[OK] Encryption ready",
+                    "[NET] Configuring network...",
+                    "   Establishing secure connection...",
+                    "   Handshake complete",
+                    "[OK] Network: ONLINE",
+                    "[AUTH] Starting authentication service...",
+                    "[SCAN] Running system integrity check...",
+                    "   Checking file permissions...",
+                    "   Verifying signatures...",
+                    "   Scanning for vulnerabilities...",
+                    "[OK] System integrity: 100%",
+                    "[SECURE] Entering secure mode...",
+                    "[DECRYPT] Loading secure environment...",
+                    "   Accessing encrypted partition...",
+                    "   Decrypting session keys...",
+                    "[OK] Secure environment ready",
+                    "[INIT] Starting ORA Tool Environment...",
+                    "   Loading user profiles...",
+                    "   Mounting virtual filesystem...",
+                    "   Initializing UI components...",
+                    "[OK] Environment initialized",
+                    "[WAIT] Finalizing boot process..."
+                ];
+                
+                // Show boot messages
+                for (let i = 0; i < bootMessages.length; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    const line = document.createElement('div');
+                    line.className = 'output hacker';
+                    line.textContent = bootMessages[i];
+                    
+                    // Random flicker effect
+                    if (Math.random() > 0.7) {
+                        line.style.opacity = '0.5';
+                        setTimeout(() => {
+                            line.style.opacity = '1';
+                        }, 50);
+                    }
+                    
+                    output.appendChild(line);
+                    output.scrollTop = output.scrollHeight;
+                }
+                
+                // Final message
+                await new Promise(resolve => setTimeout(resolve, 500));
+                const finalMsg = document.createElement('div');
+                finalMsg.className = 'output success';
+                finalMsg.textContent = "[OK] Initialization complete.";
+                output.appendChild(finalMsg);
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                this.mode = 'login';
+                this.showLoginPrompt();
+            }
+            
+            // ==============================
+            // LOGIN SYSTEM
+            // ==============================
+            showLoginPrompt() {
+                const output = document.getElementById('terminal-output');
+                output.innerHTML = '';
+                
+                const loginDiv = document.createElement('div');
+                loginDiv.className = 'output';
+                loginDiv.innerHTML = '<span class="hacker">Username:</span>';
+                output.appendChild(loginDiv);
+                
+                this.createLoginInput('username');
+            }
+            
+            createLoginInput(field) {
+                const output = document.getElementById('terminal-output');
+                const inputLine = document.createElement('div');
+                inputLine.className = 'input-line';
+                
+                const prompt = field === 'username' ? 'Username:' : 'Password:';
+                
+                inputLine.innerHTML = `
+                    <span class="prompt">${prompt}</span>
+                    <input type="${field === 'password' ? 'password' : 'text'}" 
+                           class="command-input login-field"
+                           autocomplete="off" 
+                           autofocus
+                           ${field === 'password' ? 'style="color: transparent; text-shadow: 0 0 0 #00ff00;"' : ''}>
+                    <span class="cursor"></span>
+                `;
+                
+                output.appendChild(inputLine);
+                
+                const input = inputLine.querySelector('.command-input');
+                input.focus();
+                
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const value = input.value.trim();
+                        inputLine.remove();
+                        this.processLoginInput(field, value);
+                    }
+                });
+                
+                output.scrollTop = output.scrollHeight;
+            }
+            
+            processLoginInput(field, value) {
+                const output = document.getElementById('terminal-output');
+                
+                if (field === 'username') {
+                    if (value.toLowerCase() === this.username) {
+                        const resultDiv = document.createElement('div');
+                        resultDiv.className = 'output';
+                        resultDiv.innerHTML = `<span class="success">Username verified</span>`;
+                        output.appendChild(resultDiv);
+                        
+                        setTimeout(() => {
+                            const promptDiv = document.createElement('div');
+                            promptDiv.className = 'output';
+                            promptDiv.innerHTML = `<span class="hacker">Password:</span>`;
+                            output.appendChild(promptDiv);
+                            this.createLoginInput('password');
+                        }, 500);
+                    } else {
+                        const resultDiv = document.createElement('div');
+                        resultDiv.className = 'output';
+                        resultDiv.innerHTML = `<span class="error">Invalid username. Try again.</span>`;
+                        output.appendChild(resultDiv);
+                        
+                        setTimeout(() => {
+                            const promptDiv = document.createElement('div');
+                            promptDiv.className = 'output';
+                            promptDiv.innerHTML = `<span class="hacker">Username:</span>`;
+                            output.appendChild(promptDiv);
+                            this.createLoginInput('username');
+                        }, 1000);
+                    }
+                } else if (field === 'password') {
+                    if (value === this.password) {
+                        this.loggedIn = true;
+                        
+                        const resultDiv = document.createElement('div');
+                        resultDiv.className = 'output';
+                        resultDiv.innerHTML = `
+                            <span class="success">Login successful.</span><br>
+                            <span class="hacker">Welcome to ORA Tool Environment.</span>
+                        `;
+                        output.appendChild(resultDiv);
+                        
+                        setTimeout(() => {
+                            this.enterORATool();
+                        }, 1500);
+                    } else {
+                        const resultDiv = document.createElement('div');
+                        resultDiv.className = 'output';
+                        resultDiv.innerHTML = `<span class="error">Incorrect password.</span>`;
+                        output.appendChild(resultDiv);
+                        
+                        setTimeout(() => {
+                            const promptDiv = document.createElement('div');
+                            promptDiv.className = 'output';
+                            promptDiv.innerHTML = `<span class="hacker">Password:</span>`;
+                            output.appendChild(promptDiv);
+                            this.createLoginInput('password');
+                        }, 1000);
+                    }
+                }
+                
+                output.scrollTop = output.scrollHeight;
+            }
+            
+            // ==============================
+            // ORA TOOL ENVIRONMENT
+            // ==============================
+            enterORATool() {
+                this.mode = 'ora-tool';
+                this.currentPath = '/files';
+                this.currentFile = null;
+                
+                const output = document.getElementById('terminal-output');
+                output.innerHTML = '';
+                
+                const welcomeDiv = document.createElement('div');
+                welcomeDiv.className = 'output';
+                welcomeDiv.innerHTML = `
+                    <span class="hacker">Entering ORA Tool...</span><br>
+                    <span class="hacker">Initializing File Workspace...</span><br>
+                    <span class="success">Active Repository: ${this.currentPath}</span><br><br>
+                    <span class="info">Type "ls" to view available files.</span><br>
+                    <span class="info">Type "cd filename" to open a file.</span><br>
+                    <span class="info">Type "exit" to quit ORA Tool.</span>
+                `;
+                output.appendChild(welcomeDiv);
+                
+                createInputLine();
+            }
+            
+            // ==============================
+            // FILE MODE
+            // ==============================
+            enterFileMode(fileName) {
+                this.mode = 'file-mode';
+                this.currentFile = fileName;
+                
+                const output = document.getElementById('terminal-output');
+                output.innerHTML = '';
+                
+                const filePath = `${this.currentPath}/${fileName}`;
+                const file = this.oraFiles[filePath];
+                
+                if (!file) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'output error';
+                    errorDiv.textContent = `File not found: ${fileName}`;
+                    output.appendChild(errorDiv);
+                    createInputLine();
+                    return;
+                }
+                
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'file-mode-header';
+                headerDiv.innerHTML = `
+                    <span class="hacker">=== FILE MODE: ${fileName} ===</span><br>
+                    <span class="system">Type: ${file.type.toUpperCase()}</span><br>
+                    <span class="system">Size: ${file.size}</span><br>
+                    <span class="system">Description: ${file.description}</span><br><br>
+                    <span class="info">Available commands:</span><br>
+                    <span class="command">open</span> - Open file in new tab<br>
+                    <span class="command">print</span> - Print file<br>
+                    <span class="command">download</span> - Download file<br>
+                    <span class="command">view</span> - View file content<br>
+                    <span class="command">exit</span> - Exit file mode<br>
+                `;
+                output.appendChild(headerDiv);
+                
+                if (file.content) {
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'output';
+                    contentDiv.style.background = 'rgba(0, 255, 0, 0.05)';
+                    contentDiv.style.padding = '15px';
+                    contentDiv.style.marginTop = '20px';
+                    contentDiv.style.borderRadius = '5px';
+                    contentDiv.innerHTML = `<pre style="margin:0;">${file.content}</pre>`;
+                    output.appendChild(contentDiv);
+                }
+                
+                createInputLine();
+            }
+            
+            executeFileCommand(command) {
+                const output = document.getElementById('terminal-output');
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'output';
+                
+                switch(command) {
+                    case 'open':
+                        resultDiv.innerHTML = `<span class="system">Opening ${this.currentFile} in new tab...</span>`;
+                        // Simulate opening in new tab
+                        setTimeout(() => {
+                            window.open('#', '_blank');
+                        }, 500);
+                        break;
+                        
+                    case 'print':
+                        resultDiv.innerHTML = `<span class="system">Opening print dialog for ${this.currentFile}...</span>`;
+                        setTimeout(() => {
+                            window.print();
+                        }, 500);
+                        break;
+                        
+                    case 'download':
+                        resultDiv.innerHTML = `<span class="success">Starting download: ${this.currentFile}</span>`;
+                        // Simulate download
+                        setTimeout(() => {
+                            const file = this.oraFiles[`${this.currentPath}/${this.currentFile}`];
+                            const content = file.content || `Content of ${this.currentFile}`;
+                            const blob = new Blob([content], {type: 'text/plain'});
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = this.currentFile;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                        }, 500);
+                        break;
+                        
+                    case 'view':
+                        const file = this.oraFiles[`${this.currentPath}/${this.currentFile}`];
+                        if (file.content) {
+                            output.innerHTML = '';
+                            const contentDiv = document.createElement('div');
+                            contentDiv.className = 'output';
+                            contentDiv.innerHTML = `<pre style="background:rgba(0,255,0,0.05);padding:15px;">${file.content}</pre>`;
+                            output.appendChild(contentDiv);
+                            createInputLine();
+                            return;
+                        }
+                        break;
+                        
+                    case 'exit':
+                        this.exitFileMode();
+                        return;
+                }
+                
+                output.appendChild(resultDiv);
+                createInputLine();
+            }
+            
+            exitFileMode() {
+                this.mode = 'ora-tool';
+                this.currentFile = null;
+                
+                const output = document.getElementById('terminal-output');
+                output.innerHTML = '';
+                
+                const exitDiv = document.createElement('div');
+                exitDiv.className = 'output';
+                exitDiv.innerHTML = `
+                    <span class="system">Exiting file...</span><br>
+                `;
+                output.appendChild(exitDiv);
+                
+                setTimeout(() => {
+                    this.listFiles();
+                }, 500);
+            }
+            
+            exitORATool() {
+                this.mode = 'normal';
+                this.currentPath = '/';
+                this.currentFile = null;
+                this.loggedIn = false;
+                
+                const output = document.getElementById('terminal-output');
+                output.innerHTML = '';
+                
+                const exitDiv = document.createElement('div');
+                exitDiv.className = 'output';
+                exitDiv.innerHTML = `
+                    <span class="system">Exiting ORA Tool...</span><br>
+                    <span class="success">Returning to ORA Terminal.</span><br><br>
+                `;
+                output.appendChild(exitDiv);
+                
+                setTimeout(() => {
+                    output.innerHTML = '';
+                    const welcomeDiv = document.createElement('div');
+                    welcomeDiv.className = 'output';
+                    welcomeDiv.innerHTML = `
+                        <span class="system">system 0.1 is running</span><br>
+                        <span class="system">> ora terminal shell</span><br>
+                        <span class="system">> made by Bertrand</span><br>
+                        <span class="system">> 2025</span><br><br>
+                        <span class="info">Type 'help' to see functions</span><br>
+                        <span class="info">Type 'orastart' to launch ORA Tool</span><br>
+                        <span class="info">Type 'color 1-12' to change matrix color</span><br><br>
+                    `;
+                    output.appendChild(welcomeDiv);
+                    createInputLine();
+                }, 1500);
+            }
+            
+            listFiles() {
+                const output = document.getElementById('terminal-output');
+                output.innerHTML = '';
+                
+                const files = this.oraFiles[this.currentPath].children;
+                
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'output';
+                headerDiv.innerHTML = `<span class="info">Repository: ${this.currentPath}</span><br><br>`;
+                output.appendChild(headerDiv);
+                
+                files.forEach(fileName => {
+                    const filePath = `${this.currentPath}/${fileName}`;
+                    const file = this.oraFiles[filePath];
+                    const fileDiv = document.createElement('div');
+                    fileDiv.className = 'output file-item';
+                    fileDiv.innerHTML = `
+                        <span>${file.type === 'dir' ? '📁' : '📄'} </span>
+                        <span class="${file.type === 'dir' ? 'info' : 'system'}">${fileName}</span>
+                        <span style="margin-left: 20px; color: #00aa00;">${file.size || ''}</span>
+                    `;
+                    output.appendChild(fileDiv);
+                });
+                
+                const helpDiv = document.createElement('div');
+                helpDiv.className = 'output';
+                helpDiv.innerHTML = `<br><span class="system">Type "cd filename" to open a file, or "exit" to quit ORA Tool.</span>`;
+                output.appendChild(helpDiv);
+                
+                createInputLine();
+            }
+            
+            handleORAToolCommand(cmd, args) {
+                const output = document.getElementById('terminal-output');
+                
+                if (cmd === 'ls') {
+                    this.listFiles();
+                    return true;
+                } else if (cmd === 'cd') {
+                    if (args.length === 0) {
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'output error';
+                        errorDiv.textContent = 'Usage: cd filename';
+                        output.appendChild(errorDiv);
+                        createInputLine();
+                        return true;
+                    }
+                    
+                    const fileName = args[0];
+                    const filePath = `${this.currentPath}/${fileName}`;
+                    const file = this.oraFiles[filePath];
+                    
+                    if (!file) {
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'output error';
+                        errorDiv.textContent = `File not found: ${fileName}`;
+                        output.appendChild(errorDiv);
+                        createInputLine();
+                        return true;
+                    }
+                    
+                    if (file.type === 'file') {
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = 'output';
+                        msgDiv.innerHTML = `<span class="system">Opening file: ${fileName}</span>`;
+                        output.appendChild(msgDiv);
+                        
+                        setTimeout(() => {
+                            this.enterFileMode(fileName);
+                        }, 500);
+                        return true;
+                    }
+                } else if (cmd === 'exit') {
+                    this.exitORATool();
+                    return true;
+                } else if (['open', 'print', 'download', 'view'].includes(cmd)) {
+                    if (this.mode === 'file-mode') {
+                        this.executeFileCommand(cmd);
+                        return true;
+                    } else {
+                        const errorDiv = document.createElement('div');
+                        errorDiv.className = 'output error';
+                        errorDiv.textContent = `You're currently inside a file. Use "exit" first.`;
+                        output.appendChild(errorDiv);
+                        createInputLine();
+                        return true;
+                    }
+                }
+                
+                return false;
+            }
+        }
+        
+        // ==============================
         // TERMINAL SYSTEM
         // ==============================
         const terminalOutput = document.getElementById('terminal-output');
         const terminalContainer = document.querySelector('.terminal-container');
         const terminalHeader = document.getElementById('terminal-header');
+        const oraTool = new ORATool();
         
         // Command definitions
         const commands = {
             help: {
                 description: 'Show all available commands',
                 execute: () => {
-                    let helpText = '<span class="info">=== CYBER TERMINAL COMMANDS ===</span><br><br>';
+                    let helpText = '<span class="info">=== ORA TERMINAL COMMANDS ===</span><br><br>';
                     helpText += '<span class="matrix">System Commands:</span><br>';
                     for (const [cmd, info] of Object.entries(commands)) {
                         helpText += `<span class="command">${cmd}</span> - ${info.description}<br>`;
                     }
+                    helpText += '<br><span class="matrix">ORA Tool Commands:</span><br>';
+                    helpText += '<span class="command">orastart</span> - Launch secure ORA Tool<br>';
+                    helpText += '<span class="command">ls</span> - List files (in ORA Tool)<br>';
+                    helpText += '<span class="command">cd filename</span> - Open file (in ORA Tool)<br>';
+                    helpText += '<span class="command">open/print/download/view</span> - File operations<br>';
+                    helpText += '<span class="command">exit</span> - Exit ORA Tool<br>';
                     helpText += '<br><span class="matrix">Terminal Controls:</span><br>';
                     helpText += '• Drag header to move terminal<br>';
                     helpText += '• Drag bottom-right corner to resize<br>';
-                    helpText += '• Use control panel for matrix colors<br>';
+                    helpText += '• Type "color 1-12" to change matrix<br>';
                     return helpText;
                 }
             },
@@ -492,71 +1087,47 @@
             about: {
                 description: 'Information about this terminal',
                 execute: () => {
-                    return `<span class="matrix">Cyber Terminal v2.0</span><br>
-                    Advanced web-based terminal with Matrix effects<br>
+                    return `<span class="matrix">ORA Terminal Shell v0.1</span><br>
+                    Advanced web-based terminal with ORA Tool system<br>
                     Features: Draggable, Resizable, Mobile Optimized<br>
-                    Built with HTML5, CSS3, and JavaScript`;
+                    Built by Bertrand • 2025`;
                 }
             },
             ls: {
                 description: 'List directory contents',
                 execute: () => {
-                    return `<span class="info">Desktop/</span>   <span class="info">Documents/</span>   <span class="info">Downloads/</span><br>
-                    <span class="info">Music/</span>      <span class="info">Pictures/</span>    <span class="info">Videos/</span><br>
-                    <span class="system">config.ora</span>  <span class="system">readme.txt</span>   <span class="system">notes.md</span>`;
+                    if (oraTool.mode === 'normal') {
+                        return `<span class="info">Desktop/</span>   <span class="info">Documents/</span>   <span class="info">Downloads/</span><br>
+                        <span class="info">Music/</span>      <span class="info">Pictures/</span>    <span class="info">Videos/</span><br>
+                        <span class="system">config.ora</span>  <span class="system">readme.txt</span>   <span class="system">notes.md</span>`;
+                    }
+                    return '';
                 }
             },
             pwd: {
                 description: 'Print working directory',
                 execute: () => {
-                    return '/home/cyber-user';
+                    return oraTool.mode === 'normal' ? '/home/user' : oraTool.currentPath;
                 }
             },
-            theme: {
-                description: 'Change terminal theme',
+            color: {
+                description: 'Change matrix animation color (1-12)',
                 execute: (args) => {
-                    if (args[0] === 'matrix') {
-                        matrixColor = '#00ff9d';
-                        document.querySelector('.color-option.active').classList.remove('active');
-                        document.querySelector(`[data-color="${matrixColor}"]`).classList.add('active');
-                        return '<span class="success">Theme set to Matrix Green</span>';
-                    } else if (args[0] === 'cyber') {
-                        matrixColor = '#ff00ff';
-                        document.querySelector('.color-option.active').classList.remove('active');
-                        document.querySelector(`[data-color="${matrixColor}"]`).classList.add('active');
-                        return '<span class="success">Theme set to Cyber Pink</span>';
-                    } else if (args[0] === 'ice') {
-                        matrixColor = '#00ffff';
-                        document.querySelector('.color-option.active').classList.remove('active');
-                        document.querySelector(`[data-color="${matrixColor}"]`).classList.add('active');
-                        return '<span class="success">Theme set to Ice Blue</span>';
+                    if (args.length === 0) {
+                        let colors = '<span class="info">Available colors (1-12):</span><br>';
+                        matrixColors.forEach((color, index) => {
+                            colors += `<span class="command">${index + 1}</span> - <span style="color:${color}">■</span> ${color}<br>`;
+                        });
+                        return colors;
                     }
-                    return '<span class="error">Available themes: matrix, cyber, ice</span>';
-                }
-            },
-            matrix: {
-                description: 'Control matrix animation',
-                execute: (args) => {
-                    if (args[0] === 'stop') {
-                        clearInterval(matrixInterval);
-                        return '<span class="warning">Matrix animation stopped</span>';
-                    } else if (args[0] === 'start') {
-                        matrixInterval = setInterval(drawMatrix, 50);
-                        return '<span class="success">Matrix animation started</span>';
-                    } else if (args[0] === 'faster') {
-                        clearInterval(matrixInterval);
-                        matrixInterval = setInterval(drawMatrix, 30);
-                        return '<span class="success">Matrix animation speed increased</span>';
-                    } else if (args[0] === 'slower') {
-                        clearInterval(matrixInterval);
-                        matrixInterval = setInterval(drawMatrix, 100);
-                        return '<span class="success">Matrix animation speed decreased</span>';
+                    
+                    const colorNum = parseInt(args[0]);
+                    if (colorNum >= 1 && colorNum <= 12) {
+                        matrixColor = matrixColors[colorNum - 1];
+                        return `<span class="success">Matrix color changed to #${colorNum}</span>`;
+                    } else {
+                        return '<span class="error">Color must be between 1 and 12</span>';
                     }
-                    return `<span class="info">Matrix Controls:</span><br>
-                    <span class="command">matrix start</span> - Start animation<br>
-                    <span class="command">matrix stop</span> - Stop animation<br>
-                    <span class="command">matrix faster</span> - Increase speed<br>
-                    <span class="command">matrix slower</span> - Decrease speed`;
                 }
             },
             calc: {
@@ -576,11 +1147,11 @@
                 execute: () => {
                     return `
                     <span class="matrix">╔══════════════════════════════════════╗</span><br>
-                    <span class="matrix">║        CYBER TERMINAL INFO           ║</span><br>
+                    <span class="matrix">║        ORA TERMINAL INFO             ║</span><br>
                     <span class="matrix">╠══════════════════════════════════════╣</span><br>
-                    <span class="system">║ OS: Cyber Terminal v2.0              ║</span><br>
-                    <span class="system">║ Shell: ora-shell                     ║</span><br>
-                    <span class="system">║ Theme: Matrix Green                  ║</span><br>
+                    <span class="system">║ OS: ORA Terminal Shell v0.1          ║</span><br>
+                    <span class="system">║ Mode: ${oraTool.mode.toUpperCase()}                      ║</span><br>
+                    <span class="system">║ Matrix: ${matrixColor}              ║</span><br>
                     <span class="system">║ Resolution: ${window.innerWidth}x${window.innerHeight}        ║</span><br>
                     <span class="system">║ Uptime: ${Math.floor(performance.now()/1000)}s            ║</span><br>
                     <span class="matrix">╚══════════════════════════════════════╝</span>`;
@@ -593,6 +1164,17 @@
                         location.reload();
                     }, 1000);
                     return '<span class="warning">Rebooting terminal...</span>';
+                }
+            },
+            orastart: {
+                description: 'Launch secure ORA Tool environment',
+                execute: async () => {
+                    if (oraTool.mode === 'normal') {
+                        await oraTool.startBootSequence();
+                        return '';
+                    } else {
+                        return '<span class="error">Please authenticate using "orastart"</span>';
+                    }
                 }
             }
         };
@@ -607,8 +1189,18 @@
         function createInputLine() {
             const inputLine = document.createElement('div');
             inputLine.className = 'input-line';
+            
+            let promptText = '$';
+            if (oraTool.mode === 'ora-tool') {
+                promptText = `ORA:${oraTool.currentPath}$`;
+            } else if (oraTool.mode === 'file-mode') {
+                promptText = `file:${oraTool.currentFile}$`;
+            } else if (oraTool.mode === 'login' || oraTool.mode === 'boot') {
+                promptText = '>';
+            }
+            
             inputLine.innerHTML = `
-                <span class="prompt">$</span>
+                <span class="prompt">${promptText}</span>
                 <input type="text" class="command-input" autocomplete="off">
                 <span class="cursor"></span>
             `;
@@ -622,12 +1214,12 @@
             }, 10);
             
             // Handle key events
-            input.addEventListener('keydown', (e) => {
+            input.addEventListener('keydown', async (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     const command = input.value.trim();
                     inputLine.remove();
-                    processCommand(command);
+                    await processCommand(command);
                 }
                 
                 // Tab completion
@@ -667,7 +1259,7 @@
             terminalOutput.scrollTop = terminalOutput.scrollHeight;
         }
         
-        function processCommand(fullCommand) {
+        async function processCommand(fullCommand) {
             // Add to history
             commandHistory.push(fullCommand);
             historyIndex = commandHistory.length;
@@ -675,7 +1267,17 @@
             // Display command
             const commandOutput = document.createElement('div');
             commandOutput.className = 'output';
-            commandOutput.innerHTML = `<span class="prompt">$</span> <span class="command">${fullCommand}</span>`;
+            
+            let promptText = '$';
+            if (oraTool.mode === 'ora-tool') {
+                promptText = `ORA:${oraTool.currentPath}$`;
+            } else if (oraTool.mode === 'file-mode') {
+                promptText = `file:${oraTool.currentFile}$`;
+            } else if (oraTool.mode === 'login' || oraTool.mode === 'boot') {
+                promptText = '>';
+            }
+            
+            commandOutput.innerHTML = `<span class="prompt">${promptText}</span> <span class="command">${fullCommand}</span>`;
             terminalOutput.appendChild(commandOutput);
             
             // Parse command
@@ -686,16 +1288,33 @@
             
             if (cmd === '') {
                 resultDiv.innerHTML = '';
-            } else if (commands[cmd]) {
-                try {
-                    const result = commands[cmd].execute(args);
-                    resultDiv.innerHTML = result;
-                } catch (error) {
-                    resultDiv.innerHTML = `<span class="error">Error: ${error.message}</span>`;
-                }
             } else {
-                resultDiv.innerHTML = `<span class="error">Command not found: ${cmd}</span><br>
-                Type <span class="command">'help'</span> for available commands`;
+                // Check if in ORA Tool mode
+                if (oraTool.mode === 'ora-tool' || oraTool.mode === 'file-mode') {
+                    const handled = oraTool.handleORAToolCommand(cmd, args);
+                    if (handled) {
+                        return;
+                    }
+                }
+                
+                // Check if in login mode
+                if (oraTool.mode === 'login' || oraTool.mode === 'boot') {
+                    resultDiv.innerHTML = '<span class="error">Please complete authentication first</span>';
+                } else if (commands[cmd]) {
+                    try {
+                        const result = commands[cmd].execute(args);
+                        if (result instanceof Promise) {
+                            resultDiv.innerHTML = await result;
+                        } else {
+                            resultDiv.innerHTML = result;
+                        }
+                    } catch (error) {
+                        resultDiv.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+                    }
+                } else {
+                    resultDiv.innerHTML = `<span class="error">Command not found: ${cmd}</span><br>
+                    Type <span class="command">'help'</span> for available commands`;
+                }
             }
             
             terminalOutput.appendChild(resultDiv);
@@ -875,20 +1494,9 @@
         // ==============================
         // CONTROL PANEL FUNCTIONS
         // ==============================
-        const colorOptions = document.querySelectorAll('.color-option');
         const hidePanelBtn = document.getElementById('hide-panel');
         const resetBtn = document.getElementById('reset-terminal');
-        const changeBgBtn = document.getElementById('change-bg');
         const controlPanel = document.querySelector('.control-panel');
-        
-        // Color picker
-        colorOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                colorOptions.forEach(opt => opt.classList.remove('active'));
-                option.classList.add('active');
-                matrixColor = option.dataset.color;
-            });
-        });
         
         // Hide/show panel
         hidePanelBtn.addEventListener('click', () => {
@@ -913,28 +1521,6 @@
             setTimeout(() => {
                 terminalContainer.classList.remove('terminal-start-animation');
             }, 500);
-        });
-        
-        // Change matrix style
-        changeBgBtn.addEventListener('click', () => {
-            // Toggle between different char sets
-            const charSets = [
-                "01アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン",
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~",
-                "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜｦﾝ",
-                "■□▲△▼▽◆◇○●◎☆★♠♥♦♣♤♡♢♧"
-            ];
-            
-            const randomSet = charSets[Math.floor(Math.random() * charSets.length)];
-            charArray.length = 0;
-            charArray.push(...randomSet.split(""));
-            
-            // Show message
-            const message = document.createElement('div');
-            message.className = 'output system';
-            message.textContent = 'Matrix style changed!';
-            terminalOutput.appendChild(message);
-            terminalOutput.scrollTop = terminalOutput.scrollHeight;
         });
         
         // Window buttons
@@ -976,15 +1562,6 @@
             // Initialize terminal
             createInputLine();
             
-            // Welcome message
-            setTimeout(() => {
-                const welcomeDiv = document.createElement('div');
-                welcomeDiv.className = 'output matrix';
-                welcomeDiv.innerHTML = '<span class="matrix">>> SYSTEM READY. TYPE YOUR COMMANDS...</span>';
-                terminalOutput.appendChild(welcomeDiv);
-                createInputLine();
-            }, 500);
-            
             // Handle window resize
             window.addEventListener('resize', () => {
                 initMatrix();
@@ -1004,7 +1581,7 @@
                 }
             });
             
-            // Make matrixInterval available globally for matrix command
+            // Make matrixInterval available globally
             window.matrixInterval = matrixInterval;
         }
         

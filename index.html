@@ -43,6 +43,7 @@
             border-radius: 8px;
             border: 1px solid #333;
             backdrop-filter: blur(10px);
+            max-width: 300px;
         }
         
         .control-title {
@@ -68,6 +69,16 @@
         
         .panel-btn:hover {
             background: #444;
+        }
+        
+        .file-preview {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            font-size: 11px;
+            max-height: 200px;
+            overflow-y: auto;
         }
         
         /* Terminal Container - Draggable & Resizable */
@@ -186,6 +197,7 @@
         .warning { color: #ffb86c; }
         .matrix { color: #00ff9d; }
         .hacker { color: #00ff00; }
+        .file { color: #ffaa00; }
         
         /* Cursor */
         .cursor {
@@ -272,44 +284,29 @@
             100% { opacity: 1; }
         }
         
-        .progress-bar {
-            width: 80%;
-            height: 4px;
-            background: rgba(0, 255, 0, 0.1);
-            margin: 20px 0;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: #00ff00;
-            width: 0%;
-            transition: width 0.5s ease;
-        }
-        
-        /* Login Screen */
-        .login-input {
-            background: transparent;
-            border: none;
-            color: transparent;
-            text-shadow: 0 0 0 #00ff00;
-            outline: none;
-            font-family: inherit;
-            font-size: 16px;
-            width: 200px;
-            caret-color: transparent;
-        }
-        
         /* File List */
         .file-item {
             padding: 5px 0;
             border-bottom: 1px solid rgba(0, 255, 0, 0.1);
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .file-item:hover {
             background: rgba(0, 255, 0, 0.05);
+        }
+        
+        .file-icon {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .file-size {
+            margin-left: auto;
+            color: #888;
+            font-size: 12px;
         }
         
         /* File Mode */
@@ -319,6 +316,23 @@
             border-radius: 5px;
             margin: 10px 0;
             border-left: 4px solid #00ff00;
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #444;
+            border-top-color: #00ff00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         
         /* Mobile Optimizations */
@@ -339,6 +353,7 @@
                 top: 10px;
                 right: 10px;
                 padding: 10px;
+                max-width: 200px;
             }
             
             .terminal-header {
@@ -359,6 +374,23 @@
         .terminal-start-animation {
             animation: terminalStart 0.5s ease-out;
         }
+        
+        /* File Preview */
+        .code-preview {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .line-number {
+            color: #666;
+            margin-right: 10px;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
@@ -367,9 +399,14 @@
     
     <!-- Control Panel -->
     <div class="control-panel">
-        <div class="control-title">TERMINAL CONTROLS</div>
+        <div class="control-title">ORA TERMINAL CONTROL</div>
+        <div id="file-preview" class="file-preview">
+            <span class="system">File Explorer Active</span><br>
+            <span class="info">Scanning /files directory...</span>
+        </div>
         <button class="panel-btn" id="hide-panel">Hide Panel</button>
         <button class="panel-btn" id="reset-terminal">Reset Terminal</button>
+        <button class="panel-btn" id="refresh-files">Refresh Files</button>
     </div>
     
     <!-- Terminal Window -->
@@ -479,6 +516,167 @@
         }
         
         // ==============================
+        // FILE SYSTEM SCANNER
+        // ==============================
+        class FileSystemScanner {
+            constructor() {
+                this.files = [];
+                this.filesPath = '/files/';
+                this.fileTypes = {
+                    '.html': '🌐', '.htm': '🌐',
+                    '.js': '📜', '.json': '📄',
+                    '.css': '🎨', '.scss': '🎨', '.sass': '🎨',
+                    '.py': '🐍', '.java': '☕', '.cpp': '⚙️', '.c': '⚙️',
+                    '.md': '📝', '.txt': '📝',
+                    '.jpg': '🖼️', '.jpeg': '🖼️', '.png': '🖼️', '.gif': '🖼️',
+                    '.pdf': '📕', '.doc': '📘', '.docx': '📘',
+                    '.zip': '📦', '.rar': '📦', '.tar': '📦',
+                    '.mp3': '🎵', '.wav': '🎵',
+                    '.mp4': '🎬', '.avi': '🎬'
+                };
+            }
+            
+            getFileIcon(filename) {
+                const extension = filename.substring(filename.lastIndexOf('.')).toLowerCase();
+                return this.fileTypes[extension] || '📄';
+            }
+            
+            async scanFiles() {
+                try {
+                    // Try to fetch directory listing
+                    const response = await fetch(this.filesPath);
+                    if (!response.ok) {
+                        throw new Error('Files directory not accessible');
+                    }
+                    
+                    const html = await response.text();
+                    this.parseDirectoryListing(html);
+                    return this.files;
+                } catch (error) {
+                    console.warn('Could not access /files directory, using default files:', error);
+                    return this.getDefaultFiles();
+                }
+            }
+            
+            parseDirectoryListing(html) {
+                // Parse HTML directory listing
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const links = doc.querySelectorAll('a');
+                
+                this.files = [];
+                links.forEach(link => {
+                    const href = link.getAttribute('href');
+                    const text = link.textContent;
+                    
+                    // Skip parent directory and hidden files
+                    if (href === '../' || href.startsWith('.') || text.includes('Parent Directory')) {
+                        return;
+                    }
+                    
+                    // Check if it's a file (ends with extension) or directory
+                    const isDir = href.endsWith('/');
+                    const filename = isDir ? text : href;
+                    
+                    if (filename && !filename.startsWith('.')) {
+                        this.files.push({
+                            name: filename,
+                            path: this.filesPath + filename,
+                            isDirectory: isDir,
+                            icon: isDir ? '📁' : this.getFileIcon(filename),
+                            size: 'Unknown',
+                            lastModified: 'Unknown'
+                        });
+                    }
+                });
+                
+                // If no files found, use defaults
+                if (this.files.length === 0) {
+                    this.files = this.getDefaultFiles();
+                }
+                
+                // Update control panel preview
+                this.updateFilePreview();
+            }
+            
+            getDefaultFiles() {
+                // Default files if scanning fails
+                return [
+                    { name: 'index.html', path: '/files/index.html', isDirectory: false, icon: '🌐', size: '2.4 KB', lastModified: 'Today' },
+                    { name: 'style.css', path: '/files/style.css', isDirectory: false, icon: '🎨', size: '1.8 KB', lastModified: 'Today' },
+                    { name: 'script.js', path: '/files/script.js', isDirectory: false, icon: '📜', size: '3.1 KB', lastModified: 'Today' },
+                    { name: 'readme.md', path: '/files/readme.md', isDirectory: false, icon: '📝', size: '0.8 KB', lastModified: 'Today' },
+                    { name: 'config.json', path: '/files/config.json', isDirectory: false, icon: '📄', size: '0.5 KB', lastModified: 'Today' },
+                    { name: 'images/', path: '/files/images/', isDirectory: true, icon: '📁', size: '--', lastModified: 'Today' },
+                    { name: 'documents/', path: '/files/documents/', isDirectory: true, icon: '📁', size: '--', lastModified: 'Today' }
+                ];
+            }
+            
+            updateFilePreview() {
+                const preview = document.getElementById('file-preview');
+                if (!preview) return;
+                
+                preview.innerHTML = `<span class="system">Files Found: ${this.files.length}</span><br>`;
+                
+                this.files.slice(0, 5).forEach(file => {
+                    preview.innerHTML += `<span class="file">${file.icon} ${file.name}</span><br>`;
+                });
+                
+                if (this.files.length > 5) {
+                    preview.innerHTML += `<span class="info">...and ${this.files.length - 5} more</span>`;
+                }
+            }
+            
+            async getFileContent(filename) {
+                try {
+                    const file = this.files.find(f => f.name === filename);
+                    if (!file) {
+                        throw new Error('File not found');
+                    }
+                    
+                    const response = await fetch(file.path);
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch ${filename}`);
+                    }
+                    
+                    return await response.text();
+                } catch (error) {
+                    console.error('Error fetching file:', error);
+                    return `Error loading file: ${error.message}\n\nThis is a simulated preview of ${filename}`;
+                }
+            }
+            
+            async downloadFile(filename) {
+                try {
+                    const file = this.files.find(f => f.name === filename);
+                    if (!file) {
+                        throw new Error('File not found');
+                    }
+                    
+                    const response = await fetch(file.path);
+                    if (!response.ok) {
+                        throw new Error(`Failed to download ${filename}`);
+                    }
+                    
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    return true;
+                } catch (error) {
+                    console.error('Error downloading file:', error);
+                    return false;
+                }
+            }
+        }
+        
+        // ==============================
         // ORA TOOL SYSTEM
         // ==============================
         class ORATool {
@@ -489,65 +687,7 @@
                 this.loggedIn = false;
                 this.username = 'bertrand';
                 this.password = 'karekezi@2';
-                this.oraFiles = this.initializeFiles();
-            }
-            
-            initializeFiles() {
-                return {
-                    '/files': {
-                        type: 'dir',
-                        children: ['document1.pdf', 'image.png', 'report.docx', 'notes.txt', 
-                                   'secure_data.txt', 'config.ora', 'backup.zip', 'project_specs.md']
-                    },
-                    '/files/document1.pdf': {
-                        type: 'file',
-                        description: 'Project Documentation',
-                        size: '2.4 MB',
-                        content: 'This is a PDF document containing project documentation.'
-                    },
-                    '/files/image.png': {
-                        type: 'file',
-                        description: 'System Architecture',
-                        size: '1.8 MB',
-                        content: 'This is an image file showing system architecture.'
-                    },
-                    '/files/report.docx': {
-                        type: 'file',
-                        description: 'Quarterly Report',
-                        size: '3.1 MB',
-                        content: 'This is a Word document containing quarterly report.'
-                    },
-                    '/files/notes.txt': {
-                        type: 'file',
-                        description: 'Meeting Notes',
-                        size: '45 KB',
-                        content: 'Meeting Notes\n=============\n\nDate: 2024-01-15\nAttendees: Team ORA\n\nAgenda:\n1. Security protocols\n2. New tool development\n3. User authentication system\n\nNotes:\n- Implement two-factor auth\n- Add file encryption\n- Schedule next meeting\n\nAction Items:\n1. Bertrand: Review security\n2. Team: Test login flow'
-                    },
-                    '/files/secure_data.txt': {
-                        type: 'file',
-                        description: 'Encrypted Data',
-                        size: '128 KB',
-                        content: 'ENCRYPTED DATA - ACCESS RESTRICTED\n\nThis file contains encrypted system data.\nRequires security clearance level 3.'
-                    },
-                    '/files/config.ora': {
-                        type: 'file',
-                        description: 'System Configuration',
-                        size: '12 KB',
-                        content: 'ORA System Configuration\n=======================\n\nVersion: 2.1.0\nMode: Secure\n\n[Security]\nauth_method = enhanced\nencryption = enabled\nlog_level = debug\n\n[Network]\nport = 8080\nssl = true\n\n[User]\ndefault = bertrand\nsession_timeout = 3600'
-                    },
-                    '/files/backup.zip': {
-                        type: 'file',
-                        description: 'System Backup',
-                        size: '45 MB',
-                        content: 'This is a compressed backup file containing system data.'
-                    },
-                    '/files/project_specs.md': {
-                        type: 'file',
-                        description: 'Project Specifications',
-                        size: '89 KB',
-                        content: '# ORA Project Specifications\n\n## Overview\nAdvanced terminal environment with secure file management.\n\n## Features\n- Secure authentication\n- File encryption\n- Real-time monitoring\n- Backup systems\n\n## Security Protocols\n- Two-factor authentication\n- End-to-end encryption\n- Audit logging\n- Intrusion detection'
-                    }
-                };
+                this.fileScanner = new FileSystemScanner();
             }
             
             // ==============================
@@ -598,6 +738,8 @@
                     "   Mounting virtual filesystem...",
                     "   Initializing UI components...",
                     "[OK] Environment initialized",
+                    "[SCAN] Scanning /files directory...",
+                    `[OK] Found ${(await this.fileScanner.scanFiles()).length} files`,
                     "[WAIT] Finalizing boot process..."
                 ];
                 
@@ -750,7 +892,7 @@
             // ==============================
             // ORA TOOL ENVIRONMENT
             // ==============================
-            enterORATool() {
+            async enterORATool() {
                 this.mode = 'ora-tool';
                 this.currentPath = '/files';
                 this.currentFile = null;
@@ -758,12 +900,23 @@
                 const output = document.getElementById('terminal-output');
                 output.innerHTML = '';
                 
+                // Scan for real files
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'output';
+                loadingDiv.innerHTML = `<span class="loading"></span><span class="info">Scanning /files directory for real files...</span>`;
+                output.appendChild(loadingDiv);
+                
+                const files = await this.fileScanner.scanFiles();
+                
+                output.innerHTML = '';
+                
                 const welcomeDiv = document.createElement('div');
                 welcomeDiv.className = 'output';
                 welcomeDiv.innerHTML = `
                     <span class="hacker">Entering ORA Tool...</span><br>
                     <span class="hacker">Initializing File Workspace...</span><br>
-                    <span class="success">Active Repository: ${this.currentPath}</span><br><br>
+                    <span class="success">Active Repository: ${this.currentPath}</span><br>
+                    <span class="success">Found ${files.length} files</span><br><br>
                     <span class="info">Type "ls" to view available files.</span><br>
                     <span class="info">Type "cd filename" to open a file.</span><br>
                     <span class="info">Type "exit" to quit ORA Tool.</span>
@@ -774,17 +927,74 @@
             }
             
             // ==============================
+            // FILE LISTING
+            // ==============================
+            async listFiles() {
+                const output = document.getElementById('terminal-output');
+                output.innerHTML = '';
+                
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'output';
+                loadingDiv.innerHTML = `<span class="loading"></span><span class="info">Loading files...</span>`;
+                output.appendChild(loadingDiv);
+                
+                const files = await this.fileScanner.scanFiles();
+                
+                output.innerHTML = '';
+                
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'output';
+                headerDiv.innerHTML = `<span class="info">Repository: ${this.currentPath}</span><br>`;
+                output.appendChild(headerDiv);
+                
+                if (files.length === 0) {
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'output error';
+                    emptyDiv.textContent = 'No files found in /files directory';
+                    output.appendChild(emptyDiv);
+                } else {
+                    files.forEach(file => {
+                        const fileDiv = document.createElement('div');
+                        fileDiv.className = 'output file-item';
+                        fileDiv.innerHTML = `
+                            <span class="file-icon">${file.icon}</span>
+                            <span class="${file.isDirectory ? 'info' : 'system'}">${file.name}</span>
+                            <span class="file-size">${file.size}</span>
+                        `;
+                        output.appendChild(fileDiv);
+                    });
+                }
+                
+                const helpDiv = document.createElement('div');
+                helpDiv.className = 'output';
+                helpDiv.innerHTML = `<br><span class="system">Type "cd filename" to open a file, or "exit" to quit ORA Tool.</span>`;
+                output.appendChild(helpDiv);
+                
+                createInputLine();
+            }
+            
+            // ==============================
             // FILE MODE
             // ==============================
-            enterFileMode(fileName) {
+            async enterFileMode(fileName) {
                 this.mode = 'file-mode';
                 this.currentFile = fileName;
                 
                 const output = document.getElementById('terminal-output');
                 output.innerHTML = '';
                 
-                const filePath = `${this.currentPath}/${fileName}`;
-                const file = this.oraFiles[filePath];
+                // Show loading
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'output';
+                loadingDiv.innerHTML = `<span class="loading"></span><span class="info">Loading ${fileName}...</span>`;
+                output.appendChild(loadingDiv);
+                
+                // Get file content
+                const content = await this.fileScanner.getFileContent(fileName);
+                const files = await this.fileScanner.scanFiles();
+                const file = files.find(f => f.name === fileName);
+                
+                output.innerHTML = '';
                 
                 if (!file) {
                     const errorDiv = document.createElement('div');
@@ -799,9 +1009,9 @@
                 headerDiv.className = 'file-mode-header';
                 headerDiv.innerHTML = `
                     <span class="hacker">=== FILE MODE: ${fileName} ===</span><br>
-                    <span class="system">Type: ${file.type.toUpperCase()}</span><br>
+                    <span class="system">Path: ${file.path}</span><br>
                     <span class="system">Size: ${file.size}</span><br>
-                    <span class="system">Description: ${file.description}</span><br><br>
+                    <span class="system">Type: ${file.isDirectory ? 'DIRECTORY' : 'FILE'}</span><br><br>
                     <span class="info">Available commands:</span><br>
                     <span class="command">open</span> - Open file in new tab<br>
                     <span class="command">print</span> - Print file<br>
@@ -811,32 +1021,81 @@
                 `;
                 output.appendChild(headerDiv);
                 
-                if (file.content) {
+                if (!file.isDirectory && content) {
+                    // Show file content with syntax highlighting for code files
                     const contentDiv = document.createElement('div');
-                    contentDiv.className = 'output';
-                    contentDiv.style.background = 'rgba(0, 255, 0, 0.05)';
-                    contentDiv.style.padding = '15px';
-                    contentDiv.style.marginTop = '20px';
-                    contentDiv.style.borderRadius = '5px';
-                    contentDiv.innerHTML = `<pre style="margin:0;">${file.content}</pre>`;
+                    contentDiv.className = 'code-preview';
+                    
+                    const lines = content.split('\n');
+                    let htmlContent = '';
+                    
+                    // Simple syntax highlighting
+                    const isCodeFile = fileName.match(/\.(html|css|js|json|py|java|cpp|c|md|txt)$/i);
+                    
+                    if (isCodeFile) {
+                        lines.forEach((line, index) => {
+                            let lineContent = line;
+                            // Basic syntax highlighting
+                            if (fileName.endsWith('.html')) {
+                                lineContent = lineContent
+                                    .replace(/&/g, '&amp;')
+                                    .replace(/</g, '&lt;')
+                                    .replace(/>/g, '&gt;')
+                                    .replace(/(".*?")/g, '<span style="color:#ff6b8b;">$1</span>')
+                                    .replace(/&lt;\/?([a-zA-Z][a-zA-Z0-9]*)/g, '<span style="color:#4af626;">&lt;$1</span>');
+                            } else if (fileName.endsWith('.js')) {
+                                lineContent = lineContent
+                                    .replace(/(".*?")/g, '<span style="color:#ff6b8b;">$1</span>')
+                                    .replace(/(function|const|let|var|return|if|else|for|while)/g, '<span style="color:#4af626;">$1</span>');
+                            } else if (fileName.endsWith('.css')) {
+                                lineContent = lineContent
+                                    .replace(/([\.#]?[a-zA-Z][a-zA-Z0-9]*)\s*\{/g, '<span style="color:#4af626;">$1</span> {')
+                                    .replace(/:\s*(.*?);/g, ': <span style="color:#ffaa00;">$1</span>;');
+                            }
+                            
+                            htmlContent += `<div><span class="line-number">${(index + 1).toString().padStart(3, ' ')}</span> ${lineContent}</div>`;
+                        });
+                    } else {
+                        // Plain text display
+                        htmlContent = `<pre>${content.substring(0, 2000)}${content.length > 2000 ? '\n\n... (content truncated)' : ''}</pre>`;
+                    }
+                    
+                    contentDiv.innerHTML = htmlContent;
                     output.appendChild(contentDiv);
+                    
+                    const infoDiv = document.createElement('div');
+                    infoDiv.className = 'output';
+                    infoDiv.innerHTML = `<span class="info">File size: ${content.length} characters, ${lines.length} lines</span>`;
+                    output.appendChild(infoDiv);
+                } else if (file.isDirectory) {
+                    const dirDiv = document.createElement('div');
+                    dirDiv.className = 'output warning';
+                    dirDiv.textContent = 'This is a directory. Use "ls" to view its contents.';
+                    output.appendChild(dirDiv);
                 }
                 
                 createInputLine();
             }
             
-            executeFileCommand(command) {
+            async executeFileCommand(command) {
                 const output = document.getElementById('terminal-output');
                 const resultDiv = document.createElement('div');
                 resultDiv.className = 'output';
                 
                 switch(command) {
                     case 'open':
-                        resultDiv.innerHTML = `<span class="system">Opening ${this.currentFile} in new tab...</span>`;
-                        // Simulate opening in new tab
-                        setTimeout(() => {
-                            window.open('#', '_blank');
-                        }, 500);
+                        resultDiv.innerHTML = `<span class="loading"></span><span class="system">Opening ${this.currentFile}...</span>`;
+                        output.appendChild(resultDiv);
+                        
+                        // Try to open the actual file
+                        const files = await this.fileScanner.scanFiles();
+                        const file = files.find(f => f.name === this.currentFile);
+                        
+                        if (file && !file.isDirectory) {
+                            setTimeout(() => {
+                                window.open(file.path, '_blank');
+                            }, 500);
+                        }
                         break;
                         
                     case 'print':
@@ -847,41 +1106,31 @@
                         break;
                         
                     case 'download':
-                        resultDiv.innerHTML = `<span class="success">Starting download: ${this.currentFile}</span>`;
-                        // Simulate download
-                        setTimeout(() => {
-                            const file = this.oraFiles[`${this.currentPath}/${this.currentFile}`];
-                            const content = file.content || `Content of ${this.currentFile}`;
-                            const blob = new Blob([content], {type: 'text/plain'});
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = this.currentFile;
-                            a.click();
-                            URL.revokeObjectURL(url);
-                        }, 500);
+                        resultDiv.innerHTML = `<span class="loading"></span><span class="info">Downloading ${this.currentFile}...</span>`;
+                        output.appendChild(resultDiv);
+                        
+                        const success = await this.fileScanner.downloadFile(this.currentFile);
+                        if (success) {
+                            resultDiv.innerHTML = `<span class="success">Download started: ${this.currentFile}</span>`;
+                        } else {
+                            resultDiv.innerHTML = `<span class="error">Failed to download ${this.currentFile}</span>`;
+                        }
                         break;
                         
                     case 'view':
-                        const file = this.oraFiles[`${this.currentPath}/${this.currentFile}`];
-                        if (file.content) {
-                            output.innerHTML = '';
-                            const contentDiv = document.createElement('div');
-                            contentDiv.className = 'output';
-                            contentDiv.innerHTML = `<pre style="background:rgba(0,255,0,0.05);padding:15px;">${file.content}</pre>`;
-                            output.appendChild(contentDiv);
-                            createInputLine();
-                            return;
-                        }
-                        break;
+                        // Just show the file again
+                        this.enterFileMode(this.currentFile);
+                        return;
                         
                     case 'exit':
                         this.exitFileMode();
                         return;
                 }
                 
-                output.appendChild(resultDiv);
-                createInputLine();
+                if (command !== 'exit') {
+                    output.appendChild(resultDiv);
+                    createInputLine();
+                }
             }
             
             exitFileMode() {
@@ -893,9 +1142,7 @@
                 
                 const exitDiv = document.createElement('div');
                 exitDiv.className = 'output';
-                exitDiv.innerHTML = `
-                    <span class="system">Exiting file...</span><br>
-                `;
+                exitDiv.innerHTML = `<span class="system">Exiting file...</span>`;
                 output.appendChild(exitDiv);
                 
                 setTimeout(() => {
@@ -938,43 +1185,11 @@
                 }, 1500);
             }
             
-            listFiles() {
-                const output = document.getElementById('terminal-output');
-                output.innerHTML = '';
-                
-                const files = this.oraFiles[this.currentPath].children;
-                
-                const headerDiv = document.createElement('div');
-                headerDiv.className = 'output';
-                headerDiv.innerHTML = `<span class="info">Repository: ${this.currentPath}</span><br><br>`;
-                output.appendChild(headerDiv);
-                
-                files.forEach(fileName => {
-                    const filePath = `${this.currentPath}/${fileName}`;
-                    const file = this.oraFiles[filePath];
-                    const fileDiv = document.createElement('div');
-                    fileDiv.className = 'output file-item';
-                    fileDiv.innerHTML = `
-                        <span>${file.type === 'dir' ? '📁' : '📄'} </span>
-                        <span class="${file.type === 'dir' ? 'info' : 'system'}">${fileName}</span>
-                        <span style="margin-left: 20px; color: #00aa00;">${file.size || ''}</span>
-                    `;
-                    output.appendChild(fileDiv);
-                });
-                
-                const helpDiv = document.createElement('div');
-                helpDiv.className = 'output';
-                helpDiv.innerHTML = `<br><span class="system">Type "cd filename" to open a file, or "exit" to quit ORA Tool.</span>`;
-                output.appendChild(helpDiv);
-                
-                createInputLine();
-            }
-            
-            handleORAToolCommand(cmd, args) {
+            async handleORAToolCommand(cmd, args) {
                 const output = document.getElementById('terminal-output');
                 
                 if (cmd === 'ls') {
-                    this.listFiles();
+                    await this.listFiles();
                     return true;
                 } else if (cmd === 'cd') {
                     if (args.length === 0) {
@@ -987,8 +1202,8 @@
                     }
                     
                     const fileName = args[0];
-                    const filePath = `${this.currentPath}/${fileName}`;
-                    const file = this.oraFiles[filePath];
+                    const files = await this.fileScanner.scanFiles();
+                    const file = files.find(f => f.name === fileName);
                     
                     if (!file) {
                         const errorDiv = document.createElement('div');
@@ -999,7 +1214,17 @@
                         return true;
                     }
                     
-                    if (file.type === 'file') {
+                    if (file.isDirectory) {
+                        // For now, directories show their contents
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = 'output';
+                        msgDiv.innerHTML = `<span class="system">Opening directory: ${fileName}</span>`;
+                        output.appendChild(msgDiv);
+                        
+                        setTimeout(() => {
+                            this.enterFileMode(fileName);
+                        }, 500);
+                    } else {
                         const msgDiv = document.createElement('div');
                         msgDiv.className = 'output';
                         msgDiv.innerHTML = `<span class="system">Opening file: ${fileName}</span>`;
@@ -1008,14 +1233,14 @@
                         setTimeout(() => {
                             this.enterFileMode(fileName);
                         }, 500);
-                        return true;
                     }
+                    return true;
                 } else if (cmd === 'exit') {
                     this.exitORATool();
                     return true;
                 } else if (['open', 'print', 'download', 'view'].includes(cmd)) {
                     if (this.mode === 'file-mode') {
-                        this.executeFileCommand(cmd);
+                        await this.executeFileCommand(cmd);
                         return true;
                     } else {
                         const errorDiv = document.createElement('div');
@@ -1047,18 +1272,20 @@
                     let helpText = '<span class="info">=== ORA TERMINAL COMMANDS ===</span><br><br>';
                     helpText += '<span class="matrix">System Commands:</span><br>';
                     for (const [cmd, info] of Object.entries(commands)) {
-                        helpText += `<span class="command">${cmd}</span> - ${info.description}<br>`;
+                        if (cmd !== 'orastart') {
+                            helpText += `<span class="command">${cmd}</span> - ${info.description}<br>`;
+                        }
                     }
                     helpText += '<br><span class="matrix">ORA Tool Commands:</span><br>';
                     helpText += '<span class="command">orastart</span> - Launch secure ORA Tool<br>';
-                    helpText += '<span class="command">ls</span> - List files (in ORA Tool)<br>';
-                    helpText += '<span class="command">cd filename</span> - Open file (in ORA Tool)<br>';
+                    helpText += '<span class="command">ls</span> - List real files from /files<br>';
+                    helpText += '<span class="command">cd filename</span> - Open file/directory<br>';
                     helpText += '<span class="command">open/print/download/view</span> - File operations<br>';
                     helpText += '<span class="command">exit</span> - Exit ORA Tool<br>';
-                    helpText += '<br><span class="matrix">Terminal Controls:</span><br>';
-                    helpText += '• Drag header to move terminal<br>';
-                    helpText += '• Drag bottom-right corner to resize<br>';
-                    helpText += '• Type "color 1-12" to change matrix<br>';
+                    helpText += '<br><span class="matrix">File System:</span><br>';
+                    helpText += '• Real file scanning from /files directory<br>';
+                    helpText += '• Direct file operations<br>';
+                    helpText += '• Live preview of files<br>';
                     return helpText;
                 }
             },
@@ -1088,8 +1315,8 @@
                 description: 'Information about this terminal',
                 execute: () => {
                     return `<span class="matrix">ORA Terminal Shell v0.1</span><br>
-                    Advanced web-based terminal with ORA Tool system<br>
-                    Features: Draggable, Resizable, Mobile Optimized<br>
+                    Advanced web-based terminal with real file system<br>
+                    Features: Real file scanning, Live preview, Downloads<br>
                     Built by Bertrand • 2025`;
                 }
             },
@@ -1097,9 +1324,8 @@
                 description: 'List directory contents',
                 execute: () => {
                     if (oraTool.mode === 'normal') {
-                        return `<span class="info">Desktop/</span>   <span class="info">Documents/</span>   <span class="info">Downloads/</span><br>
-                        <span class="info">Music/</span>      <span class="info">Pictures/</span>    <span class="info">Videos/</span><br>
-                        <span class="system">config.ora</span>  <span class="system">readme.txt</span>   <span class="system">notes.md</span>`;
+                        return `<span class="info">Files are now real! Type 'orastart' to access the /files directory</span><br>
+                        <span class="info">The terminal will scan for actual files in /files/</span>`;
                     }
                     return '';
                 }
@@ -1144,16 +1370,17 @@
             },
             neofetch: {
                 description: 'Display system information',
-                execute: () => {
+                execute: async () => {
+                    const files = await oraTool.fileScanner.scanFiles();
                     return `
                     <span class="matrix">╔══════════════════════════════════════╗</span><br>
                     <span class="matrix">║        ORA TERMINAL INFO             ║</span><br>
                     <span class="matrix">╠══════════════════════════════════════╣</span><br>
                     <span class="system">║ OS: ORA Terminal Shell v0.1          ║</span><br>
                     <span class="system">║ Mode: ${oraTool.mode.toUpperCase()}                      ║</span><br>
+                    <span class="system">║ Files Found: ${files.length}                    ║</span><br>
                     <span class="system">║ Matrix: ${matrixColor}              ║</span><br>
                     <span class="system">║ Resolution: ${window.innerWidth}x${window.innerHeight}        ║</span><br>
-                    <span class="system">║ Uptime: ${Math.floor(performance.now()/1000)}s            ║</span><br>
                     <span class="matrix">╚══════════════════════════════════════╝</span>`;
                 }
             },
@@ -1167,11 +1394,11 @@
                 }
             },
             orastart: {
-                description: 'Launch secure ORA Tool environment',
+                description: 'Launch secure ORA Tool with real files',
                 execute: async () => {
                     if (oraTool.mode === 'normal') {
-                        await oraTool.startBootSequence();
-                        return '';
+                        const result = await commands.orastart.execute();
+                        return result;
                     } else {
                         return '<span class="error">Please authenticate using "orastart"</span>';
                     }
@@ -1291,7 +1518,7 @@
             } else {
                 // Check if in ORA Tool mode
                 if (oraTool.mode === 'ora-tool' || oraTool.mode === 'file-mode') {
-                    const handled = oraTool.handleORAToolCommand(cmd, args);
+                    const handled = await oraTool.handleORAToolCommand(cmd, args);
                     if (handled) {
                         return;
                     }
@@ -1322,180 +1549,11 @@
         }
         
         // ==============================
-        // DRAGGABLE & RESIZABLE TERMINAL
-        // ==============================
-        let isDragging = false;
-        let isResizing = false;
-        let startX, startY;
-        let startWidth, startHeight;
-        let startLeft, startTop;
-        
-        // Dragging functionality
-        terminalHeader.addEventListener('mousedown', startDrag);
-        terminalHeader.addEventListener('touchstart', startDragTouch);
-        
-        function startDrag(e) {
-            isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            startLeft = parseInt(getComputedStyle(terminalContainer).left);
-            startTop = parseInt(getComputedStyle(terminalContainer).top);
-            
-            document.addEventListener('mousemove', drag);
-            document.addEventListener('mouseup', stopDrag);
-        }
-        
-        function startDragTouch(e) {
-            if (e.touches.length === 1) {
-                isDragging = true;
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
-                startLeft = parseInt(getComputedStyle(terminalContainer).left);
-                startTop = parseInt(getComputedStyle(terminalContainer).top);
-                
-                document.addEventListener('touchmove', dragTouch);
-                document.addEventListener('touchend', stopDragTouch);
-            }
-        }
-        
-        function drag(e) {
-            if (!isDragging) return;
-            e.preventDefault();
-            
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
-            
-            let newLeft = startLeft + dx;
-            let newTop = startTop + dy;
-            
-            // Boundary checking
-            const maxX = window.innerWidth - terminalContainer.offsetWidth;
-            const maxY = window.innerHeight - terminalContainer.offsetHeight;
-            
-            newLeft = Math.max(0, Math.min(newLeft, maxX));
-            newTop = Math.max(0, Math.min(newTop, maxY));
-            
-            terminalContainer.style.left = newLeft + 'px';
-            terminalContainer.style.top = newTop + 'px';
-            terminalContainer.style.transform = 'none';
-        }
-        
-        function dragTouch(e) {
-            if (!isDragging || e.touches.length !== 1) return;
-            e.preventDefault();
-            
-            const dx = e.touches[0].clientX - startX;
-            const dy = e.touches[0].clientY - startY;
-            
-            let newLeft = startLeft + dx;
-            let newTop = startTop + dy;
-            
-            // Boundary checking for mobile
-            const maxX = window.innerWidth - terminalContainer.offsetWidth;
-            const maxY = window.innerHeight - terminalContainer.offsetHeight;
-            
-            newLeft = Math.max(0, Math.min(newLeft, maxX));
-            newTop = Math.max(0, Math.min(newTop, maxY));
-            
-            terminalContainer.style.left = newLeft + 'px';
-            terminalContainer.style.top = newTop + 'px';
-            terminalContainer.style.transform = 'none';
-        }
-        
-        function stopDrag() {
-            isDragging = false;
-            document.removeEventListener('mousemove', drag);
-            document.removeEventListener('mouseup', stopDrag);
-        }
-        
-        function stopDragTouch() {
-            isDragging = false;
-            document.removeEventListener('touchmove', dragTouch);
-            document.removeEventListener('touchend', stopDragTouch);
-        }
-        
-        // Resizing functionality
-        const resizeHandle = document.querySelector('.resize-handle');
-        resizeHandle.addEventListener('mousedown', startResize);
-        resizeHandle.addEventListener('touchstart', startResizeTouch);
-        
-        function startResize(e) {
-            isResizing = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            startWidth = parseInt(getComputedStyle(terminalContainer).width);
-            startHeight = parseInt(getComputedStyle(terminalContainer).height);
-            
-            document.addEventListener('mousemove', resize);
-            document.addEventListener('mouseup', stopResize);
-        }
-        
-        function startResizeTouch(e) {
-            if (e.touches.length === 1) {
-                isResizing = true;
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
-                startWidth = parseInt(getComputedStyle(terminalContainer).width);
-                startHeight = parseInt(getComputedStyle(terminalContainer).height);
-                
-                document.addEventListener('touchmove', resizeTouch);
-                document.addEventListener('touchend', stopResizeTouch);
-            }
-        }
-        
-        function resize(e) {
-            if (!isResizing) return;
-            e.preventDefault();
-            
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
-            
-            let newWidth = Math.max(400, startWidth + dx);
-            let newHeight = Math.max(300, startHeight + dy);
-            
-            // Limit to viewport
-            newWidth = Math.min(newWidth, window.innerWidth - parseInt(terminalContainer.style.left || 0));
-            newHeight = Math.min(newHeight, window.innerHeight - parseInt(terminalContainer.style.top || 0));
-            
-            terminalContainer.style.width = newWidth + 'px';
-            terminalContainer.style.height = newHeight + 'px';
-        }
-        
-        function resizeTouch(e) {
-            if (!isResizing || e.touches.length !== 1) return;
-            e.preventDefault();
-            
-            const dx = e.touches[0].clientX - startX;
-            const dy = e.touches[0].clientY - startY;
-            
-            let newWidth = Math.max(300, startWidth + dx);
-            let newHeight = Math.max(400, startHeight + dy);
-            
-            // Mobile limits
-            newWidth = Math.min(newWidth, window.innerWidth);
-            newHeight = Math.min(newHeight, window.innerHeight);
-            
-            terminalContainer.style.width = newWidth + 'px';
-            terminalContainer.style.height = newHeight + 'px';
-        }
-        
-        function stopResize() {
-            isResizing = false;
-            document.removeEventListener('mousemove', resize);
-            document.removeEventListener('mouseup', stopResize);
-        }
-        
-        function stopResizeTouch() {
-            isResizing = false;
-            document.removeEventListener('touchmove', resizeTouch);
-            document.removeEventListener('touchend', stopResizeTouch);
-        }
-        
-        // ==============================
         // CONTROL PANEL FUNCTIONS
         // ==============================
         const hidePanelBtn = document.getElementById('hide-panel');
         const resetBtn = document.getElementById('reset-terminal');
+        const refreshBtn = document.getElementById('refresh-files');
         const controlPanel = document.querySelector('.control-panel');
         
         // Hide/show panel
@@ -1521,6 +1579,22 @@
             setTimeout(() => {
                 terminalContainer.classList.remove('terminal-start-animation');
             }, 500);
+        });
+        
+        // Refresh files
+        refreshBtn.addEventListener('click', async () => {
+            const files = await oraTool.fileScanner.scanFiles();
+            const preview = document.getElementById('file-preview');
+            preview.innerHTML = `<span class="success">Files refreshed!</span><br>
+            <span class="system">Found ${files.length} files</span><br>`;
+            
+            files.slice(0, 3).forEach(file => {
+                preview.innerHTML += `<span class="file">${file.icon} ${file.name}</span><br>`;
+            });
+            
+            if (files.length > 3) {
+                preview.innerHTML += `<span class="info">...and ${files.length - 3} more</span>`;
+            }
         });
         
         // Window buttons
@@ -1554,10 +1628,13 @@
         // ==============================
         // INITIALIZATION
         // ==============================
-        function init() {
+        async function init() {
             // Initialize matrix
             initMatrix();
             let matrixInterval = setInterval(drawMatrix, 50);
+            
+            // Scan for files on startup
+            await oraTool.fileScanner.scanFiles();
             
             // Initialize terminal
             createInputLine();

@@ -147,9 +147,6 @@
         .warning { color: #ffb86c; }
         .matrix { color: #00ff9d; }
         .hacker { color: #00ff00; }
-        .file { color: #ffaa00; }
-        .link { color: #00aaff; }
-        .ora { color: #9d00ff; }
         .scan { color: #ff00ff; }
         .crypto { color: #ffff00; }
         
@@ -167,24 +164,6 @@
         @keyframes blink {
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0; }
-        }
-        
-        /* Scrollbar */
-        .terminal-body::-webkit-scrollbar {
-            width: 10px;
-        }
-        
-        .terminal-body::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .terminal-body::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-        }
-        
-        .terminal-body::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.3);
         }
         
         /* Resize Handle */
@@ -236,29 +215,6 @@
             to { transform: rotate(360deg); }
         }
         
-        /* Mobile Optimizations */
-        @media (max-width: 768px) {
-            .terminal-container {
-                width: 95vw !important;
-                height: 80vh !important;
-                position: fixed !important;
-                top: 10vh !important;
-                left: 2.5vw !important;
-                transform: none !important;
-                min-width: 300px !important;
-                min-height: 400px !important;
-                resize: none;
-            }
-            
-            .terminal-header {
-                padding: 10px 15px;
-            }
-            
-            .terminal-body {
-                padding: 15px;
-            }
-        }
-        
         /* Terminal Startup Animation */
         @keyframes terminalStart {
             0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
@@ -268,84 +224,6 @@
         .terminal-start-animation {
             animation: terminalStart 0.5s ease-out;
         }
-        
-        /* Glitch effect */
-        .glitch {
-            position: relative;
-            display: inline-block;
-        }
-        
-        .glitch::before,
-        .glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .glitch::before {
-            left: 2px;
-            text-shadow: -2px 0 #ff00ff;
-            clip: rect(24px, 550px, 90px, 0);
-            animation: glitch-anim 5s infinite linear alternate-reverse;
-        }
-        
-        .glitch::after {
-            left: -2px;
-            text-shadow: -2px 0 #00ffff;
-            clip: rect(85px, 550px, 140px, 0);
-            animation: glitch-anim2 1s infinite linear alternate-reverse;
-        }
-        
-        @keyframes glitch-anim {
-            0% { clip: rect(42px, 9999px, 44px, 0); }
-            5% { clip: rect(12px, 9999px, 59px, 0); }
-            10% { clip: rect(48px, 9999px, 29px, 0); }
-            15% { clip: rect(42px, 9999px, 73px, 0); }
-            20% { clip: rect(63px, 9999px, 27px, 0); }
-            25% { clip: rect(34px, 9999px, 55px, 0); }
-            30% { clip: rect(86px, 9999px, 73px, 0); }
-            35% { clip: rect(20px, 9999px, 20px, 0); }
-            40% { clip: rect(26px, 9999px, 60px, 0); }
-            45% { clip: rect(25px, 9999px, 66px, 0); }
-            50% { clip: rect(57px, 9999px, 98px, 0); }
-            55% { clip: rect(5px, 9999px, 46px, 0); }
-            60% { clip: rect(82px, 9999px, 31px, 0); }
-            65% { clip: rect(54px, 9999px, 27px, 0); }
-            70% { clip: rect(28px, 9999px, 99px, 0); }
-            75% { clip: rect(45px, 9999px, 69px, 0); }
-            80% { clip: rect(23px, 9999px, 85px, 0); }
-            85% { clip: rect(54px, 9999px, 84px, 0); }
-            90% { clip: rect(45px, 9999px, 47px, 0); }
-            95% { clip: rect(37px, 9999px, 20px, 0); }
-            100% { clip: rect(4px, 9999px, 91px, 0); }
-        }
-        
-        @keyframes glitch-anim2 {
-            0% { clip: rect(65px, 9999px, 100px, 0); }
-            5% { clip: rect(52px, 9999px, 74px, 0); }
-            10% { clip: rect(79px, 9999px, 85px, 0); }
-            15% { clip: rect(75px, 9999px, 5px, 0); }
-            20% { clip: rect(67px, 9999px, 61px, 0); }
-            25% { clip: rect(14px, 9999px, 79px, 0); }
-            30% { clip: rect(1px, 9999px, 66px, 0); }
-            35% { clip: rect(86px, 9999px, 30px, 0); }
-            40% { clip: rect(23px, 9999px, 98px, 0); }
-            45% { clip: rect(85px, 9999px, 72px, 0); }
-            50% { clip: rect(71px, 9999px, 75px, 0); }
-            55% { clip: rect(2px, 9999px, 48px, 0); }
-            60% { clip: rect(30px, 9999px, 16px, 0); }
-            65% { clip: rect(59px, 9999px, 50px, 0); }
-            70% { clip: rect(41px, 9999px, 62px, 0); }
-            75% { clip: rect(2px, 9999px, 82px, 0); }
-            80% { clip: rect(47px, 9999px, 73px, 0); }
-            85% { clip: rect(3px, 9999px, 27px, 0); }
-            90% { clip: rect(40px, 9999px, 86px, 0); }
-            95% { clip: rect(45px, 9999px, 72px, 0); }
-            100% { clip: rect(23px, 9999px, 49px, 0); }
-        }
     </style>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
 </head>
@@ -354,7 +232,7 @@
     <canvas id="matrix-canvas"></canvas>
     
     <!-- Terminal Window -->
-    <div class="terminal-container terminal-start-animation">
+    <div class="terminal-container terminal-start-animation" id="terminal-window">
         <div class="terminal-header" id="terminal-header">
             <div class="header-left">
                 <div class="terminal-buttons">
@@ -362,7 +240,7 @@
                     <div class="terminal-button minimize" id="minimize-btn"></div>
                     <div class="terminal-button maximize" id="maximize-btn"></div>
                 </div>
-                <div class="terminal-title">ora@terminal:~</div>
+                <div class="terminal-title" id="terminal-title">ora@terminal:~</div>
             </div>
         </div>
         
@@ -376,191 +254,136 @@
 
     <script>
         // ==============================
-        // MATRIX ANIMATION
+        // MAIN APPLICATION
         // ==============================
-        const canvas = document.getElementById('matrix-canvas');
-        const ctx = canvas.getContext('2d');
-        let matrixColor = '#00ff9d';
-        
-        const matrixColors = [
-            '#00ff9d', '#4af626', '#00ffff', '#ff00ff',
-            '#ffaa00', '#ff5555', '#ffffff', '#9d00ff',
-            '#00aaff', '#ffff00', '#ff6b8b', '#00ff00'
-        ];
-        
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        
-        const chars = "01アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン";
-        const charArray = chars.split("");
-        const fontSize = 14;
-        let columns = 0;
-        let drops = [];
-        
-        function initMatrix() {
-            resizeCanvas();
-            columns = Math.floor(canvas.width / fontSize);
-            drops = [];
-            for(let i = 0; i < columns; i++) {
-                drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
-            }
-        }
-        
-        function drawMatrix() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        (function() {
+            'use strict';
             
-            ctx.font = fontSize + 'px "Courier New", monospace';
+            // Global variables
+            var matrixColor = '#00ff9d';
+            var commandHistory = [];
+            var historyIndex = 0;
+            var isDragging = false;
+            var dragOffset = { x: 0, y: 0 };
             
-            for(let i = 0; i < drops.length; i++) {
-                const char = charArray[Math.floor(Math.random() * charArray.length)];
-                const opacity = Math.random() * 0.5 + 0.5;
-                ctx.fillStyle = matrixColor.replace(')', ', ' + opacity + ')').replace('rgb', 'rgba');
-                ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-                drops[i]++;
-                
-                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-            }
-        }
-        
-        // ==============================
-        // HACKER-STYLE BOOT SEQUENCE
-        // ==============================
-        async function runBootSequence() {
-            const terminalOutput = document.getElementById('terminal-output');
-            terminalOutput.innerHTML = '';
+            // DOM Elements
+            var canvas = document.getElementById('matrix-canvas');
+            var ctx = canvas.getContext('2d');
+            var terminalOutput = document.getElementById('terminal-output');
+            var terminalContainer = document.getElementById('terminal-window');
+            var terminalHeader = document.getElementById('terminal-header');
             
-            const bootMessages = [
-                {text: "[SYSTEM] Initializing ORA Secure Terminal v2.0", delay: 100},
-                {text: "[BIOS] Scanning hardware components...", delay: 80},
-                {text: "[OK] CPU: Intel Xeon E5-2699 v4 @ 2.20GHz (44 cores)", delay: 60},
-                {text: "[OK] RAM: 128GB DDR4 @ 2400MHz", delay: 60},
-                {text: "[OK] Storage: 4TB NVMe SSD", delay: 60},
-                {text: "[OK] GPU: NVIDIA RTX 4090 (24GB VRAM)", delay: 60},
-                {text: "[NET] Establishing secure connection...", delay: 100},
-                {text: "[NET] Interface eth0: 192.168.1.100/24", delay: 80},
-                {text: "[NET] Gateway: 192.168.1.1", delay: 80},
-                {text: "[NET] DNS: 8.8.8.8, 8.8.4.4", delay: 80},
-                {text: "[SECURE] Loading encryption modules...", delay: 120},
-                {text: "[OK] AES-256 encryption initialized", delay: 60},
-                {text: "[OK] RSA-4096 key pair generated", delay: 60},
-                {text: "[OK] SHA-512 hash algorithm ready", delay: 60},
-                {text: "[SYSTEM] Mounting file systems...", delay: 100},
-                {text: "[OK] /dev/sda1 mounted on /", delay: 60},
-                {text: "[OK] /dev/sda2 mounted on /home", delay: 60},
-                {text: "[OK] /dev/sdb1 mounted on /ora", delay: 60},
-                {text: "[KERNEL] Loading security modules...", delay: 120},
-                {text: "[OK] SELinux: Enforcing mode", delay: 60},
-                {text: "[OK] AppArmor: Active", delay: 60},
-                {text: "[OK] Firewall: iptables loaded", delay: 60},
-                {text: "[NETWORK] Starting services...", delay: 100},
-                {text: "[OK] SSH: Secure shell daemon", delay: 60},
-                {text: "[OK] VPN: OpenVPN established", delay: 60},
-                {text: "[OK] Tor: Onion routing enabled", delay: 60},
-                {text: "[CRYPTO] Generating secure certificates...", delay: 150},
-                {text: "[OK] SSL/TLS certificates verified", delay: 80},
-                {text: "[OK] Let's Encrypt integration complete", delay: 80},
-                {text: "[SYSTEM] Starting user sessions...", delay: 120},
-                {text: "[OK] X11 display server started", delay: 80},
-                {text: "[OK] Window manager: i3-gaps", delay: 80},
-                {text: "[OK] Terminal: ORA Terminal v2.0", delay: 80},
-                {text: "[SECURITY] Running penetration tests...", delay: 150},
-                {text: "[SCAN] Port scanning local network...", delay: 100},
-                {text: "[SCAN] Vulnerability assessment...", delay: 100},
-                {text: "[SCAN] Intrusion detection system check...", delay: 100},
-                {text: "[OK] Security status: OPTIMAL", delay: 80},
-                {text: "[NETWORK] Testing external connections...", delay: 120},
-                {text: "[PING] google.com: 12ms", delay: 60},
-                {text: "[PING] github.com: 28ms", delay: 60},
-                {text: "[PING] 1.1.1.1: 8ms", delay: 60},
-                {text: "[SYSTEM] Finalizing startup...", delay: 150},
-                {text: "[OK] All systems operational", delay: 80},
-                {text: "[OK] Security level: MAXIMUM", delay: 80},
-                {text: "[OK] Connection: ENCRYPTED", delay: 80},
-                {text: "[OK] Ready for commands", delay: 100}
+            // Color definitions
+            var matrixColors = [
+                '#00ff9d', '#4af626', '#00ffff', '#ff00ff',
+                '#ffaa00', '#ff5555', '#ffffff', '#9d00ff',
+                '#00aaff', '#ffff00', '#ff6b8b', '#00ff00'
             ];
             
-            // Add glitch effect randomly
-            function addGlitchEffect() {
-                if (Math.random() > 0.7) {
-                    const glitchDiv = document.createElement('div');
-                    glitchDiv.className = 'output scan';
-                    glitchDiv.style.color = '#ff00ff';
-                    glitchDiv.textContent = '▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒';
-                    terminalOutput.appendChild(glitchDiv);
-                    setTimeout(() => glitchDiv.remove(), 200);
+            // Matrix animation variables
+            var chars = "01アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン";
+            var charArray = chars.split("");
+            var fontSize = 14;
+            var columns = 0;
+            var drops = [];
+            
+            // ==============================
+            // MATRIX ANIMATION
+            // ==============================
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            
+            function initMatrix() {
+                resizeCanvas();
+                columns = Math.floor(canvas.width / fontSize);
+                drops = [];
+                for(var i = 0; i < columns; i++) {
+                    drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
                 }
             }
             
-            // Add loading animation
-            function addLoadingLine(text) {
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'output';
-                loadingDiv.innerHTML = '<span class="loading"></span><span class="hacker">' + text + '</span>';
-                terminalOutput.appendChild(loadingDiv);
-                return loadingDiv;
-            }
-            
-            // Simulate progress bar
-            function addProgressBar(percent) {
-                const barDiv = document.createElement('div');
-                barDiv.className = 'output';
-                const barLength = 20;
-                const filled = Math.floor(percent/5);
-                const empty = barLength - filled;
-                const bar = '█'.repeat(filled) + '░'.repeat(empty);
-                barDiv.innerHTML = '<span class="crypto">[' + bar + '] ' + percent + '%</span>';
-                terminalOutput.appendChild(barDiv);
-                return barDiv;
-            }
-            
-            // Main boot sequence
-            for (let i = 0; i < bootMessages.length; i++) {
-                const msg = bootMessages[i];
+            function drawMatrix() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                // Add glitch effect randomly
-                if (i % 5 === 0) addGlitchEffect();
+                ctx.font = fontSize + 'px "Courier New", monospace';
                 
-                // Special handling for certain messages
-                if (msg.text.includes("Scanning hardware")) {
-                    const loadingDiv = addLoadingLine(msg.text);
-                    await new Promise(resolve => setTimeout(resolve, 300));
-                    loadingDiv.innerHTML = '<span class="success">Hardware scan COMPLETE <span class="matrix">COMPLETE</span></span>';
-                }
-                else if (msg.text.includes("Establishing secure connection")) {
-                    const loadingDiv = addLoadingLine(msg.text);
-                    await new Promise(resolve => setTimeout(resolve, 400));
-                    loadingDiv.innerHTML = '<span class="success">Secure connection ESTABLISHED <span class="matrix">ESTABLISHED</span></span>';
-                }
-                else if (msg.text.includes("Loading encryption modules")) {
-                    const loadingDiv = addLoadingLine(msg.text);
-                    for (let p = 0; p <= 100; p += 10) {
-                        const progressDiv = addProgressBar(p);
-                        await new Promise(resolve => setTimeout(resolve, 50));
-                        if (p < 100) progressDiv.remove();
+                for(var i = 0; i < drops.length; i++) {
+                    var char = charArray[Math.floor(Math.random() * charArray.length)];
+                    var opacity = Math.random() * 0.5 + 0.5;
+                    ctx.fillStyle = matrixColor.replace(')', ', ' + opacity + ')').replace('rgb', 'rgba');
+                    ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+                    drops[i]++;
+                    
+                    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
                     }
-                    loadingDiv.innerHTML = '<span class="success">' + msg.text + ' <span class="matrix">ENCRYPTED</span></span>';
                 }
-                else if (msg.text.includes("Running penetration tests")) {
-                    const loadingDiv = addLoadingLine(msg.text);
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    // Simulate scanning
-                    for (let scan = 1; scan <= 5; scan++) {
-                        const scanDiv = document.createElement('div');
-                        scanDiv.className = 'output scan';
-                        scanDiv.textContent = '[SCAN] Testing exploit ' + scan + '/5...';
-                        terminalOutput.appendChild(scanDiv);
-                        await new Promise(resolve => setTimeout(resolve, 100));
-                    }
-                    loadingDiv.innerHTML = '<span class="success">' + msg.text + ' <span class="matrix">PASSED</span></span>';
-                }
-                else {
-                    // Normal message
-                    const line = document.createElement('div');
+            }
+            
+            // ==============================
+            // BOOT SEQUENCE
+            // ==============================
+            async function runBootSequence() {
+                terminalOutput.innerHTML = '';
+                
+                var bootMessages = [
+                    {text: "[SYSTEM] Initializing ORA Secure Terminal v2.0", delay: 100},
+                    {text: "[BIOS] Scanning hardware components...", delay: 80},
+                    {text: "[OK] CPU: Intel Xeon E5-2699 v4 @ 2.20GHz (44 cores)", delay: 60},
+                    {text: "[OK] RAM: 128GB DDR4 @ 2400MHz", delay: 60},
+                    {text: "[OK] Storage: 4TB NVMe SSD", delay: 60},
+                    {text: "[OK] GPU: NVIDIA RTX 4090 (24GB VRAM)", delay: 60},
+                    {text: "[NET] Establishing secure connection...", delay: 100},
+                    {text: "[NET] Interface eth0: 192.168.1.100/24", delay: 80},
+                    {text: "[NET] Gateway: 192.168.1.1", delay: 80},
+                    {text: "[NET] DNS: 8.8.8.8, 8.8.4.4", delay: 80},
+                    {text: "[SECURE] Loading encryption modules...", delay: 120},
+                    {text: "[OK] AES-256 encryption initialized", delay: 60},
+                    {text: "[OK] RSA-4096 key pair generated", delay: 60},
+                    {text: "[OK] SHA-512 hash algorithm ready", delay: 60},
+                    {text: "[SYSTEM] Mounting file systems...", delay: 100},
+                    {text: "[OK] /dev/sda1 mounted on /", delay: 60},
+                    {text: "[OK] /dev/sda2 mounted on /home", delay: 60},
+                    {text: "[OK] /dev/sdb1 mounted on /ora", delay: 60},
+                    {text: "[KERNEL] Loading security modules...", delay: 120},
+                    {text: "[OK] SELinux: Enforcing mode", delay: 60},
+                    {text: "[OK] AppArmor: Active", delay: 60},
+                    {text: "[OK] Firewall: iptables loaded", delay: 60},
+                    {text: "[NETWORK] Starting services...", delay: 100},
+                    {text: "[OK] SSH: Secure shell daemon", delay: 60},
+                    {text: "[OK] VPN: OpenVPN established", delay: 60},
+                    {text: "[OK] Tor: Onion routing enabled", delay: 60},
+                    {text: "[CRYPTO] Generating secure certificates...", delay: 150},
+                    {text: "[OK] SSL/TLS certificates verified", delay: 80},
+                    {text: "[OK] Let's Encrypt integration complete", delay: 80},
+                    {text: "[SYSTEM] Starting user sessions...", delay: 120},
+                    {text: "[OK] X11 display server started", delay: 80},
+                    {text: "[OK] Window manager: i3-gaps", delay: 80},
+                    {text: "[OK] Terminal: ORA Terminal v2.0", delay: 80},
+                    {text: "[SECURITY] Running penetration tests...", delay: 150},
+                    {text: "[SCAN] Port scanning local network...", delay: 100},
+                    {text: "[SCAN] Vulnerability assessment...", delay: 100},
+                    {text: "[SCAN] Intrusion detection system check...", delay: 100},
+                    {text: "[OK] Security status: OPTIMAL", delay: 80},
+                    {text: "[NETWORK] Testing external connections...", delay: 120},
+                    {text: "[PING] google.com: 12ms", delay: 60},
+                    {text: "[PING] github.com: 28ms", delay: 60},
+                    {text: "[PING] 1.1.1.1: 8ms", delay: 60},
+                    {text: "[SYSTEM] Finalizing startup...", delay: 150},
+                    {text: "[OK] All systems operational", delay: 80},
+                    {text: "[OK] Security level: MAXIMUM", delay: 80},
+                    {text: "[OK] Connection: ENCRYPTED", delay: 80},
+                    {text: "[OK] Ready for commands", delay: 100}
+                ];
+                
+                // Main boot sequence
+                for (var i = 0; i < bootMessages.length; i++) {
+                    var msg = bootMessages[i];
+                    
+                    var line = document.createElement('div');
                     line.className = 'output hacker';
                     
                     // Add random color effects
@@ -568,478 +391,454 @@
                         line.style.color = matrixColors[Math.floor(Math.random() * matrixColors.length)];
                     }
                     
-                    // Add random speed variations
-                    const speedVariation = Math.random() * 40 + 40;
-                    
                     line.textContent = msg.text;
                     terminalOutput.appendChild(line);
                     
-                    await new Promise(resolve => setTimeout(resolve, speedVariation));
+                    await new Promise(function(resolve) {
+                        setTimeout(resolve, msg.delay);
+                    });
+                    
+                    terminalOutput.scrollTop = terminalOutput.scrollHeight;
                 }
                 
-                // Scroll to bottom
+                // Final message
+                await new Promise(function(resolve) {
+                    setTimeout(resolve, 500);
+                });
+                
+                var welcomeDiv = document.createElement('div');
+                welcomeDiv.className = 'output';
+                welcomeDiv.innerHTML = '<br>' +
+                    '<span class="hacker">╔══════════════════════════════════════════════════════════╗</span><br>' +
+                    '<span class="hacker">║                    ORA TERMINAL v2.0                     ║</span><br>' +
+                    '<span class="hacker">║                 SECURE ACCESS VERIFIED                   ║</span><br>' +
+                    '<span class="hacker">║                 USER: ora                                ║</span><br>' +
+                    '<span class="hacker">║                 SECURITY LEVEL: MAXIMUM                  ║</span><br>' +
+                    '<span class="hacker">║                 CONNECTION: ENCRYPTED                    ║</span><br>' +
+                    '<span class="hacker">╚══════════════════════════════════════════════════════════╝</span><br><br>' +
+                    '<span class="info">Type \'help\' for available commands</span><br>' +
+                    '<span class="info">Type \'orastart\' to launch ORA Tool (opens in new window)</span><br>' +
+                    '<span class="info">Type \'clear\' to clear terminal screen</span><br><br>' +
+                    '<span class="warning">⚠️ All activities are logged and monitored</span><br>';
+                terminalOutput.appendChild(welcomeDiv);
+                
+                // Create first input line
+                createInputLine();
+            }
+            
+            // ==============================
+            // COMMAND SYSTEM
+            // ==============================
+            var commands = {
+                help: {
+                    description: 'Show all available commands',
+                    execute: function(args) {
+                        var helpText = '<span class="hacker">Available commands:</span><br><br>';
+                        helpText += '<span class="command">orastart</span>      - Launch ORA Tool (opens new window)<br>';
+                        helpText += '<span class="command">clear</span>         - Clear the terminal screen<br>';
+                        helpText += '<span class="command">date</span>          - Show current date and time<br>';
+                        helpText += '<span class="command">echo [text]</span>   - Display a line of text<br>';
+                        helpText += '<span class="command">whoami</span>        - Print effective userid<br>';
+                        helpText += '<span class="command">pwd</span>           - Print working directory<br>';
+                        helpText += '<span class="command">ls</span>            - List directory contents<br>';
+                        helpText += '<span class="command">neofetch</span>      - Display system information<br>';
+                        helpText += '<span class="command">uname</span>         - Print system information<br>';
+                        helpText += '<span class="command">uptime</span>        - Tell how long system has been running<br>';
+                        helpText += '<span class="command">cal</span>           - Display a calendar<br>';
+                        helpText += '<span class="command">color [1-12]</span>  - Change matrix color<br>';
+                        helpText += '<span class="command">reboot</span>        - Restart terminal<br>';
+                        helpText += '<span class="command">about</span>         - About this terminal<br>';
+                        helpText += '<br><span class="info">Use TAB for auto-completion and ↑↓ for command history</span>';
+                        return helpText;
+                    }
+                },
+                
+                orastart: {
+                    description: 'Launch ORA Tool',
+                    execute: function(args) {
+                        setTimeout(function() {
+                            window.open('oratool.html', '_blank', 'width=1200,height=800');
+                        }, 500);
+                        return '<span class="success">Launching ORA Tool in new window...</span>';
+                    }
+                },
+                
+                clear: {
+                    description: 'Clear the terminal screen',
+                    execute: function(args) {
+                        setTimeout(function() {
+                            terminalOutput.innerHTML = '';
+                            createInputLine();
+                        }, 10);
+                        return '';
+                    }
+                },
+                
+                date: {
+                    description: 'Show current date and time',
+                    execute: function(args) {
+                        var now = new Date();
+                        return now.toLocaleString();
+                    }
+                },
+                
+                echo: {
+                    description: 'Echo back the input text',
+                    execute: function(args) {
+                        return args.join(' ');
+                    }
+                },
+                
+                whoami: {
+                    description: 'Print effective userid',
+                    execute: function(args) {
+                        return 'ora';
+                    }
+                },
+                
+                pwd: {
+                    description: 'Print working directory',
+                    execute: function(args) {
+                        return '/home/ora';
+                    }
+                },
+                
+                ls: {
+                    description: 'List directory contents',
+                    execute: function(args) {
+                        if (args[0] === '-la') {
+                            return 'total 128<br>' +
+                                   'drwxr-xr-x 18 ora ora  4096 Dec 12 10:30 .<br>' +
+                                   'drwxr-xr-x  3 root root 4096 Dec 12 09:15 ..<br>' +
+                                   '-rw-r--r--  1 ora ora   220 Dec 12 09:15 .bash_logout<br>' +
+                                   '-rw-r--r--  1 ora ora  3771 Dec 12 09:15 .bashrc<br>' +
+                                   'drwx------ 15 ora ora  4096 Dec 12 10:25 .cache<br>' +
+                                   'drwx------ 12 ora ora  4096 Dec 12 10:20 .config<br>' +
+                                   'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Desktop<br>' +
+                                   'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Documents<br>' +
+                                   'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Downloads<br>' +
+                                   '-rw-r--r--  1 ora ora   807 Dec 12 09:15 .profile<br>' +
+                                   'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Public<br>' +
+                                   '-rw-r--r--  1 ora ora     0 Dec 12 09:15 .sudo_as_admin_successful<br>' +
+                                   'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Templates<br>' +
+                                   'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Videos<br>' +
+                                   '-rw-r--r--  1 ora ora    46 Dec 12 09:15 .wget-hsts';
+                        }
+                        return 'Desktop    Downloads  Music     Public     oratool.html<br>' +
+                               'Documents  Pictures   Videos    data.json';
+                    }
+                },
+                
+                neofetch: {
+                    description: 'Display system information',
+                    execute: function(args) {
+                        return '' +
+                        '<span class="hacker">        .-/+oossssoo+/-.               <span class="info">ora@terminal</span></span><br>' +
+                        '<span class="hacker">    `:+ssssssssssssssssss+:`           -------------</span><br>' +
+                        '<span class="hacker">  -+ssssssssssssssssssyyssss+-         <span class="info">OS: ORA Terminal Kali v2.0</span></span><br>' +
+                        '<span class="hacker"> .ossssssssssssssssssdMMMNysssso.       <span class="info">Host: ORA Secure Server</span></span><br>' +
+                        '<span class="hacker"> /ssssssssssshdmmNNmmyNMMMMhssssss/      <span class="info">Kernel: 6.1.0-kali5-amd64</span></span><br>' +
+                        '<span class="hacker"> +ssssssssshmydMMMMMMMNddddysssssss+     <span class="info">Uptime: 15 mins</span></span><br>' +
+                        '<span class="hacker"> /sssssssshNMMMyhhyyyyhmNMMMNhssssss/    <span class="info">Shell: ora-terminal v2.0</span></span><br>' +
+                        '<span class="hacker"> .ossssssssdMMMNhsssssssssshNMMMdssssso.  <span class="info">Terminal: ORA Terminal</span></span><br>' +
+                        '<span class="hacker">  -+sssssssshyyysssssssssssssyyyyssss+-  <span class="info">CPU: Xeon E5-2699 v4 (44) @ 2.20GHz</span></span><br>' +
+                        '<span class="hacker">    `:+ssssssssssssssssssssssssssss+:`   <span class="info">Memory: 128GiB</span></span><br>' +
+                        '<span class="hacker">        .-/+oossssoo+/-.</span>';
+                    }
+                },
+                
+                uname: {
+                    description: 'Print system information',
+                    execute: function(args) {
+                        if (args[0] === '-a') {
+                            return 'Linux terminal 6.1.0-kali5-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.12-1kali2 (2023-02-23) x86_64 GNU/Linux';
+                        }
+                        return 'Linux';
+                    }
+                },
+                
+                uptime: {
+                    description: 'Tell how long system has been running',
+                    execute: function(args) {
+                        return ' 10:45:23 up 15 min,  1 user,  load average: 0.15, 0.08, 0.03';
+                    }
+                },
+                
+                cal: {
+                    description: 'Display a calendar',
+                    execute: function(args) {
+                        var now = new Date();
+                        var month = now.getMonth();
+                        var year = now.getFullYear();
+                        
+                        var monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                                        'July', 'August', 'September', 'October', 'November', 'December'];
+                        
+                        return '' +
+                        '<span class="info">     ' + monthNames[month] + ' ' + year + '</span><br>' +
+                        '<span class="info">Su Mo Tu We Th Fr Sa</span><br>' +
+                        '<span class="info"> 1  2  3  4  5  6  7</span><br>' +
+                        '<span class="info"> 8  9 10 11 12 13 14</span><br>' +
+                        '<span class="info">15 16 17 18 19 20 21</span><br>' +
+                        '<span class="info">22 23 24 25 26 27 28</span><br>' +
+                        '<span class="info">29 30 31</span>';
+                    }
+                },
+                
+                color: {
+                    description: 'Change matrix animation color (1-12)',
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            var colors = '<span class="info">Available colors (1-12):</span><br>';
+                            for (var i = 0; i < matrixColors.length; i++) {
+                                colors += '<span class="command">' + (i + 1) + '</span> - <span style="color:' + matrixColors[i] + '">■</span> ' + matrixColors[i] + '<br>';
+                            }
+                            return colors;
+                        }
+                        
+                        var colorNum = parseInt(args[0]);
+                        if (colorNum >= 1 && colorNum <= 12) {
+                            matrixColor = matrixColors[colorNum - 1];
+                            return '<span class="success">Matrix color changed to #' + colorNum + '</span>';
+                        } else {
+                            return '<span class="error">Color must be between 1 and 12</span>';
+                        }
+                    }
+                },
+                
+                reboot: {
+                    description: 'Restart terminal',
+                    execute: function(args) {
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                        return '<span class="warning">Rebooting terminal...</span>';
+                    }
+                },
+                
+                about: {
+                    description: 'About this terminal',
+                    execute: function(args) {
+                        return '<span class="hacker">ORA Terminal Shell v2.0</span><br>' +
+                        '<span class="info">Secure Kali Linux-style terminal interface</span><br>' +
+                        '<span class="info">With ORA Tool integration</span><br>' +
+                        '<span class="info">Created by MKB - 2025</span><br><br>' +
+                        '<span class="info">Features:</span><br>' +
+                        '<span class="info">• Matrix background animation (color selectable)</span><br>' +
+                        '<span class="info">• Kali Linux command set</span><br>' +
+                        '<span class="info">• ORA Tool launcher (orastart)</span><br>' +
+                        '<span class="info">• Interactive command history</span><br>' +
+                        '<span class="info">• Tab auto-completion</span><br>' +
+                        '<span class="info">• Secure encrypted connection simulation</span>';
+                    }
+                }
+            };
+            
+            // ==============================
+            // INPUT HANDLING
+            // ==============================
+            function createInputLine() {
+                var inputLine = document.createElement('div');
+                inputLine.className = 'input-line';
+                
+                inputLine.innerHTML = '' +
+                    '<span class="prompt">ora@terminal:~$ </span>' +
+                    '<input type="text" class="command-input" autocomplete="off" id="main-command-input">' +
+                    '<span class="cursor"></span>';
+                
+                terminalOutput.appendChild(inputLine);
+                
+                var input = inputLine.querySelector('.command-input');
+                
+                setTimeout(function() {
+                    input.focus();
+                }, 100);
+                
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        var command = input.value.trim();
+                        inputLine.remove();
+                        processCommand(command);
+                    }
+                    
+                    // Tab completion
+                    if (e.key === 'Tab') {
+                        e.preventDefault();
+                        var currentInput = input.value.trim();
+                        var matchingCommands = Object.keys(commands).filter(function(cmd) {
+                            return cmd.startsWith(currentInput);
+                        });
+                        if (matchingCommands.length === 1) {
+                            input.value = matchingCommands[0] + ' ';
+                        }
+                    }
+                    
+                    // Command history
+                    if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        if (commandHistory.length > 0 && historyIndex > 0) {
+                            historyIndex--;
+                            input.value = commandHistory[historyIndex] || '';
+                        }
+                    }
+                    
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        if (commandHistory.length > 0 && historyIndex < commandHistory.length - 1) {
+                            historyIndex++;
+                            input.value = commandHistory[historyIndex] || '';
+                        } else {
+                            historyIndex = commandHistory.length;
+                            input.value = '';
+                        }
+                    }
+                });
+                
                 terminalOutput.scrollTop = terminalOutput.scrollHeight;
             }
             
-            // Final dramatic effect
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            const finalGlitch = document.createElement('div');
-            finalGlitch.className = 'output glitch';
-            finalGlitch.setAttribute('data-text', 'ACCESS GRANTED');
-            finalGlitch.textContent = 'ACCESS GRANTED';
-            finalGlitch.style.fontSize = '18px';
-            finalGlitch.style.fontWeight = 'bold';
-            finalGlitch.style.color = '#00ff00';
-            terminalOutput.appendChild(finalGlitch);
-            
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            const welcomeDiv = document.createElement('div');
-            welcomeDiv.className = 'output';
-            welcomeDiv.innerHTML = '<br>' +
-                '<span class="ora">╔══════════════════════════════════════════════════════════╗</span><br>' +
-                '<span class="ora">║                    ORA TERMINAL v2.0                     ║</span><br>' +
-                '<span class="ora">║                 SECURE ACCESS VERIFIED                   ║</span><br>' +
-                '<span class="ora">║                 USER: ora                                ║</span><br>' +
-                '<span class="ora">║                 SECURITY LEVEL: MAXIMUM                  ║</span><br>' +
-                '<span class="ora">║                 CONNECTION: ENCRYPTED                    ║</span><br>' +
-                '<span class="ora">╚══════════════════════════════════════════════════════════╝</span><br><br>' +
-                '<span class="info">Type \'help\' for available commands</span><br>' +
-                '<span class="info">Type \'orastart\' to launch ORA Tool (opens in new window)</span><br>' +
-                '<span class="info">Type \'clear\' to clear terminal screen</span><br><br>' +
-                '<span class="warning">⚠️ All activities are logged and monitored</span><br>';
-            terminalOutput.appendChild(welcomeDiv);
-            
-            // Create first input line
-            createInputLine();
-        }
-        
-        // ==============================
-        // TERMINAL SYSTEM
-        // ==============================
-        const terminalOutput = document.getElementById('terminal-output');
-        const terminalContainer = document.querySelector('.terminal-container');
-        
-        // Command definitions (Kali-like)
-        const commands = {
-            help: {
-                description: 'Show all available commands',
-                execute: function() {
-                    let helpText = '<span class="ora">Available commands:</span><br><br>';
-                    helpText += '<span class="command">orastart</span>      - Launch ORA Tool (opens new window)<br>';
-                    helpText += '<span class="command">clear</span>         - Clear the terminal screen<br>';
-                    helpText += '<span class="command">date</span>          - Show current date and time<br>';
-                    helpText += '<span class="command">echo [text]</span>   - Display a line of text<br>';
-                    helpText += '<span class="command">whoami</span>        - Print effective userid<br>';
-                    helpText += '<span class="command">pwd</span>           - Print working directory<br>';
-                    helpText += '<span class="command">ls</span>            - List directory contents<br>';
-                    helpText += '<span class="command">neofetch</span>      - Display system information<br>';
-                    helpText += '<span class="command">uname</span>         - Print system information<br>';
-                    helpText += '<span class="command">uptime</span>        - Tell how long system has been running<br>';
-                    helpText += '<span class="command">cal</span>           - Display a calendar<br>';
-                    helpText += '<span class="command">color [1-12]</span>  - Change matrix color<br>';
-                    helpText += '<span class="command">reboot</span>        - Restart terminal<br>';
-                    helpText += '<span class="command">about</span>         - About this terminal<br>';
-                    helpText += '<br><span class="info">Use TAB for auto-completion and ↑↓ for command history</span>';
-                    return helpText;
-                }
-            },
-            
-            orastart: {
-                description: 'Launch ORA Tool',
-                execute: function() {
-                    setTimeout(function() {
-                        window.open('oratool.html', '_blank', 'width=1200,height=800');
-                    }, 500);
-                    return '<span class="success">Launching ORA Tool in new window...</span>';
-                }
-            },
-            
-            clear: {
-                description: 'Clear the terminal screen',
-                execute: function() {
-                    setTimeout(function() {
-                        terminalOutput.innerHTML = '';
-                        createInputLine();
-                    }, 10);
-                    return '';
-                }
-            },
-            
-            date: {
-                description: 'Show current date and time',
-                execute: function() {
-                    const now = new Date();
-                    return now.toLocaleString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        hour12: false
-                    });
-                }
-            },
-            
-            echo: {
-                description: 'Echo back the input text',
-                execute: function(args) {
-                    return args.join(' ');
-                }
-            },
-            
-            whoami: {
-                description: 'Print effective userid',
-                execute: function() {
-                    return 'ora';
-                }
-            },
-            
-            pwd: {
-                description: 'Print working directory',
-                execute: function() {
-                    return '/home/ora';
-                }
-            },
-            
-            ls: {
-                description: 'List directory contents',
-                execute: function(args) {
-                    if (args.includes('-la')) {
-                        return 'total 128<br>' +
-                               'drwxr-xr-x 18 ora ora  4096 Dec 12 10:30 .<br>' +
-                               'drwxr-xr-x  3 root root 4096 Dec 12 09:15 ..<br>' +
-                               '-rw-r--r--  1 ora ora   220 Dec 12 09:15 .bash_logout<br>' +
-                               '-rw-r--r--  1 ora ora  3771 Dec 12 09:15 .bashrc<br>' +
-                               'drwx------ 15 ora ora  4096 Dec 12 10:25 .cache<br>' +
-                               'drwx------ 12 ora ora  4096 Dec 12 10:20 .config<br>' +
-                               'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Desktop<br>' +
-                               'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Documents<br>' +
-                               'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Downloads<br>' +
-                               '-rw-r--r--  1 ora ora   807 Dec 12 09:15 .profile<br>' +
-                               'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Public<br>' +
-                               '-rw-r--r--  1 ora ora     0 Dec 12 09:15 .sudo_as_admin_successful<br>' +
-                               'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Templates<br>' +
-                               'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Videos<br>' +
-                               '-rw-r--r--  1 ora ora    46 Dec 12 09:15 .wget-hsts';
-                    }
-                    return 'Desktop    Downloads  Music     Public     oratool.html<br>' +
-                           'Documents  Pictures   Videos    data.json';
-                }
-            },
-            
-            neofetch: {
-                description: 'Display system information',
-                execute: function() {
-                    return '' +
-                    '<span class="ora">        .-/+oossssoo+/-.               <span class="system">ora@terminal</span></span><br>' +
-                    '<span class="ora">    `:+ssssssssssssssssss+:`           -------------</span><br>' +
-                    '<span class="ora">  -+ssssssssssssssssssyyssss+-         <span class="info">OS: ORA Terminal Kali v2.0</span></span><br>' +
-                    '<span class="ora"> .ossssssssssssssssssdMMMNysssso.       <span class="info">Host: ORA Secure Server</span></span><br>' +
-                    '<span class="ora"> /ssssssssssshdmmNNmmyNMMMMhssssss/      <span class="info">Kernel: 6.1.0-kali5-amd64</span></span><br>' +
-                    '<span class="ora"> +ssssssssshmydMMMMMMMNddddysssssss+     <span class="info">Uptime: 15 mins</span></span><br>' +
-                    '<span class="ora"> /sssssssshNMMMyhhyyyyhmNMMMNhssssss/    <span class="info">Shell: ora-terminal v2.0</span></span><br>' +
-                    '<span class="ora"> .ossssssssdMMMNhsssssssssshNMMMdssssso.  <span class="info">Terminal: ORA Terminal</span></span><br>' +
-                    '<span class="ora">  -+sssssssshyyysssssssssssssyyyyssss+-  <span class="info">CPU: Xeon E5-2699 v4 (44) @ 2.20GHz</span></span><br>' +
-                    '<span class="ora">    `:+ssssssssssssssssssssssssssss+:`   <span class="info">Memory: 128GiB</span></span><br>' +
-                    '<span class="ora">        .-/+oossssoo+/-.</span>';
-                }
-            },
-            
-            uname: {
-                description: 'Print system information',
-                execute: function(args) {
-                    if (args.includes('-a')) {
-                        return 'Linux terminal 6.1.0-kali5-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.12-1kali2 (2023-02-23) x86_64 GNU/Linux';
-                    }
-                    return 'Linux';
-                }
-            },
-            
-            uptime: {
-                description: 'Tell how long system has been running',
-                execute: function() {
-                    return ' 10:45:23 up 15 min,  1 user,  load average: 0.15, 0.08, 0.03';
-                }
-            },
-            
-            cal: {
-                description: 'Display a calendar',
-                execute: function() {
-                    const now = new Date();
-                    const month = now.getMonth();
-                    const year = now.getFullYear();
-                    
-                    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                                      'July', 'August', 'September', 'October', 'November', 'December'];
-                    
-                    return '' +
-                    '<span class="system">     ' + monthNames[month] + ' ' + year + '</span><br>' +
-                    '<span class="system">Su Mo Tu We Th Fr Sa</span><br>' +
-                    '<span class="system"> 1  2  3  4  5  6  7</span><br>' +
-                    '<span class="system"> 8  9 10 11 12 13 14</span><br>' +
-                    '<span class="system">15 16 17 18 19 20 21</span><br>' +
-                    '<span class="system">22 23 24 25 26 27 28</span><br>' +
-                    '<span class="system">29 30 31</span>';
-                }
-            },
-            
-            color: {
-                description: 'Change matrix animation color (1-12)',
-                execute: function(args) {
-                    if (args.length === 0) {
-                        let colors = '<span class="info">Available colors (1-12):</span><br>';
-                        matrixColors.forEach(function(color, index) {
-                            colors += '<span class="command">' + (index + 1) + '</span> - <span style="color:' + color + '">■</span> ' + color + '<br>';
-                        });
-                        return colors;
-                    }
-                    
-                    const colorNum = parseInt(args[0]);
-                    if (colorNum >= 1 && colorNum <= 12) {
-                        matrixColor = matrixColors[colorNum - 1];
-                        return '<span class="success">Matrix color changed to #' + colorNum + '</span>';
-                    } else {
-                        return '<span class="error">Color must be between 1 and 12</span>';
-                    }
-                }
-            },
-            
-            reboot: {
-                description: 'Restart terminal',
-                execute: function() {
-                    setTimeout(function() {
-                        location.reload();
-                    }, 1000);
-                    return '<span class="warning">Rebooting terminal...</span>';
-                }
-            },
-            
-            about: {
-                description: 'About this terminal',
-                execute: function() {
-                    return '<span class="ora">ORA Terminal Shell v2.0</span><br>' +
-                    '<span class="info">Secure Kali Linux-style terminal interface</span><br>' +
-                    '<span class="info">With ORA Tool integration</span><br>' +
-                    '<span class="info">Created by MKB - 2025</span><br><br>' +
-                    '<span class="system">Features:</span><br>' +
-                    '<span class="system">• Matrix background animation (color selectable)</span><br>' +
-                    '<span class="system">• Kali Linux command set</span><br>' +
-                    '<span class="system">• ORA Tool launcher (orastart)</span><br>' +
-                    '<span class="system">• Interactive command history</span><br>' +
-                    '<span class="system">• Tab auto-completion</span><br>' +
-                    '<span class="system">• Secure encrypted connection simulation</span>';
-                }
-            }
-        };
-        
-        // Command history
-        let commandHistory = [];
-        let historyIndex = 0;
-        
-        // ==============================
-        // INPUT HANDLING
-        // ==============================
-        function createInputLine() {
-            const inputLine = document.createElement('div');
-            inputLine.className = 'input-line';
-            
-            inputLine.innerHTML = '' +
-                '<span class="prompt">ora@terminal:~$ </span>' +
-                '<input type="text" class="command-input" autocomplete="off" id="main-command-input">' +
-                '<span class="cursor"></span>';
-            
-            terminalOutput.appendChild(inputLine);
-            
-            const input = inputLine.querySelector('.command-input');
-            
-            setTimeout(function() {
-                input.focus();
-            }, 100);
-            
-            input.addEventListener('keydown', async function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const command = input.value.trim();
-                    inputLine.remove();
-                    await processCommand(command);
-                }
+            function processCommand(fullCommand) {
+                // Add to history
+                commandHistory.push(fullCommand);
+                historyIndex = commandHistory.length;
                 
-                // Tab completion
-                if (e.key === 'Tab') {
-                    e.preventDefault();
-                    const currentInput = input.value.trim();
-                    const matchingCommands = Object.keys(commands).filter(function(cmd) {
-                        return cmd.startsWith(currentInput);
-                    });
-                    if (matchingCommands.length === 1) {
-                        input.value = matchingCommands[0] + ' ';
-                    }
-                }
+                // Display command
+                var commandOutput = document.createElement('div');
+                commandOutput.className = 'output';
+                commandOutput.innerHTML = '<span class="prompt">ora@terminal:~$ </span> <span class="command">' + fullCommand + '</span>';
+                terminalOutput.appendChild(commandOutput);
                 
-                // Command history
-                if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    if (commandHistory.length > 0 && historyIndex > 0) {
-                        historyIndex--;
-                        input.value = commandHistory[historyIndex] || '';
-                    }
-                }
+                // Parse command
+                var parts = fullCommand.split(' ');
+                var cmd = parts[0];
+                var args = parts.slice(1);
                 
-                if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    if (commandHistory.length > 0 && historyIndex < commandHistory.length - 1) {
-                        historyIndex++;
-                        input.value = commandHistory[historyIndex] || '';
-                    } else {
-                        historyIndex = commandHistory.length;
-                        input.value = '';
-                    }
-                }
-            });
-            
-            terminalOutput.scrollTop = terminalOutput.scrollHeight;
-        }
-        
-        async function processCommand(fullCommand) {
-            // Add to history
-            commandHistory.push(fullCommand);
-            historyIndex = commandHistory.length;
-            
-            // Display command
-            const commandOutput = document.createElement('div');
-            commandOutput.className = 'output';
-            commandOutput.innerHTML = '<span class="prompt">ora@terminal:~$ </span> <span class="command">' + fullCommand + '</span>';
-            terminalOutput.appendChild(commandOutput);
-            
-            // Parse command
-            const parts = fullCommand.split(' ');
-            const cmd = parts[0];
-            const args = parts.slice(1);
-            
-            const resultDiv = document.createElement('div');
-            resultDiv.className = 'output';
-            
-            if (cmd === '') {
-                resultDiv.innerHTML = '';
-            } else if (commands[cmd]) {
-                try {
-                    const result = commands[cmd].execute(args);
-                    if (result instanceof Promise) {
-                        resultDiv.innerHTML = await result;
-                    } else {
+                var resultDiv = document.createElement('div');
+                resultDiv.className = 'output';
+                
+                if (cmd === '') {
+                    resultDiv.innerHTML = '';
+                } else if (commands[cmd]) {
+                    try {
+                        var result = commands[cmd].execute(args);
                         resultDiv.innerHTML = result;
+                    } catch (error) {
+                        console.error('Command error:', error);
+                        resultDiv.innerHTML = '<span class="error">Error: ' + error.message + '</span>';
                     }
-                } catch (error) {
-                    console.error('Command error:', error);
-                    resultDiv.innerHTML = '<span class="error">Error: ' + error.message + '</span>';
+                } else {
+                    resultDiv.innerHTML = '<span class="error">Command not found: ' + cmd + '</span><br>' +
+                    'Type <span class="command">\'help\'</span> for available commands';
                 }
-            } else {
-                resultDiv.innerHTML = '<span class="error">Command not found: ' + cmd + '</span><br>' +
-                'Type <span class="command">\'help\'</span> for available commands';
+                
+                if (resultDiv.innerHTML !== '') {
+                    terminalOutput.appendChild(resultDiv);
+                }
+                
+                createInputLine();
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
             }
             
-            if (resultDiv.innerHTML !== '') {
-                terminalOutput.appendChild(resultDiv);
+            // ==============================
+            // TERMINAL CONTROLS
+            // ==============================
+            function setupTerminalControls() {
+                // Close button
+                document.getElementById('close-btn').addEventListener('click', function() {
+                    terminalContainer.style.display = 'none';
+                    var message = document.createElement('div');
+                    message.className = 'output error';
+                    message.textContent = 'Terminal closed. Refresh page to restart.';
+                    terminalOutput.appendChild(message);
+                });
+                
+                // Minimize button
+                document.getElementById('minimize-btn').addEventListener('click', function() {
+                    terminalContainer.style.height = '45px';
+                    setTimeout(function() {
+                        terminalContainer.style.height = '600px';
+                    }, 2000);
+                });
+                
+                // Maximize button
+                document.getElementById('maximize-btn').addEventListener('click', function() {
+                    if (terminalContainer.style.width === '95vw') {
+                        terminalContainer.style.width = '900px';
+                        terminalContainer.style.height = '600px';
+                        terminalContainer.style.left = '50%';
+                        terminalContainer.style.top = '50%';
+                        terminalContainer.style.transform = 'translate(-50%, -50%)';
+                    } else {
+                        terminalContainer.style.width = '95vw';
+                        terminalContainer.style.height = '90vh';
+                        terminalContainer.style.left = '2.5vw';
+                        terminalContainer.style.top = '5vh';
+                        terminalContainer.style.transform = 'none';
+                    }
+                });
+                
+                // Draggable terminal
+                terminalHeader.addEventListener('mousedown', function(e) {
+                    if (e.target === terminalHeader || e.target.classList.contains('terminal-title')) {
+                        isDragging = true;
+                        var rect = terminalContainer.getBoundingClientRect();
+                        dragOffset.x = e.clientX - rect.left;
+                        dragOffset.y = e.clientY - rect.top;
+                        terminalContainer.style.cursor = 'grabbing';
+                    }
+                });
+                
+                document.addEventListener('mousemove', function(e) {
+                    if (isDragging) {
+                        terminalContainer.style.left = (e.clientX - dragOffset.x) + 'px';
+                        terminalContainer.style.top = (e.clientY - dragOffset.y) + 'px';
+                        terminalContainer.style.transform = 'none';
+                    }
+                });
+                
+                document.addEventListener('mouseup', function() {
+                    isDragging = false;
+                    terminalContainer.style.cursor = '';
+                });
+                
+                // Focus input on click
+                document.addEventListener('click', function() {
+                    setTimeout(function() {
+                        var input = document.querySelector('.command-input');
+                        if (input) input.focus();
+                    }, 100);
+                });
+                
+                // Handle window resize
+                window.addEventListener('resize', function() {
+                    initMatrix();
+                });
             }
             
-            createInputLine();
-            terminalOutput.scrollTop = terminalOutput.scrollHeight;
-        }
-        
-        // ==============================
-        // TERMINAL CONTROLS
-        // ==============================
-        document.getElementById('close-btn').addEventListener('click', function() {
-            terminalContainer.style.display = 'none';
-            const message = document.createElement('div');
-            message.className = 'output error';
-            message.textContent = 'Terminal closed. Refresh page to restart.';
-            terminalOutput.appendChild(message);
-        });
-        
-        document.getElementById('minimize-btn').addEventListener('click', function() {
-            terminalContainer.style.height = '45px';
-            setTimeout(function() {
-                terminalContainer.style.height = '600px';
-            }, 2000);
-        });
-        
-        document.getElementById('maximize-btn').addEventListener('click', function() {
-            if (terminalContainer.style.width === '95vw') {
-                terminalContainer.style.width = '900px';
-                terminalContainer.style.height = '600px';
-                terminalContainer.style.left = '50%';
-                terminalContainer.style.top = '50%';
-                terminalContainer.style.transform = 'translate(-50%, -50%)';
-            } else {
-                terminalContainer.style.width = '95vw';
-                terminalContainer.style.height = '90vh';
-                terminalContainer.style.left = '2.5vw';
-                terminalContainer.style.top = '5vh';
-                terminalContainer.style.transform = 'none';
-            }
-        });
-        
-        // ==============================
-        // DRAGGABLE TERMINAL
-        // ==============================
-        let isDragging = false;
-        let dragOffset = { x: 0, y: 0 };
-        
-        terminalHeader.addEventListener('mousedown', function(e) {
-            if (e.target === terminalHeader || e.target.classList.contains('terminal-title')) {
-                isDragging = true;
-                const rect = terminalContainer.getBoundingClientRect();
-                dragOffset.x = e.clientX - rect.left;
-                dragOffset.y = e.clientY - rect.top;
-                terminalContainer.style.cursor = 'grabbing';
-            }
-        });
-        
-        document.addEventListener('mousemove', function(e) {
-            if (isDragging) {
-                terminalContainer.style.left = (e.clientX - dragOffset.x) + 'px';
-                terminalContainer.style.top = (e.clientY - dragOffset.y) + 'px';
-                terminalContainer.style.transform = 'none';
-            }
-        });
-        
-        document.addEventListener('mouseup', function() {
-            isDragging = false;
-            terminalContainer.style.cursor = '';
-        });
-        
-        // ==============================
-        // INITIALIZATION
-        // ==============================
-        async function init() {
-            // Initialize matrix
-            initMatrix();
-            setInterval(drawMatrix, 50);
-            
-            // Start with dramatic boot sequence
-            await runBootSequence();
-            
-            // Handle window resize
-            window.addEventListener('resize', function() {
+            // ==============================
+            // INITIALIZATION
+            // ==============================
+            async function init() {
+                // Initialize matrix animation
                 initMatrix();
-            });
+                setInterval(drawMatrix, 50);
+                
+                // Setup terminal controls
+                setupTerminalControls();
+                
+                // Start boot sequence
+                await runBootSequence();
+            }
             
-            // Focus input on click
-            document.addEventListener('click', function() {
-                setTimeout(function() {
-                    const input = document.querySelector('.command-input');
-                    if (input) input.focus();
-                }, 100);
-            });
-        }
-        
-        // Start everything
-        document.addEventListener('DOMContentLoaded', init);
+            // Start the application when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+            
+        })(); // End of IIFE
     </script>
 </body>
 </html>

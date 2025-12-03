@@ -18,7 +18,6 @@
             height: 100vh;
             overflow: hidden;
             position: relative;
-            user-select: none;
         }
         
         /* Matrix Canvas Background */
@@ -32,77 +31,27 @@
             opacity: 0.08;
         }
         
-        /* Control Panel - Hidden by default */
-        .control-panel {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
-            background: rgba(20, 20, 20, 0.9);
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            backdrop-filter: blur(10px);
-            max-width: 300px;
-            display: none; /* Hidden by default */
-        }
-        
-        .control-title {
-            color: #4af626;
-            margin-bottom: 10px;
-            font-size: 14px;
-            text-align: center;
-        }
-        
-        .panel-btn {
-            background: #333;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 12px;
-            width: 100%;
-            margin-top: 5px;
-            transition: all 0.3s;
-        }
-        
-        .panel-btn:hover {
-            background: #444;
-        }
-        
-        .file-preview {
-            margin-top: 10px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
-            font-size: 11px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
-        /* Terminal Container - Draggable & Resizable */
+        /* Terminal Container */
         .terminal-container {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 800px;
-            height: 500px;
+            width: 900px;
+            height: 600px;
             background-color: rgba(0, 0, 0, 0.95);
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
             border: 1px solid #333;
             z-index: 10;
-            min-width: 400px;
-            min-height: 300px;
+            min-width: 500px;
+            min-height: 400px;
             resize: both;
             overflow: hidden;
         }
         
-        /* Terminal Header - Draggable area */
+        /* Terminal Header */
         .terminal-header {
             background: linear-gradient(to bottom, #1a1a1a, #000);
             padding: 12px 20px;
@@ -110,7 +59,6 @@
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid #333;
-            cursor: move;
             user-select: none;
         }
         
@@ -155,6 +103,7 @@
             padding: 20px;
             overflow-y: auto;
             background: rgba(0, 0, 0, 0.9);
+            position: relative;
         }
         
         .output {
@@ -258,96 +207,14 @@
             border-bottom: 2px solid #444;
         }
         
-        /* Link Display Box */
-        .link-box {
-            background: rgba(0, 170, 255, 0.1);
-            border: 1px solid #00aaff;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px 0;
-            word-break: break-all;
-            position: relative;
-        }
-        
-        .copy-btn {
+        /* Footer */
+        .terminal-footer {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #00aaff;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 12px;
-        }
-        
-        .copy-btn:hover {
-            background: #0088cc;
-        }
-        
-        .copy-success {
-            position: absolute;
-            top: 10px;
-            right: 80px;
-            color: #50fa7b;
-            font-size: 12px;
-            animation: fadeOut 2s forwards;
-        }
-        
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            70% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-        
-        /* File List */
-        .file-item {
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(0, 255, 0, 0.1);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .file-item:hover {
-            background: rgba(0, 255, 0, 0.05);
-        }
-        
-        .file-icon {
-            width: 20px;
-            text-align: center;
-        }
-        
-        .file-size {
-            margin-left: auto;
-            color: #888;
-            font-size: 12px;
-        }
-        
-        .file-type {
+            bottom: 10px;
+            right: 20px;
             color: #666;
-            font-size: 11px;
-            margin-left: 10px;
-        }
-        
-        /* Loading Animation */
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #444;
-            border-top-color: #00ff00;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            vertical-align: middle;
-            margin-right: 10px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+            font-size: 12px;
+            z-index: 5;
         }
         
         /* Mobile Optimizations */
@@ -362,13 +229,6 @@
                 min-width: 300px !important;
                 min-height: 400px !important;
                 resize: none;
-            }
-            
-            .control-panel {
-                top: 10px;
-                right: 10px;
-                padding: 10px;
-                max-width: 200px;
             }
             
             .terminal-header {
@@ -389,115 +249,12 @@
         .terminal-start-animation {
             animation: terminalStart 0.5s ease-out;
         }
-        
-        /* File Preview */
-        .file-preview-content {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 5px;
-            padding: 15px;
-            margin: 10px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        .file-meta {
-            background: rgba(0, 170, 255, 0.1);
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-            font-size: 12px;
-        }
-        
-        /* Panel Toggle Button */
-        .panel-toggle {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: #333;
-            color: #4af626;
-            border: 1px solid #4af626;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            z-index: 99;
-            font-family: inherit;
-            font-size: 12px;
-        }
-        
-        .panel-toggle:hover {
-            background: #444;
-        }
-        
-        /* Embed Container */
-        .embed-container {
-            margin: 15px 0;
-            border: 1px solid #333;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .embed-header {
-            background: #1a1a1a;
-            padding: 8px 15px;
-            border-bottom: 1px solid #333;
-            font-size: 12px;
-            color: #4af626;
-        }
-        
-        .embed-content {
-            background: rgba(255, 255, 255, 0.02);
-            padding: 10px;
-        }
-        
-        /* File Preview Box */
-        .preview-box {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px 0;
-            border: 1px solid #333;
-        }
-        
-        .open-btn {
-            background: #4af626;
-            color: black;
-            border: none;
-            padding: 5px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: inherit;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-        
-        .open-btn:hover {
-            background: #3bd61f;
-        }
     </style>
-    <!-- Favicon fix -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
 </head>
 <body>
     <!-- Matrix Canvas Background -->
     <canvas id="matrix-canvas"></canvas>
-    
-    <!-- Panel Toggle Button -->
-    <button class="panel-toggle" id="panel-toggle">Show Panel</button>
-    
-    <!-- Control Panel -->
-    <div class="control-panel" id="control-panel">
-        <div class="control-title">ORA CONTROL PANEL</div>
-        <div id="file-preview" class="file-preview">
-            <span class="ora">ORA Files System</span><br>
-            <span class="info">Connected to ORA Repository</span>
-        </div>
-        <button class="panel-btn" id="hide-panel">Hide Panel</button>
-        <button class="panel-btn" id="reset-terminal">Reset Terminal</button>
-        <button class="panel-btn" id="refresh-files">Refresh ORA Files</button>
-        <button class="panel-btn" id="embed-mode">Embed Mode</button>
-    </div>
     
     <!-- Terminal Window -->
     <div class="terminal-container terminal-start-animation">
@@ -508,24 +265,27 @@
                     <div class="terminal-button minimize" id="minimize-btn"></div>
                     <div class="terminal-button maximize" id="maximize-btn"></div>
                 </div>
-                <div class="terminal-title">ora terminal shell</div>
+                <div class="terminal-title">ora@terminal:~</div>
             </div>
         </div>
         
         <div class="terminal-body" id="terminal-output">
             <div class="output">
-                <span class="system">system 0.1 is running</span><br>
-                <span class="system">> terminal shell</span><br>
-                <span class="system">> made by Bertrand</span><br>
-                <span class="system">> 2025</span><br><br>
-                <span class="info">Type 'help' to see functions</span><br>
-                <span class="info">Type 'start' to launch ORA Tool (GitHub)</span><br>
-                <span class="info">Type 'localfiles' to access local S6 documents</span><br>
-                <span class="info">Type 'link show' to access secure link</span><br>
-                <span class="info">Type 'color 1-12' to change matrix color</span><br><br>
+                <span class="system">Linux kali 6.1.0-kali5-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.12-1kali2 (2023-02-23) x86_64</span><br><br>
+                <span class="system">The programs included with the Kali GNU/Linux system are free software;</span><br>
+                <span class="system">the exact distribution terms for each program are described in the</span><br>
+                <span class="system">individual files in /usr/share/doc/*/copyright.</span><br><br>
+                <span class="system">Kali GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent</span><br>
+                <span class="system">permitted by applicable law.</span><br><br>
+                <span class="info">Last login: Thu Dec 12 10:30:45 2025 from 192.168.1.100</span><br>
+                <span class="ora">ora@terminal:~$ </span><span id="initial-command"></span><br><br>
+                <span class="info">Type 'help' to see available commands</span><br>
+                <span class="info">Type 'orastart' to launch ORA Tool (new window)</span><br>
+                <span class="info">Type 'clear' to clear screen</span><br><br>
             </div>
         </div>
         
+        <div class="terminal-footer">ora terminal by MKB - 2025</div>
         <div class="resize-handle"></div>
     </div>
 
@@ -537,36 +297,23 @@
         const ctx = canvas.getContext('2d');
         let matrixColor = '#00ff9d';
         
-        // Color definitions for 12 colors
         const matrixColors = [
-            '#00ff9d', // 1 - Matrix Green
-            '#4af626', // 2 - Neon Green
-            '#00ffff', // 3 - Cyan
-            '#ff00ff', // 4 - Magenta
-            '#ffaa00', // 5 - Orange
-            '#ff5555', // 6 - Red
-            '#ffffff', // 7 - White
-            '#9d00ff', // 8 - Purple
-            '#00aaff', // 9 - Blue
-            '#ffff00', // 10 - Yellow
-            '#ff6b8b', // 11 - Pink
-            '#00ff00'  // 12 - Pure Green
+            '#00ff9d', '#4af626', '#00ffff', '#ff00ff',
+            '#ffaa00', '#ff5555', '#ffffff', '#9d00ff',
+            '#00aaff', '#ffff00', '#ff6b8b', '#00ff00'
         ];
         
-        // Set canvas size
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
         
-        // Matrix characters
         const chars = "01アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン";
         const charArray = chars.split("");
         const fontSize = 14;
         let columns = 0;
         let drops = [];
         
-        // Initialize matrix
         function initMatrix() {
             resizeCanvas();
             columns = Math.floor(canvas.width / fontSize);
@@ -576,956 +323,22 @@
             }
         }
         
-        // Draw matrix
         function drawMatrix() {
-            // Semi-transparent black rectangle for trail effect
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Set text style
             ctx.font = `${fontSize}px 'Courier New', monospace`;
             
-            // Draw characters
             for(let i = 0; i < drops.length; i++) {
-                // Random character
                 const char = charArray[Math.floor(Math.random() * charArray.length)];
-                
-                // Gradient color effect
                 const opacity = Math.random() * 0.5 + 0.5;
                 ctx.fillStyle = matrixColor.replace(')', `, ${opacity})`).replace('rgb', 'rgba');
-                
-                // Draw character
                 ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-                
-                // Move drop down
                 drops[i]++;
                 
-                // Randomly reset drop
                 if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
                     drops[i] = 0;
                 }
-            }
-        }
-        
-        // ==============================
-        // LOCAL FILE SYSTEM
-        // ==============================
-        class LocalFileSystem {
-            constructor() {
-                this.files = [];
-                this.fileIcons = {
-                    '.pdf': '📕',
-                    '.docx': '📘',
-                    '.doc': '📘',
-                    '.txt': '📝',
-                    '.xlsx': '📊',
-                    '.xls': '📊'
-                };
-            }
-            
-            async loadFiles() {
-                try {
-                    const response = await fetch('./data.json');
-                    if (!response.ok) {
-                        throw new Error('Failed to load data.json');
-                    }
-                    
-                    const data = await response.json();
-                    this.files = data.files || [];
-                    return this.files;
-                    
-                } catch (error) {
-                    console.error('Error loading local files:', error);
-                    return [];
-                }
-            }
-            
-            getFileIcon(filename) {
-                const extension = filename.substring(filename.lastIndexOf('.')).toLowerCase();
-                return this.fileIcons[extension] || '📄';
-            }
-            
-            searchFiles(keyword) {
-                const searchTerm = keyword.toLowerCase();
-                return this.files.filter(file => 
-                    file.toLowerCase().includes(searchTerm)
-                );
-            }
-            
-            getFileUrl(filename) {
-                const extension = filename.split('.').pop().toLowerCase();
-                const filePath = `files/${encodeURIComponent(filename)}`;
-                
-                if (extension === 'pdf') {
-                    return filePath;
-                } else if (extension === 'docx' || extension === 'doc') {
-                    const currentUrl = window.location.href;
-                    const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
-                    return `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(baseUrl + '/' + filePath)}`;
-                } else {
-                    return filePath;
-                }
-            }
-            
-            openFile(filename) {
-                const url = this.getFileUrl(filename);
-                window.open(url, '_blank');
-                return true;
-            }
-        }
-        
-        // ==============================
-        // LINK SYSTEM
-        // ==============================
-        class LinkSystem {
-            constructor() {
-                this.driveLink = "https://drive.google.com/drive/folders/11EI-l9iNJ9y0FXA-Fb97Yg4DDavRMeRQ";
-                this.oraFilesLink = "https://github.com/MKB-NEL/orabymkb/tree/main/files";
-                this.password = "karekezi@2";
-                this.isLinkVisible = false;
-            }
-            
-            showLinkPrompt() {
-                const output = document.getElementById('terminal-output');
-                output.innerHTML = '';
-                
-                const promptDiv = document.createElement('div');
-                promptDiv.className = 'output';
-                promptDiv.innerHTML = '<span class="hacker">Secure Link Password:</span>';
-                output.appendChild(promptDiv);
-                
-                this.createPasswordInput();
-            }
-            
-            createPasswordInput() {
-                const output = document.getElementById('terminal-output');
-                const inputLine = document.createElement('div');
-                inputLine.className = 'input-line';
-                
-                inputLine.innerHTML = `
-                    <span class="prompt">Password:</span>
-                    <input type="password" 
-                           class="command-input link-password"
-                           autocomplete="off" 
-                           id="link-password-input"
-                           style="color: transparent; text-shadow: 0 0 0 #00ff00;">
-                    <span class="cursor"></span>
-                `;
-                
-                output.appendChild(inputLine);
-                
-                const input = inputLine.querySelector('.command-input');
-                
-                // Focus with timeout to avoid autofocus error
-                setTimeout(() => {
-                    input.focus();
-                }, 100);
-                
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const value = input.value.trim();
-                        inputLine.remove();
-                        this.verifyPassword(value);
-                    }
-                });
-                
-                output.scrollTop = output.scrollHeight;
-            }
-            
-            verifyPassword(password) {
-                const output = document.getElementById('terminal-output');
-                
-                if (password === this.password) {
-                    this.isLinkVisible = true;
-                    this.displaySecureLink();
-                } else {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'output error';
-                    errorDiv.textContent = 'Incorrect password. Access denied.';
-                    output.appendChild(errorDiv);
-                    
-                    setTimeout(() => {
-                        createInputLine();
-                    }, 1000);
-                }
-                
-                output.scrollTop = output.scrollHeight;
-            }
-            
-            displaySecureLink() {
-                const output = document.getElementById('terminal-output');
-                output.innerHTML = '';
-                
-                const successDiv = document.createElement('div');
-                successDiv.className = 'output success';
-                successDiv.innerHTML = '<span class="success">✓ Access granted. Secure link unlocked.</span>';
-                output.appendChild(successDiv);
-                
-                const linkBox = document.createElement('div');
-                linkBox.className = 'link-box';
-                linkBox.innerHTML = `
-                    <span class="link">${this.driveLink}</span>
-                    <button class="copy-btn" onclick="copyToClipboard('${this.driveLink}')">Copy</button>
-                `;
-                output.appendChild(linkBox);
-                
-                const infoDiv = document.createElement('div');
-                infoDiv.className = 'output';
-                infoDiv.innerHTML = `
-                    <span class="info">This link provides access to secured ORA files.</span><br>
-                    <span class="info">ORA Files Repository: ${this.oraFilesLink}</span><br><br>
-                    <span class="warning">⚠️ This link is sensitive. Handle with care.</span>
-                `;
-                output.appendChild(infoDiv);
-                
-                createInputLine();
-            }
-        }
-        
-        // ==============================
-        // ORA FILES SYSTEM (GitHub API)
-        // ==============================
-        class ORAFileSystem {
-            constructor() {
-                this.apiUrl = "https://api.github.com/repos/MKB-NEL/orabymkb/contents/files";
-                this.githubUrl = "https://github.com/MKB-NEL/orabymkb/tree/main/files";
-                this.rawBaseUrl = "https://raw.githubusercontent.com/MKB-NEL/orabymkb/main/files/";
-                this.files = [];
-                this.fileIcons = {
-                    '.pdf': '📕', '.doc': '📘', '.docx': '📘',
-                    '.jpg': '🖼️', '.jpeg': '🖼️', '.png': '🖼️', '.gif': '🖼️',
-                    '.txt': '📝', '.md': '📝', '.rtf': '📝',
-                    '.xls': '📊', '.xlsx': '📊', '.csv': '📊',
-                    '.zip': '📦', '.rar': '📦', '.7z': '📦',
-                    '.mp3': '🎵', '.wav': '🎵', '.mp4': '🎬', '.avi': '🎬',
-                    '.html': '🌐', '.css': '🎨', '.js': '📜', '.json': '📄',
-                    '.py': '🐍', '.java': '☕', '.cpp': '⚙️', '.c': '⚙️'
-                };
-            }
-            
-            getFileIcon(name, type) {
-                if (type === 'dir') return '📁';
-                const extension = name.substring(name.lastIndexOf('.')).toLowerCase();
-                return this.fileIcons[extension] || '📄';
-            }
-            
-            formatFileSize(bytes) {
-                if (!bytes) return '--';
-                if (bytes < 1024) return bytes + ' B';
-                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-                return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-            }
-            
-            async scanORAFiles() {
-                try {
-                    const output = document.getElementById('terminal-output');
-                    const loadingDiv = document.createElement('div');
-                    loadingDiv.className = 'output';
-                    loadingDiv.innerHTML = `<span class="loading"></span><span class="ora">Scanning ORA files repository...</span>`;
-                    output.appendChild(loadingDiv);
-                    
-                    // Fetch from GitHub API
-                    const response = await fetch(this.apiUrl);
-                    
-                    if (!response.ok) {
-                        throw new Error(`GitHub API error: ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    
-                    // Remove loading
-                    loadingDiv.remove();
-                    
-                    // Process files
-                    this.files = data.map(item => ({
-                        name: item.name,
-                        path: item.path,
-                        type: item.type,
-                        size: this.formatFileSize(item.size),
-                        download_url: item.download_url,
-                        html_url: item.html_url,
-                        icon: this.getFileIcon(item.name, item.type),
-                        sha: item.sha,
-                        lastModified: new Date().toLocaleDateString()
-                    }));
-                    
-                    this.updateFilePreview();
-                    return this.files;
-                    
-                } catch (error) {
-                    console.error('Error scanning ORA files:', error);
-                    
-                    // Fallback - try alternative approach
-                    try {
-                        // Try to fetch from raw endpoint as fallback
-                        const fallbackResponse = await fetch('https://raw.githubusercontent.com/MKB-NEL/orabymkb/main/files/README.md').catch(() => null);
-                        
-                        if (fallbackResponse && fallbackResponse.ok) {
-                            // If we can access at least one file, create basic file list
-                            this.files = [
-                                { name: 'README.md', type: 'file', size: '~1 KB', icon: '📝', html_url: this.githubUrl + '/README.md' },
-                                { name: 'S6 ALL-ENGLISH.pdf', type: 'file', size: '~2 MB', icon: '📕', html_url: this.githubUrl + '/S6%20ALL-ENGLISH.pdf' },
-                                { name: 'documents/', type: 'dir', size: '--', icon: '📁', html_url: this.githubUrl + '/documents' }
-                            ];
-                        } else {
-                            throw new Error('Cannot access ORA repository');
-                        }
-                    } catch (fallbackError) {
-                        console.error('Fallback also failed:', fallbackError);
-                        this.files = [];
-                    }
-                    
-                    this.updateFilePreview();
-                    return this.files;
-                }
-            }
-            
-            updateFilePreview() {
-                const preview = document.getElementById('file-preview');
-                if (!preview) return;
-                
-                if (this.files.length === 0) {
-                    preview.innerHTML = `<span class="ora">ORA Files Repository</span><br>
-                    <span class="error">Cannot connect to ORA files</span>`;
-                    return;
-                }
-                
-                preview.innerHTML = `<span class="ora">ORA Files: ${this.files.length}</span><br>
-                <span class="info">Repository connected</span><br>`;
-                
-                this.files.slice(0, 4).forEach(file => {
-                    preview.innerHTML += `<span class="file">${file.icon} ${file.name}</span><br>`;
-                });
-                
-                if (this.files.length > 4) {
-                    preview.innerHTML += `<span class="info">...and ${this.files.length - 4} more</span>`;
-                }
-            }
-            
-            async getFileInfo(filename) {
-                try {
-                    const file = this.files.find(f => f.name === filename);
-                    if (!file) {
-                        // Try case-insensitive search
-                        const fileLower = this.files.find(f => f.name.toLowerCase() === filename.toLowerCase());
-                        if (fileLower) {
-                            return await this.getFileInfoFromAPI(filename);
-                        }
-                        throw new Error('File not found in ORA repository');
-                    }
-                    
-                    return await this.getFileInfoFromAPI(filename);
-                    
-                } catch (error) {
-                    console.error('Error getting file info:', error);
-                    return {
-                        name: filename,
-                        type: 'unknown',
-                        size: 'unknown',
-                        error: error.message,
-                        content: `Error loading file: ${error.message}\n\nTry accessing directly: ${this.githubUrl}`
-                    };
-                }
-            }
-            
-            async getFileInfoFromAPI(filename) {
-                try {
-                    const response = await fetch(`${this.apiUrl}/${encodeURIComponent(filename)}`);
-                    if (!response.ok) {
-                        throw new Error(`File not found: ${filename}`);
-                    }
-                    
-                    const fileData = await response.json();
-                    let content = '';
-                    
-                    if (fileData.type === 'file' && fileData.download_url) {
-                        const contentResponse = await fetch(fileData.download_url);
-                        if (contentResponse.ok) {
-                            content = await contentResponse.text();
-                        }
-                    }
-                    
-                    return {
-                        name: fileData.name,
-                        type: fileData.type,
-                        size: this.formatFileSize(fileData.size),
-                        path: fileData.path,
-                        url: fileData.html_url,
-                        download_url: fileData.download_url,
-                        icon: this.getFileIcon(fileData.name, fileData.type),
-                        content: content || `File content for ${filename}`
-                    };
-                    
-                } catch (error) {
-                    console.error('API Error:', error);
-                    throw error;
-                }
-            }
-            
-            async downloadFile(filename) {
-                try {
-                    const file = this.files.find(f => f.name === filename);
-                    if (!file || file.type === 'dir') {
-                        throw new Error('File not found or is directory');
-                    }
-                    
-                    if (file.download_url) {
-                        // Open download in new tab
-                        window.open(file.download_url, '_blank');
-                        return true;
-                    } else {
-                        // Fallback to creating download
-                        const fileInfo = await this.getFileInfo(filename);
-                        const blob = new Blob([fileInfo.content], { type: 'text/plain' });
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = filename;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        window.URL.revokeObjectURL(url);
-                        return true;
-                    }
-                } catch (error) {
-                    console.error('Error downloading file:', error);
-                    return false;
-                }
-            }
-            
-            openInBrowser(filename) {
-                const file = this.files.find(f => f.name === filename);
-                if (file && file.html_url) {
-                    window.open(file.html_url, '_blank');
-                    return true;
-                }
-                return false;
-            }
-        }
-        
-        // ==============================
-        // ORA TOOL SYSTEM
-        // ==============================
-        class ORATool {
-            constructor() {
-                this.mode = 'normal';
-                this.currentPath = '/';
-                this.currentFile = null;
-                this.loggedIn = false;
-                this.username = 'bertrand';
-                this.password = 'karekezi@2';
-                this.fileSystem = new ORAFileSystem();
-                this.linkSystem = new LinkSystem();
-                this.localFileSystem = new LocalFileSystem();
-                this.isBooting = false;
-            }
-            
-            // ==============================
-            // BOOT SEQUENCE
-            // ==============================
-            async startBootSequence() {
-                if (this.isBooting) return;
-                
-                this.isBooting = true;
-                this.mode = 'boot';
-                const output = document.getElementById('terminal-output');
-                output.innerHTML = '';
-                
-                const bootMessages = [
-                    "[BOOT] Starting ORA Secure Boot Sequence...",
-                    "[OK] Memory test passed",
-                    "[OK] CPU: 8 cores detected",
-                    "[OK] RAM: 16GB available",
-                    "[LOAD] Loading kernel modules...",
-                    "   -> module_ora_core.ko [LOADED]",
-                    "   -> module_encryption.ko [LOADED]",
-                    "   -> module_network.ko [LOADED]",
-                    "   -> module_filesystem.ko [LOADED]",
-                    "[OK] All modules loaded",
-                    "[CRYPTO] Initializing ORA encryption...",
-                    "   Generating ORA-4096 keys...",
-                    "   Setting up AES-256...",
-                    "[OK] Encryption ready",
-                    "[NET] Configuring ORA network...",
-                    "   Establishing secure connection...",
-                    "   Connecting to ORA repository...",
-                    "[OK] Network: ORA ONLINE",
-                    "[AUTH] Starting ORA authentication service...",
-                    "[SCAN] Running ORA integrity check...",
-                    "   Checking ORA permissions...",
-                    "   Verifying ORA signatures...",
-                    "   Scanning for vulnerabilities...",
-                    "[OK] ORA integrity: 100%",
-                    "[SECURE] Entering ORA secure mode...",
-                    "[ORA] Connecting to ORA repository...",
-                    "   Repository: MKB-NEL/orabymkb",
-                    "   Branch: main",
-                    "   Path: /files",
-                    "[OK] ORA repository connected",
-                    "[INIT] Starting ORA Tool Environment...",
-                    "   Loading ORA profiles...",
-                    "   Mounting ORA filesystem...",
-                    "   Initializing ORA UI...",
-                    "[OK] ORA environment initialized",
-                    "[SCAN] Scanning ORA files...",
-                    "[WAIT] Finalizing ORA boot process..."
-                ];
-                
-                for (let i = 0; i < bootMessages.length; i++) {
-                    await new Promise(resolve => setTimeout(resolve, 80));
-                    const line = document.createElement('div');
-                    line.className = 'output hacker';
-                    line.textContent = bootMessages[i];
-                    
-                    if (Math.random() > 0.7) {
-                        line.style.opacity = '0.5';
-                        setTimeout(() => line.style.opacity = '1', 50);
-                    }
-                    
-                    output.appendChild(line);
-                    output.scrollTop = output.scrollHeight;
-                }
-                
-                await new Promise(resolve => setTimeout(resolve, 500));
-                const finalMsg = document.createElement('div');
-                finalMsg.className = 'output success';
-                finalMsg.textContent = "[OK] ORA initialization complete. Connected to ORA repository.";
-                output.appendChild(finalMsg);
-                
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                this.mode = 'login';
-                this.isBooting = false;
-                this.showLoginPrompt();
-            }
-            
-            // ==============================
-            // LOGIN SYSTEM
-            // ==============================
-            showLoginPrompt() {
-                const output = document.getElementById('terminal-output');
-                output.innerHTML = '';
-                
-                const loginDiv = document.createElement('div');
-                loginDiv.className = 'output';
-                loginDiv.innerHTML = '<span class="hacker">ORA Username:</span>';
-                output.appendChild(loginDiv);
-                
-                this.createLoginInput('username');
-            }
-            
-            createLoginInput(field) {
-                const output = document.getElementById('terminal-output');
-                const inputLine = document.createElement('div');
-                inputLine.className = 'input-line';
-                
-                const prompt = field === 'username' ? 'Username:' : 'Password:';
-                
-                inputLine.innerHTML = `
-                    <span class="prompt">${prompt}</span>
-                    <input type="${field === 'password' ? 'password' : 'text'}" 
-                           class="command-input login-field"
-                           autocomplete="off" 
-                           id="login-input-${field}"
-                           ${field === 'password' ? 'style="color: transparent; text-shadow: 0 0 0 #00ff00;"' : ''}>
-                    <span class="cursor"></span>
-                `;
-                
-                output.appendChild(inputLine);
-                
-                const input = inputLine.querySelector('.command-input');
-                
-                // Focus with timeout to avoid autofocus error
-                setTimeout(() => {
-                    input.focus();
-                }, 100);
-                
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const value = input.value.trim();
-                        inputLine.remove();
-                        this.processLoginInput(field, value);
-                    }
-                });
-                
-                output.scrollTop = output.scrollHeight;
-            }
-            
-            processLoginInput(field, value) {
-                const output = document.getElementById('terminal-output');
-                
-                if (field === 'username') {
-                    if (value.toLowerCase() === this.username) {
-                        const resultDiv = document.createElement('div');
-                        resultDiv.className = 'output';
-                        resultDiv.innerHTML = `<span class="success">ORA Username verified</span>`;
-                        output.appendChild(resultDiv);
-                        
-                        setTimeout(() => {
-                            const promptDiv = document.createElement('div');
-                            promptDiv.className = 'output';
-                            promptDiv.innerHTML = `<span class="hacker">ORA Password:</span>`;
-                            output.appendChild(promptDiv);
-                            this.createLoginInput('password');
-                        }, 500);
-                    } else {
-                        const resultDiv = document.createElement('div');
-                        resultDiv.className = 'output';
-                        resultDiv.innerHTML = `<span class="error">Invalid ORA username. Try again.</span>`;
-                        output.appendChild(resultDiv);
-                        
-                        setTimeout(() => {
-                            const promptDiv = document.createElement('div');
-                            promptDiv.className = 'output';
-                            promptDiv.innerHTML = `<span class="hacker">ORA Username:</span>`;
-                            output.appendChild(promptDiv);
-                            this.createLoginInput('username');
-                        }, 1000);
-                    }
-                } else if (field === 'password') {
-                    if (value === this.password) {
-                        this.loggedIn = true;
-                        
-                        const resultDiv = document.createElement('div');
-                        resultDiv.className = 'output';
-                        resultDiv.innerHTML = `
-                            <span class="success">ORA Login successful.</span><br>
-                            <span class="hacker">Welcome to ORA Tool Environment.</span>
-                        `;
-                        output.appendChild(resultDiv);
-                        
-                        setTimeout(() => {
-                            this.enterORATool();
-                        }, 1500);
-                    } else {
-                        const resultDiv = document.createElement('div');
-                        resultDiv.className = 'output';
-                        resultDiv.innerHTML = `<span class="error">Incorrect ORA password.</span>`;
-                        output.appendChild(resultDiv);
-                        
-                        setTimeout(() => {
-                            const promptDiv = document.createElement('div');
-                            promptDiv.className = 'output';
-                            promptDiv.innerHTML = `<span class="hacker">ORA Password:</span>`;
-                            output.appendChild(promptDiv);
-                            this.createLoginInput('password');
-                        }, 1000);
-                    }
-                }
-                
-                output.scrollTop = output.scrollHeight;
-            }
-            
-            // ==============================
-            // ORA TOOL ENVIRONMENT
-            // ==============================
-            async enterORATool() {
-                this.mode = 'ora-tool';
-                this.currentPath = '/ora/files';
-                this.currentFile = null;
-                
-                const output = document.getElementById('terminal-output');
-                output.innerHTML = '';
-                
-                const files = await this.fileSystem.scanORAFiles();
-                
-                const welcomeDiv = document.createElement('div');
-                welcomeDiv.className = 'output';
-                welcomeDiv.innerHTML = `
-                    <span class="ora">=== ORA TOOL ENVIRONMENT ===</span><br>
-                    <span class="hacker">Entering ORA Tool...</span><br>
-                    <span class="hacker">Connecting to ORA Repository...</span><br>
-                    <span class="success">Repository: MKB-NEL/orabymkb</span><br>
-                    <span class="success">Path: /files</span><br>
-                    <span class="success">Found ${files.length} ORA files/directories</span><br><br>
-                    <span class="info">Type "ls" to view ORA files.</span><br>
-                    <span class="info">Type "open filename" to open a file.</span><br>
-                    <span class="info">Type "info filename" for file details.</span><br>
-                    <span class="info">Type "get filename" to download.</span><br>
-                    <span class="info">Type "view filename" to preview.</span><br>
-                    <span class="info">Type "exit" to quit ORA Tool.</span><br><br>
-                    <span class="warning">⚠️ ORA Tool provides access to secured repository files.</span>
-                `;
-                output.appendChild(welcomeDiv);
-                
-                createInputLine();
-            }
-            
-            // ==============================
-            // ORA FILE COMMANDS
-            // ==============================
-            async listORAFiles() {
-                const output = document.getElementById('terminal-output');
-                output.innerHTML = '';
-                
-                const files = await this.fileSystem.scanORAFiles();
-                
-                const headerDiv = document.createElement('div');
-                headerDiv.className = 'output';
-                headerDiv.innerHTML = `<span class="ora">=== ORA FILES REPOSITORY ===</span><br>
-                <span class="info">Path: ${this.currentPath}</span><br><br>`;
-                output.appendChild(headerDiv);
-                
-                if (files.length === 0) {
-                    const emptyDiv = document.createElement('div');
-                    emptyDiv.className = 'output error';
-                    emptyDiv.textContent = 'No files found in ORA repository';
-                    output.appendChild(emptyDiv);
-                } else {
-                    files.forEach(file => {
-                        const fileDiv = document.createElement('div');
-                        fileDiv.className = 'output file-item';
-                        fileDiv.innerHTML = `
-                            <span class="file-icon">${file.icon}</span>
-                            <span class="${file.type === 'dir' ? 'info' : 'system'}">${file.name}</span>
-                            <span class="file-type">${file.type === 'dir' ? 'DIR' : 'FILE'}</span>
-                            <span class="file-size">${file.size}</span>
-                        `;
-                        output.appendChild(fileDiv);
-                    });
-                }
-                
-                const helpDiv = document.createElement('div');
-                helpDiv.className = 'output';
-                helpDiv.innerHTML = `<br><span class="system">Use "open filename" to open, "info filename" for details, or "exit" to quit.</span>`;
-                output.appendChild(helpDiv);
-                
-                createInputLine();
-            }
-            
-            async openORAFile(filename) {
-                const success = this.fileSystem.openInBrowser(filename);
-                const output = document.getElementById('terminal-output');
-                
-                if (success) {
-                    const msgDiv = document.createElement('div');
-                    msgDiv.className = 'output success';
-                    msgDiv.textContent = `Opening ${filename} in ORA repository...`;
-                    output.appendChild(msgDiv);
-                } else {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'output error';
-                    errorDiv.textContent = `Cannot open ${filename} in browser`;
-                    output.appendChild(errorDiv);
-                }
-                
-                createInputLine();
-            }
-            
-            async getORAFileInfo(filename) {
-                const output = document.getElementById('terminal-output');
-                output.innerHTML = '';
-                
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'output';
-                loadingDiv.innerHTML = `<span class="loading"></span><span class="ora">Loading ORA file info...</span>`;
-                output.appendChild(loadingDiv);
-                
-                const fileInfo = await this.fileSystem.getFileInfo(filename);
-                
-                output.innerHTML = '';
-                
-                const headerDiv = document.createElement('div');
-                headerDiv.className = 'output';
-                headerDiv.innerHTML = `<span class="ora">=== ORA FILE INFO: ${filename} ===</span>`;
-                output.appendChild(headerDiv);
-                
-                const metaDiv = document.createElement('div');
-                metaDiv.className = 'file-meta';
-                metaDiv.innerHTML = `
-                    <span class="info">${fileInfo.icon} ${fileInfo.name}</span><br>
-                    <span class="system">Type: ${fileInfo.type.toUpperCase()}</span><br>
-                    <span class="system">Size: ${fileInfo.size}</span><br>
-                    <span class="system">Path: ${fileInfo.path || 'N/A'}</span><br>
-                    ${fileInfo.url ? `<span class="link">URL: <a href="${fileInfo.url}" target="_blank" style="color:#00aaff;">${fileInfo.url}</a></span><br>` : ''}
-                `;
-                output.appendChild(metaDiv);
-                
-                if (fileInfo.type === 'file' && fileInfo.content) {
-                    const contentDiv = document.createElement('div');
-                    contentDiv.className = 'file-preview-content';
-                    
-                    // Limit content display for large files
-                    let displayContent = fileInfo.content;
-                    if (displayContent.length > 2000) {
-                        displayContent = displayContent.substring(0, 2000) + '\n\n... (content truncated)';
-                    }
-                    
-                    contentDiv.textContent = displayContent;
-                    output.appendChild(contentDiv);
-                }
-                
-                const commandsDiv = document.createElement('div');
-                commandsDiv.className = 'output';
-                commandsDiv.innerHTML = `
-                    <br><span class="info">Commands for this file:</span><br>
-                    <span class="command">open ${filename}</span> - Open in repository<br>
-                    <span class="command">get ${filename}</span> - Download file<br>
-                    <span class="command">ls</span> - Back to file list<br>
-                `;
-                output.appendChild(commandsDiv);
-                
-                createInputLine();
-            }
-            
-            async downloadORAFile(filename) {
-                const output = document.getElementById('terminal-output');
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'output';
-                loadingDiv.innerHTML = `<span class="loading"></span><span class="ora">Downloading ORA file...</span>`;
-                output.appendChild(loadingDiv);
-                
-                const success = await this.fileSystem.downloadFile(filename);
-                
-                output.innerHTML = '';
-                
-                if (success) {
-                    const successDiv = document.createElement('div');
-                    successDiv.className = 'output success';
-                    successDiv.textContent = `✓ ORA file download started: ${filename}`;
-                    output.appendChild(successDiv);
-                } else {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'output error';
-                    errorDiv.textContent = `✗ Failed to download ORA file: ${filename}`;
-                    output.appendChild(errorDiv);
-                }
-                
-                createInputLine();
-            }
-            
-            exitORATool() {
-                this.mode = 'normal';
-                this.currentPath = '/';
-                this.currentFile = null;
-                this.loggedIn = false;
-                
-                const output = document.getElementById('terminal-output');
-                output.innerHTML = '';
-                
-                const exitDiv = document.createElement('div');
-                exitDiv.className = 'output';
-                exitDiv.innerHTML = `
-                    <span class="system">Exiting ORA Tool...</span><br>
-                    <span class="success">Returning to Terminal.</span><br><br>
-                `;
-                output.appendChild(exitDiv);
-                
-                setTimeout(() => {
-                    output.innerHTML = '';
-                    const welcomeDiv = document.createElement('div');
-                    welcomeDiv.className = 'output';
-                    welcomeDiv.innerHTML = `
-                        <span class="system">system 0.1 is running</span><br>
-                        <span class="system">> terminal shell</span><br>
-                        <span class="system">> made by Bertrand</span><br>
-                        <span class="system">> 2025</span><br><br>
-                        <span class="info">Type 'help' to see functions</span><br>
-                        <span class="info">Type 'start' to launch ORA Tool</span><br>
-                        <span class="info">Type 'localfiles' to access local S6 documents</span><br>
-                        <span class="info">Type 'link show' to access secure link</span><br>
-                        <span class="info">Type 'color 1-12' to change matrix color</span><br><br>
-                    `;
-                    output.appendChild(welcomeDiv);
-                    createInputLine();
-                }, 1500);
-            }
-            
-            async handleORAToolCommand(cmd, args) {
-                const output = document.getElementById('terminal-output');
-                
-                if (cmd === 'ls' || cmd === 'list') {
-                    await this.listORAFiles();
-                    return true;
-                } else if (cmd === 'open') {
-                    if (args.length === 0) {
-                        const errorDiv = document.createElement('div');
-                        errorDiv.className = 'output error';
-                        errorDiv.textContent = 'Usage: open filename';
-                        output.appendChild(errorDiv);
-                        createInputLine();
-                        return true;
-                    }
-                    
-                    await this.openORAFile(args[0]);
-                    return true;
-                } else if (cmd === 'info') {
-                    if (args.length === 0) {
-                        const errorDiv = document.createElement('div');
-                        errorDiv.className = 'output error';
-                        errorDiv.textContent = 'Usage: info filename';
-                        output.appendChild(errorDiv);
-                        createInputLine();
-                        return true;
-                    }
-                    
-                    await this.getORAFileInfo(args[0]);
-                    return true;
-                } else if (cmd === 'get' || cmd === 'download') {
-                    if (args.length === 0) {
-                        const errorDiv = document.createElement('div');
-                        errorDiv.className = 'output error';
-                        errorDiv.textContent = 'Usage: get filename';
-                        output.appendChild(errorDiv);
-                        createInputLine();
-                        return true;
-                    }
-                    
-                    await this.downloadORAFile(args[0]);
-                    return true;
-                } else if (cmd === 'view' || cmd === 'preview') {
-                    if (args.length === 0) {
-                        const errorDiv = document.createElement('div');
-                        errorDiv.className = 'output error';
-                        errorDiv.textContent = 'Usage: view filename';
-                        output.appendChild(errorDiv);
-                        createInputLine();
-                        return true;
-                    }
-                    
-                    await this.getORAFileInfo(args[0]);
-                    return true;
-                } else if (cmd === 'scan' || cmd === 'refresh') {
-                    const loadingDiv = document.createElement('div');
-                    loadingDiv.className = 'output';
-                    loadingDiv.innerHTML = `<span class="loading"></span><span class="ora">Rescanning ORA repository...</span>`;
-                    output.appendChild(loadingDiv);
-                    
-                    await this.fileSystem.scanORAFiles();
-                    
-                    loadingDiv.remove();
-                    const successDiv = document.createElement('div');
-                    successDiv.className = 'output success';
-                    successDiv.textContent = '✓ ORA repository rescanned successfully';
-                    output.appendChild(successDiv);
-                    
-                    createInputLine();
-                    return true;
-                } else if (cmd === 'exit') {
-                    this.exitORATool();
-                    return true;
-                } else if (cmd === 'help') {
-                    const helpDiv = document.createElement('div');
-                    helpDiv.className = 'output';
-                    helpDiv.innerHTML = `
-                        <span class="ora">=== ORA TOOL COMMANDS ===</span><br><br>
-                        <span class="command">ls / list</span> - List ORA files<br>
-                        <span class="command">open filename</span> - Open file in repository<br>
-                        <span class="command">info filename</span> - Show file details<br>
-                        <span class="command">get filename</span> - Download file<br>
-                        <span class="command">view filename</span> - Preview file content<br>
-                        <span class="command">scan / refresh</span> - Rescan repository<br>
-                        <span class="command">exit</span> - Exit ORA Tool<br><br>
-                        <span class="info">Files are accessed from: MKB-NEL/orabymkb/files</span>
-                    `;
-                    output.appendChild(helpDiv);
-                    createInputLine();
-                    return true;
-                }
-                
-                return false;
             }
         }
         
@@ -1534,51 +347,62 @@
         // ==============================
         const terminalOutput = document.getElementById('terminal-output');
         const terminalContainer = document.querySelector('.terminal-container');
-        const terminalHeader = document.getElementById('terminal-header');
-        const oraTool = new ORATool();
-        const localFileSystem = new LocalFileSystem();
         
-        // Global function to open local files from buttons
-        window.openLocalFile = async function(filename) {
-            const success = localFileSystem.openFile(filename);
-            if (success) {
-                const resultDiv = document.createElement('div');
-                resultDiv.className = 'output success';
-                resultDiv.textContent = `Opening: ${filename}`;
-                terminalOutput.appendChild(resultDiv);
-                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        // Simulate typing effect for initial command
+        function simulateTyping() {
+            const commands = ['orastart', 'help', 'neofetch', 'clear'];
+            const command = commands[Math.floor(Math.random() * commands.length)];
+            let i = 0;
+            const initialCommand = document.getElementById('initial-command');
+            
+            function typeChar() {
+                if (i < command.length) {
+                    initialCommand.textContent += command.charAt(i);
+                    i++;
+                    setTimeout(typeChar, 100);
+                } else {
+                    setTimeout(() => {
+                        processCommand(command);
+                        createInputLine();
+                    }, 500);
+                }
             }
-        };
+            
+            setTimeout(typeChar, 1000);
+        }
         
-        // Command definitions
+        // Command definitions (Kali-like)
         const commands = {
             help: {
                 description: 'Show all available commands',
                 execute: () => {
-                    let helpText = '<span class="info">=== TERMINAL COMMANDS ===</span><br><br>';
-                    helpText += '<span class="ora">System Commands:</span><br>';
-                    for (const [cmd, info] of Object.entries(commands)) {
-                        if (cmd !== 'start' && cmd !== 'link' && cmd !== 'ls' && cmd !== 'open' && cmd !== 'info' && cmd !== 'get' && cmd !== 'view' && cmd !== 'localfiles') {
-                            helpText += `<span class="command">${cmd}</span> - ${info.description}<br>`;
-                        }
-                    }
-                    helpText += '<br><span class="ora">Link System:</span><br>';
-                    helpText += '<span class="command">link show</span> - Access secure Google Drive link<br>';
-                    helpText += '<br><span class="ora">Local Files System:</span><br>';
-                    helpText += '<span class="command">localfiles</span> - Access local S6 documents<br>';
-                    helpText += '<span class="command">open filename</span> - Open local file (after localfiles)<br>';
-                    helpText += '<span class="command">search keyword</span> - Search local files (after localfiles)<br>';
-                    helpText += '<span class="command">count</span> - Show file statistics (after localfiles)<br>';
-                    helpText += '<br><span class="ora">ORA Tool Commands (GitHub):</span><br>';
-                    helpText += '<span class="command">start</span> - Launch ORA Tool (GitHub files)<br>';
-                    helpText += '<span class="command">ls</span> - List ORA files (in ORA Tool)<br>';
-                    helpText += '<span class="command">open filename</span> - Open ORA file (in ORA Tool)<br>';
-                    helpText += '<span class="command">info filename</span> - File details (in ORA Tool)<br>';
-                    helpText += '<span class="command">get filename</span> - Download file (in ORA Tool)<br>';
-                    helpText += '<span class="command">view filename</span> - Preview file (in ORA Tool)<br>';
-                    helpText += '<span class="command">exit</span> - Exit ORA Tool<br>';
-                    helpText += '<br><span class="info">Type the command to see specific help</span>';
+                    let helpText = '<span class="ora">Available commands:</span><br><br>';
+                    helpText += '<span class="command">orastart</span>      - Launch ORA Tool (opens new window)<br>';
+                    helpText += '<span class="command">clear</span>         - Clear the terminal screen<br>';
+                    helpText += '<span class="command">date</span>          - Show current date and time<br>';
+                    helpText += '<span class="command">echo [text]</span>   - Display a line of text<br>';
+                    helpText += '<span class="command">whoami</span>        - Print effective userid<br>';
+                    helpText += '<span class="command">pwd</span>           - Print working directory<br>';
+                    helpText += '<span class="command">ls</span>            - List directory contents<br>';
+                    helpText += '<span class="command">neofetch</span>      - Display system information<br>';
+                    helpText += '<span class="command">uname</span>         - Print system information<br>';
+                    helpText += '<span class="command">uptime</span>        - Tell how long system has been running<br>';
+                    helpText += '<span class="command">cal</span>           - Display a calendar<br>';
+                    helpText += '<span class="command">color [1-12]</span>  - Change matrix color<br>';
+                    helpText += '<span class="command">reboot</span>        - Restart terminal<br>';
+                    helpText += '<span class="command">about</span>         - About this terminal<br>';
+                    helpText += '<br><span class="info">Use TAB for auto-completion and ↑↓ for command history</span>';
                     return helpText;
+                }
+            },
+            
+            orastart: {
+                description: 'Launch ORA Tool',
+                execute: () => {
+                    setTimeout(() => {
+                        window.open('oratool.html', '_blank');
+                    }, 500);
+                    return '<span class="success">Launching ORA Tool in new window...</span>';
                 }
             },
             
@@ -1590,99 +414,6 @@
                         createInputLine();
                     }, 10);
                     return '';
-                }
-            },
-            
-            localfiles: {
-                description: 'Access local S6 documents',
-                execute: async () => {
-                    const loadingDiv = document.createElement('div');
-                    loadingDiv.className = 'output';
-                    loadingDiv.innerHTML = `<span class="loading"></span><span class="info">Loading local documents...</span>`;
-                    terminalOutput.appendChild(loadingDiv);
-                    
-                    const files = await localFileSystem.loadFiles();
-                    
-                    loadingDiv.remove();
-                    
-                    if (files.length === 0) {
-                        return '<span class="error">No local files found. Check data.json and files/ folder</span>';
-                    }
-                    
-                    let result = `<span class="ora">=== S6 DOCUMENTS (${files.length} files) ===</span><br><br>`;
-                    result += `<span class="info">Local files from data.json:</span><br><br>`;
-                    
-                    files.forEach((filename, index) => {
-                        const icon = localFileSystem.getFileIcon(filename);
-                        const extension = filename.split('.').pop().toUpperCase();
-                        
-                        result += `<div class="file-item">
-                            <span class="file-icon">${icon}</span>
-                            <span class="file">${filename}</span>
-                            <span class="file-size">${extension}</span>
-                            <button class="open-btn" onclick="openLocalFile('${filename.replace(/'/g, "\\'")}')">OPEN</button>
-                        </div>`;
-                    });
-                    
-                    result += `<br><span class="info">Commands for local files:</span><br>`;
-                    result += `<span class="command">open filename</span> - Open a document<br>`;
-                    result += `<span class="command">search keyword</span> - Search for files<br>`;
-                    result += `<span class="command">count</span> - Show file statistics<br>`;
-                    result += `<span class="command">help</span> - Show all commands<br>`;
-                    
-                    return result;
-                }
-            },
-            
-            search: {
-                description: 'Search local files',
-                execute: async (args) => {
-                    if (args.length === 0) {
-                        return '<span class="error">Usage: search keyword</span><br>Example: search math';
-                    }
-                    
-                    const keyword = args.join(' ');
-                    const files = await localFileSystem.loadFiles();
-                    const results = localFileSystem.searchFiles(keyword);
-                    
-                    if (results.length === 0) {
-                        return `<span class="warning">No files found matching: ${keyword}</span>`;
-                    }
-                    
-                    let result = `<span class="ora">=== SEARCH RESULTS (${results.length} files) ===</span><br>`;
-                    result += `<span class="info">Searching for: ${keyword}</span><br><br>`;
-                    
-                    results.forEach(filename => {
-                        const icon = localFileSystem.getFileIcon(filename);
-                        result += `<div class="file-item">
-                            <span class="file-icon">${icon}</span>
-                            <span class="file">${filename}</span>
-                            <button class="open-btn" onclick="openLocalFile('${filename.replace(/'/g, "\\'")}')">OPEN</button>
-                        </div>`;
-                    });
-                    
-                    return result;
-                }
-            },
-            
-            count: {
-                description: 'Show local file statistics',
-                execute: async () => {
-                    const files = await localFileSystem.loadFiles();
-                    
-                    const pdfCount = files.filter(f => f.toLowerCase().endsWith('.pdf')).length;
-                    const docxCount = files.filter(f => f.toLowerCase().endsWith('.docx')).length;
-                    const docCount = files.filter(f => f.toLowerCase().endsWith('.doc')).length;
-                    const otherCount = files.length - pdfCount - docxCount - docCount;
-                    
-                    let stats = `<span class="ora">=== LOCAL FILE STATISTICS ===</span><br><br>`;
-                    stats += `<span class="info">Total files: ${files.length}</span><br>`;
-                    stats += `<span class="info">PDF files: ${pdfCount}</span><br>`;
-                    stats += `<span class="info">DOCX files: ${docxCount}</span><br>`;
-                    stats += `<span class="info">DOC files: ${docCount}</span><br>`;
-                    stats += `<span class="info">Other files: ${otherCount}</span><br>`;
-                    
-                    return stats;
                 }
             },
             
@@ -1700,33 +431,81 @@
                 }
             },
             
-            about: {
-                description: 'Information about this terminal',
+            whoami: {
+                description: 'Print effective userid',
                 execute: () => {
-                    return `<span class="ora">Terminal Shell v1.0</span><br>
-                    Advanced web-based terminal with multiple file systems<br>
-                    Features: GitHub API, Local files, Secure link system<br>
-                    Built by Bertrand • 2025<br><br>
-                    <span class="info">GitHub Repository: MKB-NEL/orabymkb</span><br>
-                    <span class="info">Local Files: /files directory (S6 documents)</span>`;
-                }
-            },
-            
-            ls: {
-                description: 'List ORA directory contents',
-                execute: () => {
-                    if (oraTool.mode === 'normal') {
-                        return `<span class="info">Type 'start' to access ORA files (GitHub)</span><br>
-                        <span class="info">Type 'localfiles' to access local S6 documents</span>`;
-                    }
-                    return '';
+                    return 'ora';
                 }
             },
             
             pwd: {
                 description: 'Print working directory',
                 execute: () => {
-                    return oraTool.mode === 'normal' ? '/home/user' : oraTool.currentPath;
+                    return '/home/ora';
+                }
+            },
+            
+            ls: {
+                description: 'List directory contents',
+                execute: () => {
+                    return `Desktop    Downloads  Music     Public<br>
+                    Documents  Pictures   Videos    oratool.html`;
+                }
+            },
+            
+            neofetch: {
+                description: 'Display system information',
+                execute: () => {
+                    return `
+                    <span class="ora">        .-/+oossssoo+/-.               <span class="system">ora@terminal</span></span><br>
+                    <span class="ora">    `:+ssssssssssssssssss+:`           -------------</span><br>
+                    <span class="ora">  -+ssssssssssssssssssyyssss+-         <span class="info">OS: ORA Terminal Kali v1.0</span></span><br>
+                    <span class="ora"> .ossssssssssssssssssdMMMNysssso.       <span class="info">Host: Virtual Terminal</span></span><br>
+                    <span class="ora"> /ssssssssssshdmmNNmmyNMMMMhssssss/      <span class="info">Kernel: 6.1.0-kali5-amd64</span></span><br>
+                    <span class="ora"> +ssssssssshmydMMMMMMMNddddysssssss+     <span class="info">Uptime: 2 hours, 15 mins</span></span><br>
+                    <span class="ora"> /sssssssshNMMMyhhyyyyhmNMMMNhssssss/    <span class="info">Shell: ora-terminal v1.0</span></span><br>
+                    <span class="ora"> .ossssssssdMMMNhsssssssssshNMMMdssssso.  <span class="info">Terminal: ORA Terminal</span></span><br>
+                    <span class="ora">  -+sssssssshyyysssssssssssssyyyyssss+-  <span class="info">CPU: Virtual CPU (8) @ 3.60GHz</span></span><br>
+                    <span class="ora">    `:+ssssssssssssssssssssssssssss+:`   <span class="info">Memory: 4096MiB / 8192MiB</span></span><br>
+                    <span class="ora">        .-/+oossssoo+/-.</span>`;
+                }
+            },
+            
+            uname: {
+                description: 'Print system information',
+                execute: (args) => {
+                    if (args.includes('-a')) {
+                        return 'Linux terminal 6.1.0-kali5-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.12-1kali2 (2023-02-23) x86_64 GNU/Linux';
+                    }
+                    return 'Linux';
+                }
+            },
+            
+            uptime: {
+                description: 'Tell how long system has been running',
+                execute: () => {
+                    return ' 10:30:45 up 2:15,  1 user,  load average: 0.08, 0.03, 0.01';
+                }
+            },
+            
+            cal: {
+                description: 'Display a calendar',
+                execute: () => {
+                    const now = new Date();
+                    const month = now.getMonth();
+                    const year = now.getFullYear();
+                    
+                    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                                      'July', 'August', 'September', 'October', 'November', 'December'];
+                    
+                    return `
+                    <span class="system">     ${monthNames[month]} ${year}</span><br>
+                    <span class="system">Su Mo Tu We Th Fr Sa</span><br>
+                    <span class="system"> 1  2  3  4  5  6  7</span><br>
+                    <span class="system"> 8  9 10 11 12 13 14</span><br>
+                    <span class="system">15 16 17 18 19 20 21</span><br>
+                    <span class="system">22 23 24 25 26 27 28</span><br>
+                    <span class="system">29 30 31</span>`;
                 }
             },
             
@@ -1751,41 +530,8 @@
                 }
             },
             
-            calc: {
-                description: 'Simple calculator',
-                execute: (args) => {
-                    try {
-                        const expression = args.join(' ');
-                        const result = eval(expression);
-                        return `${expression} = <span class="success">${result}</span>`;
-                    } catch {
-                        return '<span class="error">Invalid expression</span>';
-                    }
-                }
-            },
-            
-            neofetch: {
-                description: 'Display system information',
-                execute: async () => {
-                    const files = await oraTool.fileSystem.scanORAFiles();
-                    const localFiles = await localFileSystem.loadFiles();
-                    
-                    return `
-                    <span class="ora">╔══════════════════════════════════════╗</span><br>
-                    <span class="ora">║        TERMINAL INFO                 ║</span><br>
-                    <span class="ora">╠══════════════════════════════════════╣</span><br>
-                    <span class="system">║ OS: Terminal Shell v1.0              ║</span><br>
-                    <span class="system">║ Mode: ${oraTool.mode.toUpperCase()}                      ║</span><br>
-                    <span class="system">║ GitHub Files: ${files.length}                ║</span><br>
-                    <span class="system">║ Local Files: ${localFiles.length}                ║</span><br>
-                    <span class="system">║ Matrix: ${matrixColor}              ║</span><br>
-                    <span class="system">║ Status: DUAL SYSTEM ACTIVE         ║</span><br>
-                    <span class="ora">╚══════════════════════════════════════╝</span>`;
-                }
-            },
-            
             reboot: {
-                description: 'Reboot terminal interface',
+                description: 'Restart terminal',
                 execute: () => {
                     setTimeout(() => {
                         location.reload();
@@ -1794,117 +540,19 @@
                 }
             },
             
-            link: {
-                description: 'Access secure link system',
-                execute: (args) => {
-                    if (args.length === 0) {
-                        return `<span class="info">Link System Commands:</span><br>
-                        <span class="command">link show</span> - Access secure Google Drive link<br>
-                        <span class="info">Password: karekezi@2</span>`;
-                    }
-                    
-                    if (args[0] === 'show') {
-                        oraTool.linkSystem.showLinkPrompt();
-                        return '';
-                    }
-                    
-                    return '<span class="error">Usage: link show</span>';
-                }
-            },
-            
-            start: {
-                description: 'Launch ORA Tool with real GitHub API',
-                execute: async () => {
-                    if (oraTool.mode === 'normal') {
-                        await oraTool.startBootSequence();
-                        return '';
-                    } else if (oraTool.mode === 'boot') {
-                        return '<span class="info">ORA boot sequence already running...</span>';
-                    } else {
-                        return '<span class="error">Already in ORA Tool mode. Type "exit" first.</span>';
-                    }
-                }
-            },
-            
-            // ORA Tool commands (only work in ORA Tool mode)
-            open: {
-                description: 'Open file in current mode',
-                execute: async (args) => {
-                    if (oraTool.mode === 'ora-tool') {
-                        return await oraTool.handleORAToolCommand('open', args) ? '' : '<span class="error">Failed to open ORA file</span>';
-                    } else {
-                        // Handle local file opening
-                        if (args.length === 0) {
-                            return '<span class="error">Usage: open filename</span><br>Example: open S6 ALL-ENGLISH.pdf<br>Type "localfiles" first to see available files';
-                        }
-                        
-                        const filename = args.join(' ');
-                        const files = await localFileSystem.loadFiles();
-                        
-                        // Find exact match first
-                        let file = files.find(f => f === filename);
-                        
-                        // If not found, try case-insensitive
-                        if (!file) {
-                            file = files.find(f => f.toLowerCase() === filename.toLowerCase());
-                        }
-                        
-                        // If still not found, try partial match
-                        if (!file) {
-                            const matches = files.filter(f => f.toLowerCase().includes(filename.toLowerCase()));
-                            if (matches.length === 1) {
-                                file = matches[0];
-                            } else if (matches.length > 1) {
-                                let msg = `<span class="warning">Multiple matches found:</span><br>`;
-                                matches.forEach(match => {
-                                    msg += `<span class="info">${match}</span><br>`;
-                                });
-                                msg += `<br><span class="info">Be more specific</span>`;
-                                return msg;
-                            }
-                        }
-                        
-                        if (!file) {
-                            return `<span class="error">File not found: ${filename}</span><br>Type 'localfiles' to see available files`;
-                        }
-                        
-                        const success = localFileSystem.openFile(file);
-                        if (success) {
-                            return `<span class="success">Opening: ${file}</span>`;
-                        } else {
-                            return `<span class="error">Failed to open: ${file}</span>`;
-                        }
-                    }
-                }
-            },
-            
-            info: {
-                description: 'Show ORA file details',
-                execute: async (args) => {
-                    if (oraTool.mode !== 'ora-tool') {
-                        return '<span class="error">ORA Tool not active. Type "start" first.</span>';
-                    }
-                    return await oraTool.handleORAToolCommand('info', args) ? '' : '<span class="error">Failed to get file info</span>';
-                }
-            },
-            
-            get: {
-                description: 'Download ORA file',
-                execute: async (args) => {
-                    if (oraTool.mode !== 'ora-tool') {
-                        return '<span class="error">ORA Tool not active. Type "start" first.</span>';
-                    }
-                    return await oraTool.handleORAToolCommand('get', args) ? '' : '<span class="error">Failed to download file</span>';
-                }
-            },
-            
-            view: {
-                description: 'Preview ORA file content',
-                execute: async (args) => {
-                    if (oraTool.mode !== 'ora-tool') {
-                        return '<span class="error">ORA Tool not active. Type "start" first.</span>';
-                    }
-                    return await oraTool.handleORAToolCommand('view', args) ? '' : '<span class="error">Failed to preview file</span>';
+            about: {
+                description: 'About this terminal',
+                execute: () => {
+                    return `<span class="ora">ORA Terminal Shell v2.0</span><br>
+                    <span class="info">Kali Linux-style terminal interface</span><br>
+                    <span class="info">With ORA Tool integration</span><br>
+                    <span class="info">Created by MKB - 2025</span><br><br>
+                    <span class="system">Features:</span><br>
+                    <span class="system">• Matrix background animation</span><br>
+                    <span class="system">• Kali Linux command set</span><br>
+                    <span class="system">• ORA Tool launcher (orastart)</span><br>
+                    <span class="system">• Interactive command history</span><br>
+                    <span class="system">• Tab auto-completion</span>`;
                 }
             }
         };
@@ -1920,15 +568,8 @@
             const inputLine = document.createElement('div');
             inputLine.className = 'input-line';
             
-            let promptText = '$';
-            if (oraTool.mode === 'ora-tool') {
-                promptText = `ORA:${oraTool.currentPath}$`;
-            } else if (oraTool.mode === 'login' || oraTool.mode === 'boot') {
-                promptText = '>';
-            }
-            
             inputLine.innerHTML = `
-                <span class="prompt">${promptText}</span>
+                <span class="prompt">ora@terminal:~$ </span>
                 <input type="text" class="command-input" autocomplete="off" id="main-command-input">
                 <span class="cursor"></span>
             `;
@@ -1936,7 +577,6 @@
             
             const input = inputLine.querySelector('.command-input');
             
-            // Use setTimeout to avoid autofocus blocking
             setTimeout(() => {
                 input.focus();
             }, 100);
@@ -1993,15 +633,7 @@
             // Display command
             const commandOutput = document.createElement('div');
             commandOutput.className = 'output';
-            
-            let promptText = '$';
-            if (oraTool.mode === 'ora-tool') {
-                promptText = `ORA:${oraTool.currentPath}$`;
-            } else if (oraTool.mode === 'login' || oraTool.mode === 'boot') {
-                promptText = '>';
-            }
-            
-            commandOutput.innerHTML = `<span class="prompt">${promptText}</span> <span class="command">${fullCommand}</span>`;
+            commandOutput.innerHTML = `<span class="prompt">ora@terminal:~$ </span> <span class="command">${fullCommand}</span>`;
             terminalOutput.appendChild(commandOutput);
             
             // Parse command
@@ -2012,174 +644,34 @@
             
             if (cmd === '') {
                 resultDiv.innerHTML = '';
+            } else if (commands[cmd]) {
+                try {
+                    const result = commands[cmd].execute(args);
+                    if (result instanceof Promise) {
+                        resultDiv.innerHTML = await result;
+                    } else {
+                        resultDiv.innerHTML = result;
+                    }
+                } catch (error) {
+                    console.error('Command error:', error);
+                    resultDiv.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+                }
             } else {
-                // Handle commands based on mode
-                if (oraTool.mode === 'ora-tool') {
-                    // In ORA Tool mode, first try ORA Tool commands
-                    const handled = await oraTool.handleORAToolCommand(cmd, args);
-                    if (handled) {
-                        // Command was handled by ORA Tool
-                        return;
-                    }
-                }
-                
-                // Try regular commands
-                if (commands[cmd]) {
-                    try {
-                        const result = commands[cmd].execute(args);
-                        if (result instanceof Promise) {
-                            resultDiv.innerHTML = await result;
-                        } else {
-                            resultDiv.innerHTML = result;
-                        }
-                    } catch (error) {
-                        console.error('Command error:', error);
-                        resultDiv.innerHTML = `<span class="error">Error: ${error.message}</span>`;
-                    }
-                } else if (oraTool.mode === 'normal') {
-                    resultDiv.innerHTML = `<span class="error">Command not found: ${cmd}</span><br>
-                    Type <span class="command">'help'</span> for available commands`;
-                } else if (oraTool.mode === 'ora-tool') {
-                    resultDiv.innerHTML = `<span class="error">ORA Tool command not found: ${cmd}</span><br>
-                    Type <span class="command">'help'</span> for available ORA Tool commands`;
-                }
+                resultDiv.innerHTML = `<span class="error">Command not found: ${cmd}</span><br>
+                Type <span class="command">'help'</span> for available commands`;
             }
             
             if (resultDiv.innerHTML !== '') {
                 terminalOutput.appendChild(resultDiv);
             }
             
-            // Don't create input line if in special modes (login, boot)
-            if (oraTool.mode !== 'login' && oraTool.mode !== 'boot') {
-                createInputLine();
-            }
-            
+            createInputLine();
             terminalOutput.scrollTop = terminalOutput.scrollHeight;
         }
         
         // ==============================
-        // COPY TO CLIPBOARD FUNCTION
+        // TERMINAL CONTROLS
         // ==============================
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                const successMsg = document.createElement('div');
-                successMsg.className = 'copy-success';
-                successMsg.textContent = '✓ Copied!';
-                document.querySelector('.link-box').appendChild(successMsg);
-                
-                setTimeout(() => {
-                    if (successMsg.parentNode) {
-                        successMsg.parentNode.removeChild(successMsg);
-                    }
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                
-                const successMsg = document.createElement('div');
-                successMsg.className = 'copy-success';
-                successMsg.textContent = '✓ Copied!';
-                document.querySelector('.link-box').appendChild(successMsg);
-                
-                setTimeout(() => {
-                    if (successMsg.parentNode) {
-                        successMsg.parentNode.removeChild(successMsg);
-                    }
-                }, 2000);
-            });
-        }
-        
-        // ==============================
-        // CONTROL PANEL FUNCTIONS
-        // ==============================
-        const panelToggle = document.getElementById('panel-toggle');
-        const controlPanel = document.getElementById('control-panel');
-        const hidePanelBtn = document.getElementById('hide-panel');
-        const resetBtn = document.getElementById('reset-terminal');
-        const refreshBtn = document.getElementById('refresh-files');
-        const embedBtn = document.getElementById('embed-mode');
-        
-        // Panel toggle
-        panelToggle.addEventListener('click', () => {
-            if (controlPanel.style.display !== 'block') {
-                controlPanel.style.display = 'block';
-                panelToggle.textContent = 'Hide Panel';
-            } else {
-                controlPanel.style.display = 'none';
-                panelToggle.textContent = 'Show Panel';
-            }
-        });
-        
-        // Hide panel
-        hidePanelBtn.addEventListener('click', () => {
-            controlPanel.style.display = 'none';
-            panelToggle.textContent = 'Show Panel';
-        });
-        
-        // Reset terminal position
-        resetBtn.addEventListener('click', () => {
-            terminalContainer.style.left = '50%';
-            terminalContainer.style.top = '50%';
-            terminalContainer.style.transform = 'translate(-50%, -50%)';
-            terminalContainer.style.width = '800px';
-            terminalContainer.style.height = '500px';
-            terminalContainer.classList.add('terminal-start-animation');
-            
-            setTimeout(() => {
-                terminalContainer.classList.remove('terminal-start-animation');
-            }, 500);
-        });
-        
-        // Refresh files
-        refreshBtn.addEventListener('click', async () => {
-            const files = await oraTool.fileSystem.scanORAFiles();
-            const preview = document.getElementById('file-preview');
-            
-            if (files.length === 0) {
-                preview.innerHTML = `<span class="ora">ORA Files Repository</span><br>
-                <span class="error">Cannot connect to ORA files</span>`;
-            } else {
-                preview.innerHTML = `<span class="success">✓ ORA Files Refreshed</span><br>
-                <span class="ora">Files: ${files.length}</span><br>`;
-                
-                files.slice(0, 3).forEach(file => {
-                    preview.innerHTML += `<span class="file">${file.icon} ${file.name}</span><br>`;
-                });
-                
-                if (files.length > 3) {
-                    preview.innerHTML += `<span class="info">...and ${files.length - 3} more</span>`;
-                }
-            }
-        });
-        
-        // Embed mode
-        embedBtn.addEventListener('click', () => {
-            const output = document.getElementById('terminal-output');
-            output.innerHTML = '';
-            
-            const embedDiv = document.createElement('div');
-            embedDiv.className = 'embed-container';
-            embedDiv.innerHTML = `
-                <div class="embed-header">EMBED MODE</div>
-                <div class="embed-content">
-                    <span class="info">To embed this terminal in another page:</span><br><br>
-                    <span class="command">&lt;iframe src="YOUR_URL" width="100%" height="600" frameborder="0"&gt;&lt;/iframe&gt;</span><br><br>
-                    <span class="info">Or embed specific content:</span><br>
-                    <span class="command">&lt;div class="ora-terminal"&gt;...&lt;/div&gt;</span><br><br>
-                    <span class="warning">⚠️ Ensure CORS headers are properly configured.</span>
-                </div>
-            `;
-            output.appendChild(embedDiv);
-            
-            createInputLine();
-        });
-        
-        // Window buttons
         document.getElementById('close-btn').addEventListener('click', () => {
             terminalContainer.style.display = 'none';
             const message = document.createElement('div');
@@ -2191,13 +683,17 @@
         document.getElementById('minimize-btn').addEventListener('click', () => {
             terminalContainer.style.height = '45px';
             setTimeout(() => {
-                terminalContainer.style.height = '500px';
+                terminalContainer.style.height = '600px';
             }, 2000);
         });
         
         document.getElementById('maximize-btn').addEventListener('click', () => {
             if (terminalContainer.style.width === '95vw') {
-                resetBtn.click();
+                terminalContainer.style.width = '900px';
+                terminalContainer.style.height = '600px';
+                terminalContainer.style.left = '50%';
+                terminalContainer.style.top = '50%';
+                terminalContainer.style.transform = 'translate(-50%, -50%)';
             } else {
                 terminalContainer.style.width = '95vw';
                 terminalContainer.style.height = '90vh';
@@ -2242,42 +738,23 @@
         async function init() {
             // Initialize matrix
             initMatrix();
-            let matrixInterval = setInterval(drawMatrix, 50);
+            setInterval(drawMatrix, 50);
             
-            // Scan ORA files on startup
-            await oraTool.fileSystem.scanORAFiles();
-            
-            // Initialize terminal
-            createInputLine();
+            // Start with typing effect
+            simulateTyping();
             
             // Handle window resize
             window.addEventListener('resize', () => {
                 initMatrix();
-                const rect = terminalContainer.getBoundingClientRect();
-                if (rect.right > window.innerWidth || rect.bottom > window.innerHeight) {
-                    resetBtn.click();
-                }
             });
             
-            // Global click to focus input (with delay to avoid conflicts)
-            document.addEventListener('click', (e) => {
-                if (!controlPanel.contains(e.target) && !terminalHeader.contains(e.target) && 
-                    !panelToggle.contains(e.target)) {
-                    setTimeout(() => {
-                        const input = document.querySelector('.command-input');
-                        if (input && !input.disabled) input.focus();
-                    }, 100);
-                }
+            // Focus input on click
+            document.addEventListener('click', () => {
+                setTimeout(() => {
+                    const input = document.querySelector('.command-input');
+                    if (input) input.focus();
+                }, 100);
             });
-            
-            // Make copy function globally available
-            window.copyToClipboard = copyToClipboard;
-            
-            // Fix for favicon 404 error
-            const favicon = document.createElement('link');
-            favicon.rel = 'icon';
-            favicon.href = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>';
-            document.head.appendChild(favicon);
         }
         
         // Start everything

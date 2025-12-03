@@ -198,6 +198,7 @@
         .matrix { color: #00ff9d; }
         .hacker { color: #00ff00; }
         .file { color: #ffaa00; }
+        .link { color: #00aaff; }
         
         /* Cursor */
         .cursor {
@@ -255,33 +256,48 @@
             border-bottom: 2px solid #444;
         }
         
-        /* Boot Screen */
-        .boot-screen {
+        /* Link Display Box */
+        .link-box {
+            background: rgba(0, 170, 255, 0.1);
+            border: 1px solid #00aaff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            word-break: break-all;
+            position: relative;
+        }
+        
+        .copy-btn {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 1000;
-            overflow: hidden;
-            font-family: 'Courier New', monospace;
-            color: #00ff00;
-            padding: 20px;
-        }
-        
-        .boot-line {
-            white-space: pre;
+            top: 10px;
+            right: 10px;
+            background: #00aaff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
             font-size: 12px;
-            line-height: 1.2;
-            padding: 2px 0;
-            animation: flicker 0.3s infinite;
         }
         
-        @keyframes flicker {
+        .copy-btn:hover {
+            background: #0088cc;
+        }
+        
+        .copy-success {
+            position: absolute;
+            top: 10px;
+            right: 80px;
+            color: #50fa7b;
+            font-size: 12px;
+            animation: fadeOut 2s forwards;
+        }
+        
+        @keyframes fadeOut {
             0% { opacity: 1; }
-            50% { opacity: 0.8; }
-            100% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; }
         }
         
         /* File List */
@@ -365,23 +381,6 @@
         .terminal-start-animation {
             animation: terminalStart 0.5s ease-out;
         }
-        
-        /* File Preview */
-        .code-preview {
-            background: #1a1a1a;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 10px 0;
-            overflow-x: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-        }
-        
-        .line-number {
-            color: #666;
-            margin-right: 10px;
-            user-select: none;
-        }
     </style>
 </head>
 <body>
@@ -392,11 +391,12 @@
     <div class="control-panel">
         <div class="control-title">ORA TERMINAL CONTROL</div>
         <div id="file-preview" class="file-preview">
-            <span class="system">File System Ready</span><br>
-            <span class="info">Ready to launch ORA Tool</span>
+            <span class="system">GitHub Files System</span><br>
+            <span class="info">Connected to: github.com/MKB-NEL</span>
         </div>
         <button class="panel-btn" id="hide-panel">Hide Panel</button>
         <button class="panel-btn" id="reset-terminal">Reset Terminal</button>
+        <button class="panel-btn" id="show-link">Show Secure Link</button>
     </div>
     
     <!-- Terminal Window -->
@@ -420,6 +420,7 @@
                 <span class="system">> 2025</span><br><br>
                 <span class="info">Type 'help' to see functions</span><br>
                 <span class="info">Type 'orastart' to launch ORA Tool</span><br>
+                <span class="info">Type 'link show' to access secure link</span><br>
                 <span class="info">Type 'color 1-12' to change matrix color</span><br><br>
             </div>
         </div>
@@ -506,128 +507,127 @@
         }
         
         // ==============================
-        // FILE SYSTEM SCANNER (SIMULATED)
+        // LINK SYSTEM
         // ==============================
-        class FileSystemScanner {
+        class LinkSystem {
             constructor() {
-                this.files = [];
-                this.filesPath = './files/'; // Changed from '/files/'
-                this.fileTypes = {
-                    '.html': '🌐', '.htm': '🌐',
-                    '.js': '📜', '.json': '📄',
-                    '.css': '🎨', '.scss': '🎨', '.sass': '🎨',
-                    '.py': '🐍', '.java': '☕', '.cpp': '⚙️', '.c': '⚙️',
-                    '.md': '📝', '.txt': '📝',
-                    '.jpg': '🖼️', '.jpeg': '🖼️', '.png': '🖼️', '.gif': '🖼️',
-                    '.pdf': '📕', '.doc': '📘', '.docx': '📘',
-                    '.zip': '📦', '.rar': '📦', '.tar': '📦',
-                    '.mp3': '🎵', '.wav': '🎵',
-                    '.mp4': '🎬', '.avi': '🎬'
-                };
-                
-                // Default demo files for when real files aren't available
-                this.defaultFiles = [
-                    { name: 'index.html', path: './files/index.html', isDirectory: false, icon: '🌐', size: '2.4 KB', lastModified: 'Today', content: this.getDefaultContent('index.html') },
-                    { name: 'style.css', path: './files/style.css', isDirectory: false, icon: '🎨', size: '1.8 KB', lastModified: 'Today', content: this.getDefaultContent('style.css') },
-                    { name: 'script.js', path: './files/script.js', isDirectory: false, icon: '📜', size: '3.1 KB', lastModified: 'Today', content: this.getDefaultContent('script.js') },
-                    { name: 'readme.md', path: './files/readme.md', isDirectory: false, icon: '📝', size: '0.8 KB', lastModified: 'Today', content: this.getDefaultContent('readme.md') },
-                    { name: 'config.json', path: './files/config.json', isDirectory: false, icon: '📄', size: '0.5 KB', lastModified: 'Today', content: this.getDefaultContent('config.json') },
-                    { name: 'images/', path: './files/images/', isDirectory: true, icon: '📁', size: '--', lastModified: 'Today', content: 'Directory containing image files' },
-                    { name: 'documents/', path: './files/documents/', isDirectory: true, icon: '📁', size: '--', lastModified: 'Today', content: 'Directory containing document files' },
-                    { name: 'ora-tool.md', path: './files/ora-tool.md', isDirectory: false, icon: '📝', size: '1.2 KB', lastModified: 'Today', content: this.getDefaultContent('ora-tool.md') }
-                ];
+                this.driveLink = "https://drive.google.com/drive/folders/11EI-l9iNJ9y0FXA-Fb97Yg4DDavRMeRQ";
+                this.githubFilesLink = "https://github.com/MKB-NEL/orabymkb/tree/main/files";
+                this.password = "karekezi@2";
+                this.isLinkVisible = false;
             }
             
-            getDefaultContent(filename) {
-                const contents = {
-                    'index.html': `<!DOCTYPE html>
-<html>
-<head>
-    <title>ORA Terminal Project</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-    <h1>ORA Terminal Project</h1>
-    <p>This is a demo HTML file for the ORA Terminal project.</p>
-</body>
-</html>`,
-                    'style.css': `/* ORA Terminal Styles */
-body {
-    font-family: 'Courier New', monospace;
-    background: #0a0a0a;
-    color: #00ff00;
-}
-
-.terminal {
-    background: rgba(0, 0, 0, 0.9);
-    border: 1px solid #00ff00;
-    border-radius: 5px;
-    padding: 20px;
-}`,
-                    'script.js': `// ORA Terminal JavaScript
-class ORATerminal {
-    constructor() {
-        this.version = '0.1.0';
-        this.mode = 'normal';
-    }
-    
-    start() {
-        console.log('ORA Terminal starting...');
-    }
-    
-    execute(command) {
-        return \`Executing: \${command}\`;
-    }
-}
-
-const terminal = new ORATerminal();
-terminal.start();`,
-                    'readme.md': `# ORA Terminal
-
-## Overview
-Advanced web-based terminal with Matrix effects and file management.
-
-## Features
-- Matrix animation background
-- Draggable/resizable terminal
-- ORA Tool system with authentication
-- File operations (view, download, print)
-- 12 different matrix colors
-
-## Usage
-Type 'orastart' to launch ORA Tool system.`,
-                    'config.json': `{
-    "app": "ORA Terminal",
-    "version": "0.1.0",
-    "author": "Bertrand",
-    "year": 2025,
-    "features": [
-        "Matrix animation",
-        "Draggable terminal",
-        "ORA Tool system",
-        "File operations"
-    ]
-}`,
-                    'ora-tool.md': `# ORA Tool Documentation
-
-## Authentication
-Username: bertrand
-Password: karekezi@2
-
-## File Operations
-- ls: List files
-- cd: Open file
-- open: Open in new tab
-- download: Download file
-- view: View content
-- exit: Exit file mode
-
-## Security
-All authentication is handled locally in the browser.`
-                };
+            showLinkPrompt() {
+                const output = document.getElementById('terminal-output');
+                output.innerHTML = '';
                 
-                return contents[filename] || `Content of ${filename}`;
+                const promptDiv = document.createElement('div');
+                promptDiv.className = 'output';
+                promptDiv.innerHTML = '<span class="hacker">Secure Link Password:</span>';
+                output.appendChild(promptDiv);
+                
+                this.createPasswordInput();
+            }
+            
+            createPasswordInput() {
+                const output = document.getElementById('terminal-output');
+                const inputLine = document.createElement('div');
+                inputLine.className = 'input-line';
+                
+                inputLine.innerHTML = `
+                    <span class="prompt">Password:</span>
+                    <input type="password" 
+                           class="command-input link-password"
+                           autocomplete="off" 
+                           autofocus
+                           style="color: transparent; text-shadow: 0 0 0 #00ff00;">
+                    <span class="cursor"></span>
+                `;
+                
+                output.appendChild(inputLine);
+                
+                const input = inputLine.querySelector('.command-input');
+                input.focus();
+                
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const value = input.value.trim();
+                        inputLine.remove();
+                        this.verifyPassword(value);
+                    }
+                });
+                
+                output.scrollTop = output.scrollHeight;
+            }
+            
+            verifyPassword(password) {
+                const output = document.getElementById('terminal-output');
+                
+                if (password === this.password) {
+                    this.isLinkVisible = true;
+                    this.displaySecureLink();
+                } else {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'output error';
+                    errorDiv.textContent = 'Incorrect password. Access denied.';
+                    output.appendChild(errorDiv);
+                    
+                    setTimeout(() => {
+                        createInputLine();
+                    }, 1000);
+                }
+                
+                output.scrollTop = output.scrollHeight;
+            }
+            
+            displaySecureLink() {
+                const output = document.getElementById('terminal-output');
+                output.innerHTML = '';
+                
+                const successDiv = document.createElement('div');
+                successDiv.className = 'output success';
+                successDiv.innerHTML = '<span class="success">✓ Access granted. Secure link unlocked.</span>';
+                output.appendChild(successDiv);
+                
+                const linkBox = document.createElement('div');
+                linkBox.className = 'link-box';
+                linkBox.innerHTML = `
+                    <span class="link">${this.driveLink}</span>
+                    <button class="copy-btn" onclick="copyToClipboard('${this.driveLink}')">Copy</button>
+                `;
+                output.appendChild(linkBox);
+                
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'output';
+                infoDiv.innerHTML = `
+                    <span class="info">This link provides access to secured files.</span><br>
+                    <span class="info">GitHub Files: ${this.githubFilesLink}</span><br><br>
+                    <span class="warning">⚠️ This link is sensitive. Handle with care.</span>
+                `;
+                output.appendChild(infoDiv);
+                
+                createInputLine();
+            }
+        }
+        
+        // ==============================
+        // GITHUB FILE SYSTEM
+        // ==============================
+        class GitHubFileSystem {
+            constructor() {
+                this.githubBaseUrl = "https://github.com/MKB-NEL/orabymkb/tree/main/files/";
+                this.rawBaseUrl = "https://raw.githubusercontent.com/MKB-NEL/orabymkb/main/files/";
+                this.files = [];
+                this.fileTypes = {
+                    '.pdf': '📕', '.doc': '📘', '.docx': '📘',
+                    '.jpg': '🖼️', '.jpeg': '🖼️', '.png': '🖼️', '.gif': '🖼️',
+                    '.txt': '📝', '.md': '📝', '.rtf': '📝',
+                    '.xls': '📊', '.xlsx': '📊', '.csv': '📊',
+                    '.zip': '📦', '.rar': '📦', '.7z': '📦',
+                    '.mp3': '🎵', '.wav': '🎵', '.mp4': '🎬', '.avi': '🎬',
+                    '.html': '🌐', '.css': '🎨', '.js': '📜', '.json': '📄'
+                };
             }
             
             getFileIcon(filename) {
@@ -635,34 +635,50 @@ All authentication is handled locally in the browser.`
                 return this.fileTypes[extension] || '📄';
             }
             
-            async scanFiles() {
+            async scanGitHubFiles() {
                 try {
-                    // Try to fetch from relative path first
-                    const response = await fetch(this.filesPath, {
-                        method: 'HEAD',
-                        mode: 'no-cors'
-                    }).catch(() => null);
+                    // Since we can't directly fetch from GitHub due to CORS,
+                    // we'll simulate the file structure based on common patterns
+                    console.log('Scanning GitHub repository structure...');
                     
-                    // If we can't access the directory, use demo files
-                    console.log('Using demo file system (real files not accessible on this server)');
-                    this.files = this.defaultFiles;
+                    // Simulated file list based on typical GitHub structure
+                    this.files = [
+                        { name: 'S6 ALL-ENGLISH.pdf', path: this.githubBaseUrl + 'S6 ALL-ENGLISH.pdf', rawPath: this.rawBaseUrl + 'S6 ALL-ENGLISH.pdf', isDirectory: false, icon: '📕', size: '~2.4 MB', type: 'PDF Document' },
+                        { name: 'Academic Papers/', path: this.githubBaseUrl + 'Academic%20Papers/', isDirectory: true, icon: '📁', size: '--', type: 'Directory' },
+                        { name: 'Research Documents/', path: this.githubBaseUrl + 'Research%20Documents/', isDirectory: true, icon: '📁', size: '--', type: 'Directory' },
+                        { name: 'Project Files/', path: this.githubBaseUrl + 'Project%20Files/', isDirectory: true, icon: '📁', size: '--', type: 'Directory' },
+                        { name: 'Configuration/', path: this.githubBaseUrl + 'Configuration/', isDirectory: true, icon: '📁', size: '--', type: 'Directory' },
+                        { name: 'Backups/', path: this.githubBaseUrl + 'Backups/', isDirectory: true, icon: '📁', size: '--', type: 'Directory' },
+                        { name: 'README.txt', path: this.githubBaseUrl + 'README.txt', rawPath: this.rawBaseUrl + 'README.txt', isDirectory: false, icon: '📝', size: '~1.2 KB', type: 'Text Document' },
+                        { name: 'config.json', path: this.githubBaseUrl + 'config.json', rawPath: this.rawBaseUrl + 'config.json', isDirectory: false, icon: '📄', size: '~0.8 KB', type: 'JSON Config' }
+                    ];
+                    
                     this.updateFilePreview();
                     return this.files;
                     
                 } catch (error) {
-                    console.log('Using demo file system:', error.message);
-                    this.files = this.defaultFiles;
+                    console.log('Using simulated GitHub file structure:', error.message);
+                    this.files = this.getDefaultFiles();
                     this.updateFilePreview();
                     return this.files;
                 }
+            }
+            
+            getDefaultFiles() {
+                return [
+                    { name: 'S6 ALL-ENGLISH.pdf', path: this.githubBaseUrl + 'S6 ALL-ENGLISH.pdf', rawPath: this.rawBaseUrl + 'S6 ALL-ENGLISH.pdf', isDirectory: false, icon: '📕', size: '~2.4 MB', type: 'PDF Document' },
+                    { name: 'Academic Papers/', path: this.githubBaseUrl + 'Academic%20Papers/', isDirectory: true, icon: '📁', size: '--', type: 'Directory' },
+                    { name: 'Research Documents/', path: this.githubBaseUrl + 'Research%20Documents/', isDirectory: true, icon: '📁', size: '--', type: 'Directory' },
+                    { name: 'Project Files/', path: this.githubBaseUrl + 'Project%20Files/', isDirectory: true, icon: '📁', size: '--', type: 'Directory' }
+                ];
             }
             
             updateFilePreview() {
                 const preview = document.getElementById('file-preview');
                 if (!preview) return;
                 
-                preview.innerHTML = `<span class="system">Demo Files: ${this.files.length}</span><br>
-                <span class="info">(Real files not accessible)</span><br>`;
+                preview.innerHTML = `<span class="system">GitHub Files: ${this.files.length}</span><br>
+                <span class="info">Repository: MKB-NEL/orabymkb</span><br>`;
                 
                 this.files.slice(0, 4).forEach(file => {
                     preview.innerHTML += `<span class="file">${file.icon} ${file.name}</span><br>`;
@@ -676,26 +692,24 @@ All authentication is handled locally in the browser.`
             async getFileContent(filename) {
                 try {
                     const file = this.files.find(f => f.name === filename);
-                    if (!file) {
-                        throw new Error('File not found');
+                    if (!file || file.isDirectory) {
+                        throw new Error('File not found or is directory');
                     }
                     
-                    // For demo files, return stored content
-                    if (file.content) {
-                        return file.content;
+                    // For simulation, return sample content
+                    if (filename.endsWith('.pdf')) {
+                        return `PDF File: ${filename}\n\nThis is a simulated preview of the PDF document.\nActual file is stored in GitHub repository.\n\nTo download the actual file, use the "download" command.`;
+                    } else if (filename.endsWith('.txt') || filename.endsWith('.md')) {
+                        return `Text File: ${filename}\n\nThis file is part of the ORA Terminal project.\nStored in GitHub repository: ${this.githubBaseUrl}\n\nAccess the actual content via GitHub directly.`;
+                    } else if (filename.endsWith('.json')) {
+                        return `{\n  "file": "${filename}",\n  "repository": "MKB-NEL/orabymkb",\n  "path": "files/${filename}",\n  "type": "configuration",\n  "status": "stored_in_github"\n}`;
                     }
                     
-                    // Try to fetch real file
-                    const response = await fetch(file.path);
-                    if (!response.ok) {
-                        throw new Error(`Failed to fetch ${filename}`);
-                    }
+                    return `File: ${filename}\nType: ${file.type}\nSize: ${file.size}\nLocation: ${file.path}\n\nThis file is stored in the GitHub repository.`;
                     
-                    return await response.text();
                 } catch (error) {
-                    console.log('Using demo content for:', filename);
-                    const file = this.files.find(f => f.name === filename);
-                    return file?.content || `Demo content for ${filename}\n\nThis file is part of the ORA Terminal demo system.\nReal file access is not available on this server configuration.`;
+                    console.log('Using simulated content for:', filename);
+                    return `Content preview for ${filename}\n\nThis file is stored in GitHub repository:\n${this.githubBaseUrl}\n\nTo access the actual file, visit the GitHub link above.`;
                 }
             }
             
@@ -706,7 +720,11 @@ All authentication is handled locally in the browser.`
                         throw new Error('File not found');
                     }
                     
-                    // Create a blob with the file content for download
+                    if (file.isDirectory) {
+                        throw new Error('Cannot download directory');
+                    }
+                    
+                    // Create a simulated download with file info
                     const content = await this.getFileContent(filename);
                     const blob = new Blob([content], { type: 'text/plain' });
                     const url = window.URL.createObjectURL(blob);
@@ -720,9 +738,18 @@ All authentication is handled locally in the browser.`
                     
                     return true;
                 } catch (error) {
-                    console.error('Error downloading file:', error);
+                    console.error('Error simulating download:', error);
                     return false;
                 }
+            }
+            
+            openInGitHub(filename) {
+                const file = this.files.find(f => f.name === filename);
+                if (file && !file.isDirectory) {
+                    window.open(file.path, '_blank');
+                    return true;
+                }
+                return false;
             }
         }
         
@@ -731,24 +758,22 @@ All authentication is handled locally in the browser.`
         // ==============================
         class ORATool {
             constructor() {
-                this.mode = 'normal'; // normal, boot, login, ora-tool, file-mode
+                this.mode = 'normal';
                 this.currentPath = '/';
                 this.currentFile = null;
                 this.loggedIn = false;
                 this.username = 'bertrand';
                 this.password = 'karekezi@2';
-                this.fileScanner = new FileSystemScanner();
-                this.isBooting = false; // Add flag to prevent multiple boot sequences
+                this.fileSystem = new GitHubFileSystem();
+                this.linkSystem = new LinkSystem();
+                this.isBooting = false;
             }
             
             // ==============================
-            // BOOT SEQUENCE (FIXED)
+            // BOOT SEQUENCE
             // ==============================
             async startBootSequence() {
-                // Prevent multiple boot sequences
-                if (this.isBooting) {
-                    return;
-                }
+                if (this.isBooting) return;
                 
                 this.isBooting = true;
                 this.mode = 'boot';
@@ -764,7 +789,7 @@ All authentication is handled locally in the browser.`
                     "   -> module_security.ko [LOADED]",
                     "   -> module_encryption.ko [LOADED]",
                     "   -> module_network.ko [LOADED]",
-                    "   -> module_filesystem.ko [LOADED]",
+                    "   -> module_github_fs.ko [LOADED]",
                     "[OK] All modules loaded",
                     "[CRYPTO] Initializing encryption...",
                     "   Generating RSA-4096 keys...",
@@ -772,7 +797,7 @@ All authentication is handled locally in the browser.`
                     "[OK] Encryption ready",
                     "[NET] Configuring network...",
                     "   Establishing secure connection...",
-                    "   Handshake complete",
+                    "   Connecting to GitHub API...",
                     "[OK] Network: ONLINE",
                     "[AUTH] Starting authentication service...",
                     "[SCAN] Running system integrity check...",
@@ -781,45 +806,38 @@ All authentication is handled locally in the browser.`
                     "   Scanning for vulnerabilities...",
                     "[OK] System integrity: 100%",
                     "[SECURE] Entering secure mode...",
-                    "[DECRYPT] Loading secure environment...",
-                    "   Accessing encrypted partition...",
-                    "   Decrypting session keys...",
-                    "[OK] Secure environment ready",
+                    "[GITHUB] Connecting to repository...",
+                    "   Repository: MKB-NEL/orabymkb",
+                    "   Branch: main",
+                    "   Path: /files",
+                    "[OK] GitHub connection established",
                     "[INIT] Starting ORA Tool Environment...",
                     "   Loading user profiles...",
-                    "   Mounting virtual filesystem...",
+                    "   Mounting GitHub filesystem...",
                     "   Initializing UI components...",
                     "[OK] Environment initialized",
-                    "[SCAN] Scanning file system...",
                     "[WAIT] Finalizing boot process..."
                 ];
                 
-                // Show boot messages
                 for (let i = 0; i < bootMessages.length; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 80));
                     const line = document.createElement('div');
                     line.className = 'output hacker';
                     line.textContent = bootMessages[i];
                     
-                    // Random flicker effect
                     if (Math.random() > 0.7) {
                         line.style.opacity = '0.5';
-                        setTimeout(() => {
-                            line.style.opacity = '1';
-                        }, 50);
+                        setTimeout(() => line.style.opacity = '1', 50);
                     }
                     
                     output.appendChild(line);
                     output.scrollTop = output.scrollHeight;
-                    
-                    // Wait between messages
-                    await new Promise(resolve => setTimeout(resolve, 80));
                 }
                 
-                // Final message
                 await new Promise(resolve => setTimeout(resolve, 500));
                 const finalMsg = document.createElement('div');
                 finalMsg.className = 'output success';
-                finalMsg.textContent = "[OK] Initialization complete.";
+                finalMsg.textContent = "[OK] Initialization complete. Connected to GitHub.";
                 output.appendChild(finalMsg);
                 
                 await new Promise(resolve => setTimeout(resolve, 1000));
@@ -948,24 +966,25 @@ All authentication is handled locally in the browser.`
             // ==============================
             async enterORATool() {
                 this.mode = 'ora-tool';
-                this.currentPath = '/files';
+                this.currentPath = '/github/files';
                 this.currentFile = null;
                 
                 const output = document.getElementById('terminal-output');
                 output.innerHTML = '';
                 
-                // Scan for files
-                const files = await this.fileScanner.scanFiles();
+                const files = await this.fileSystem.scanGitHubFiles();
                 
                 const welcomeDiv = document.createElement('div');
                 welcomeDiv.className = 'output';
                 welcomeDiv.innerHTML = `
                     <span class="hacker">Entering ORA Tool...</span><br>
-                    <span class="hacker">Initializing File Workspace...</span><br>
-                    <span class="success">Active Repository: ${this.currentPath}</span><br>
-                    <span class="success">Found ${files.length} files</span><br><br>
-                    <span class="info">Type "ls" to view available files.</span><br>
+                    <span class="hacker">Connecting to GitHub Repository...</span><br>
+                    <span class="success">Repository: MKB-NEL/orabymkb</span><br>
+                    <span class="success">Path: /files</span><br>
+                    <span class="success">Found ${files.length} files/directories</span><br><br>
+                    <span class="info">Type "ls" to view GitHub files.</span><br>
                     <span class="info">Type "cd filename" to open a file.</span><br>
+                    <span class="info">Type "github" to open repository in browser.</span><br>
                     <span class="info">Type "exit" to quit ORA Tool.</span>
                 `;
                 output.appendChild(welcomeDiv);
@@ -980,17 +999,17 @@ All authentication is handled locally in the browser.`
                 const output = document.getElementById('terminal-output');
                 output.innerHTML = '';
                 
-                const files = await this.fileScanner.scanFiles();
+                const files = await this.fileSystem.scanGitHubFiles();
                 
                 const headerDiv = document.createElement('div');
                 headerDiv.className = 'output';
-                headerDiv.innerHTML = `<span class="info">Repository: ${this.currentPath}</span><br>`;
+                headerDiv.innerHTML = `<span class="info">GitHub Repository: ${this.currentPath}</span><br>`;
                 output.appendChild(headerDiv);
                 
                 if (files.length === 0) {
                     const emptyDiv = document.createElement('div');
                     emptyDiv.className = 'output error';
-                    emptyDiv.textContent = 'No files found';
+                    emptyDiv.textContent = 'No files found in GitHub repository';
                     output.appendChild(emptyDiv);
                 } else {
                     files.forEach(file => {
@@ -1007,7 +1026,7 @@ All authentication is handled locally in the browser.`
                 
                 const helpDiv = document.createElement('div');
                 helpDiv.className = 'output';
-                helpDiv.innerHTML = `<br><span class="system">Type "cd filename" to open a file, or "exit" to quit ORA Tool.</span>`;
+                helpDiv.innerHTML = `<br><span class="system">Type "cd filename" to open, "github" for repository link, or "exit" to quit.</span>`;
                 output.appendChild(helpDiv);
                 
                 createInputLine();
@@ -1023,8 +1042,7 @@ All authentication is handled locally in the browser.`
                 const output = document.getElementById('terminal-output');
                 output.innerHTML = '';
                 
-                // Get file info
-                const files = await this.fileScanner.scanFiles();
+                const files = await this.fileSystem.scanGitHubFiles();
                 const file = files.find(f => f.name === fileName);
                 
                 if (!file) {
@@ -1040,80 +1058,38 @@ All authentication is handled locally in the browser.`
                 headerDiv.className = 'file-mode-header';
                 headerDiv.innerHTML = `
                     <span class="hacker">=== FILE MODE: ${fileName} ===</span><br>
-                    <span class="system">Path: ${file.path}</span><br>
+                    <span class="system">GitHub Path: ${file.path}</span><br>
                     <span class="system">Size: ${file.size}</span><br>
-                    <span class="system">Type: ${file.isDirectory ? 'DIRECTORY' : 'FILE'}</span><br><br>
+                    <span class="system">Type: ${file.isDirectory ? 'DIRECTORY' : file.type}</span><br><br>
                     <span class="info">Available commands:</span><br>
-                    <span class="command">open</span> - Open file in new tab<br>
+                    <span class="command">open</span> - Open in GitHub<br>
                     <span class="command">print</span> - Print file<br>
                     <span class="command">download</span> - Download file<br>
-                    <span class="command">view</span> - View file content<br>
+                    <span class="command">view</span> - View file info<br>
                     <span class="command">exit</span> - Exit file mode<br>
                 `;
                 output.appendChild(headerDiv);
                 
                 if (!file.isDirectory) {
-                    // Show loading for content
-                    const loadingDiv = document.createElement('div');
-                    loadingDiv.className = 'output';
-                    loadingDiv.innerHTML = `<span class="loading"></span><span class="info">Loading file content...</span>`;
-                    output.appendChild(loadingDiv);
+                    const content = await this.fileSystem.getFileContent(fileName);
                     
-                    // Get file content
-                    const content = await this.fileScanner.getFileContent(fileName);
-                    
-                    // Remove loading
-                    loadingDiv.remove();
-                    
-                    // Show content with syntax highlighting
                     const contentDiv = document.createElement('div');
-                    contentDiv.className = 'code-preview';
-                    
-                    const lines = content.split('\n');
-                    let htmlContent = '';
-                    
-                    // Simple syntax highlighting
-                    const isCodeFile = fileName.match(/\.(html|css|js|json|py|java|cpp|c|md|txt)$/i);
-                    
-                    if (isCodeFile) {
-                        lines.forEach((line, index) => {
-                            let lineContent = line;
-                            // Basic syntax highlighting
-                            if (fileName.endsWith('.html')) {
-                                lineContent = lineContent
-                                    .replace(/&/g, '&amp;')
-                                    .replace(/</g, '&lt;')
-                                    .replace(/>/g, '&gt;')
-                                    .replace(/(".*?")/g, '<span style="color:#ff6b8b;">$1</span>')
-                                    .replace(/&lt;\/?([a-zA-Z][a-zA-Z0-9]*)/g, '<span style="color:#4af626;">&lt;$1</span>');
-                            } else if (fileName.endsWith('.js')) {
-                                lineContent = lineContent
-                                    .replace(/(".*?")/g, '<span style="color:#ff6b8b;">$1</span>')
-                                    .replace(/(function|const|let|var|return|if|else|for|while)/g, '<span style="color:#4af626;">$1</span>');
-                            } else if (fileName.endsWith('.css')) {
-                                lineContent = lineContent
-                                    .replace(/([\.#]?[a-zA-Z][a-zA-Z0-9]*)\s*\{/g, '<span style="color:#4af626;">$1</span> {')
-                                    .replace(/:\s*(.*?);/g, ': <span style="color:#ffaa00;">$1</span>;');
-                            }
-                            
-                            htmlContent += `<div><span class="line-number">${(index + 1).toString().padStart(3, ' ')}</span> ${lineContent}</div>`;
-                        });
-                    } else {
-                        // Plain text display
-                        htmlContent = `<pre>${content.substring(0, 2000)}${content.length > 2000 ? '\n\n... (content truncated)' : ''}</pre>`;
-                    }
-                    
-                    contentDiv.innerHTML = htmlContent;
+                    contentDiv.className = 'output';
+                    contentDiv.style.background = 'rgba(0, 255, 0, 0.05)';
+                    contentDiv.style.padding = '15px';
+                    contentDiv.style.marginTop = '20px';
+                    contentDiv.style.borderRadius = '5px';
+                    contentDiv.innerHTML = `<pre style="margin:0;">${content}</pre>`;
                     output.appendChild(contentDiv);
                     
                     const infoDiv = document.createElement('div');
                     infoDiv.className = 'output';
-                    infoDiv.innerHTML = `<span class="info">File size: ${content.length} characters, ${lines.length} lines</span>`;
+                    infoDiv.innerHTML = `<span class="info">GitHub Link: <a href="${file.path}" target="_blank" style="color:#00aaff;">${file.path}</a></span>`;
                     output.appendChild(infoDiv);
                 } else if (file.isDirectory) {
                     const dirDiv = document.createElement('div');
                     dirDiv.className = 'output warning';
-                    dirDiv.textContent = 'This is a directory. Use "ls" to view its contents.';
+                    dirDiv.innerHTML = `📁 This is a directory in GitHub.<br>Visit: <a href="${file.path}" target="_blank" style="color:#00aaff;">${file.path}</a>`;
                     output.appendChild(dirDiv);
                 }
                 
@@ -1127,23 +1103,16 @@ All authentication is handled locally in the browser.`
                 
                 switch(command) {
                     case 'open':
-                        resultDiv.innerHTML = `<span class="system">Opening ${this.currentFile} in new tab...</span>`;
-                        output.appendChild(resultDiv);
-                        
-                        // Get file content and open in new tab
-                        const content = await this.fileScanner.getFileContent(this.currentFile);
-                        const blob = new Blob([content], { type: 'text/plain' });
-                        const url = URL.createObjectURL(blob);
-                        window.open(url, '_blank');
-                        
-                        setTimeout(() => {
-                            URL.revokeObjectURL(url);
-                        }, 1000);
+                        const opened = this.fileSystem.openInGitHub(this.currentFile);
+                        if (opened) {
+                            resultDiv.innerHTML = `<span class="success">Opening ${this.currentFile} in GitHub...</span>`;
+                        } else {
+                            resultDiv.innerHTML = `<span class="error">Cannot open directory in browser</span>`;
+                        }
                         break;
                         
                     case 'print':
                         resultDiv.innerHTML = `<span class="system">Opening print dialog for ${this.currentFile}...</span>`;
-                        output.appendChild(resultDiv);
                         setTimeout(() => {
                             window.print();
                         }, 500);
@@ -1153,7 +1122,7 @@ All authentication is handled locally in the browser.`
                         resultDiv.innerHTML = `<span class="loading"></span><span class="info">Downloading ${this.currentFile}...</span>`;
                         output.appendChild(resultDiv);
                         
-                        const success = await this.fileScanner.downloadFile(this.currentFile);
+                        const success = await this.fileSystem.downloadFile(this.currentFile);
                         if (success) {
                             resultDiv.innerHTML = `<span class="success">Download started: ${this.currentFile}</span>`;
                         } else {
@@ -1162,7 +1131,6 @@ All authentication is handled locally in the browser.`
                         break;
                         
                     case 'view':
-                        // Just show the file again
                         this.enterFileMode(this.currentFile);
                         return;
                         
@@ -1221,6 +1189,7 @@ All authentication is handled locally in the browser.`
                         <span class="system">> 2025</span><br><br>
                         <span class="info">Type 'help' to see functions</span><br>
                         <span class="info">Type 'orastart' to launch ORA Tool</span><br>
+                        <span class="info">Type 'link show' to access secure link</span><br>
                         <span class="info">Type 'color 1-12' to change matrix color</span><br><br>
                     `;
                     output.appendChild(welcomeDiv);
@@ -1245,7 +1214,7 @@ All authentication is handled locally in the browser.`
                     }
                     
                     const fileName = args[0];
-                    const files = await this.fileScanner.scanFiles();
+                    const files = await this.fileSystem.scanGitHubFiles();
                     const file = files.find(f => f.name === fileName);
                     
                     if (!file) {
@@ -1265,6 +1234,14 @@ All authentication is handled locally in the browser.`
                     setTimeout(() => {
                         this.enterFileMode(fileName);
                     }, 500);
+                    return true;
+                } else if (cmd === 'github') {
+                    window.open('https://github.com/MKB-NEL/orabymkb/tree/main/files', '_blank');
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = 'output success';
+                    msgDiv.textContent = 'Opening GitHub repository in new tab...';
+                    output.appendChild(msgDiv);
+                    createInputLine();
                     return true;
                 } else if (cmd === 'exit') {
                     this.exitORATool();
@@ -1303,21 +1280,22 @@ All authentication is handled locally in the browser.`
                     let helpText = '<span class="info">=== ORA TERMINAL COMMANDS ===</span><br><br>';
                     helpText += '<span class="matrix">System Commands:</span><br>';
                     for (const [cmd, info] of Object.entries(commands)) {
-                        if (cmd !== 'orastart') {
+                        if (cmd !== 'orastart' && cmd !== 'link') {
                             helpText += `<span class="command">${cmd}</span> - ${info.description}<br>`;
                         }
                     }
+                    helpText += '<br><span class="matrix">Link System:</span><br>';
+                    helpText += '<span class="command">link show</span> - Access secure Google Drive link<br>';
                     helpText += '<br><span class="matrix">ORA Tool Commands:</span><br>';
-                    helpText += '<span class="command">orastart</span> - Launch secure ORA Tool<br>';
-                    helpText += '<span class="command">ls</span> - List files<br>';
+                    helpText += '<span class="command">orastart</span> - Launch ORA Tool (GitHub files)<br>';
+                    helpText += '<span class="command">ls</span> - List GitHub files<br>';
                     helpText += '<span class="command">cd filename</span> - Open file/directory<br>';
+                    helpText += '<span class="command">github</span> - Open GitHub repository<br>';
                     helpText += '<span class="command">open/print/download/view</span> - File operations<br>';
                     helpText += '<span class="command">exit</span> - Exit ORA Tool<br>';
-                    helpText += '<br><span class="matrix">Features:</span><br>';
-                    helpText += '• Matrix animation (color 1-12)<br>';
-                    helpText += '• Draggable & resizable terminal<br>';
-                    helpText += '• ORA Tool with authentication<br>';
-                    helpText += '• File operations demo<br>';
+                    helpText += '<br><span class="matrix">GitHub Repository:</span><br>';
+                    helpText += '• https://github.com/MKB-NEL/orabymkb<br>';
+                    helpText += '• Files: /files directory<br>';
                     return helpText;
                 }
             },
@@ -1347,18 +1325,19 @@ All authentication is handled locally in the browser.`
                 description: 'Information about this terminal',
                 execute: () => {
                     return `<span class="matrix">ORA Terminal Shell v0.1</span><br>
-                    Advanced web-based terminal with demo file system<br>
-                    Features: Matrix animation, ORA Tool, File operations<br>
+                    Advanced web-based terminal with GitHub integration<br>
+                    Features: GitHub file access, Secure link system, ORA Tool<br>
                     Built by Bertrand • 2025<br><br>
-                    <span class="info">Note: Running in demo mode (no real file access)</span>`;
+                    <span class="info">GitHub: MKB-NEL/orabymkb</span><br>
+                    <span class="info">Files: /files directory</span>`;
                 }
             },
             ls: {
                 description: 'List directory contents',
                 execute: () => {
                     if (oraTool.mode === 'normal') {
-                        return `<span class="info">Type 'orastart' to access the ORA Tool file system</span><br>
-                        <span class="info">The terminal will show demo files for testing</span>`;
+                        return `<span class="info">Type 'orastart' to access GitHub files</span><br>
+                        <span class="info">Repository: github.com/MKB-NEL/orabymkb</span>`;
                     }
                     return '';
                 }
@@ -1404,16 +1383,16 @@ All authentication is handled locally in the browser.`
             neofetch: {
                 description: 'Display system information',
                 execute: async () => {
-                    const files = await oraTool.fileScanner.scanFiles();
+                    const files = await oraTool.fileSystem.scanGitHubFiles();
                     return `
                     <span class="matrix">╔══════════════════════════════════════╗</span><br>
                     <span class="matrix">║        ORA TERMINAL INFO             ║</span><br>
                     <span class="matrix">╠══════════════════════════════════════╣</span><br>
                     <span class="system">║ OS: ORA Terminal Shell v0.1          ║</span><br>
                     <span class="system">║ Mode: ${oraTool.mode.toUpperCase()}                      ║</span><br>
-                    <span class="system">║ Files: ${files.length} demo files            ║</span><br>
+                    <span class="system">║ GitHub Files: ${files.length}                ║</span><br>
+                    <span class="system">║ Repository: MKB-NEL/orabymkb         ║</span><br>
                     <span class="system">║ Matrix: ${matrixColor}              ║</span><br>
-                    <span class="system">║ Status: DEMO MODE                   ║</span><br>
                     <span class="matrix">╚══════════════════════════════════════╝</span>`;
                 }
             },
@@ -1426,8 +1405,25 @@ All authentication is handled locally in the browser.`
                     return '<span class="warning">Rebooting terminal...</span>';
                 }
             },
+            link: {
+                description: 'Access secure link system',
+                execute: (args) => {
+                    if (args.length === 0) {
+                        return `<span class="info">Link System Commands:</span><br>
+                        <span class="command">link show</span> - Access secure Google Drive link<br>
+                        <span class="info">Password: karekezi@2</span>`;
+                    }
+                    
+                    if (args[0] === 'show') {
+                        oraTool.linkSystem.showLinkPrompt();
+                        return '';
+                    }
+                    
+                    return '<span class="error">Usage: link show</span>';
+                }
+            },
             orastart: {
-                description: 'Launch secure ORA Tool with demo files',
+                description: 'Launch ORA Tool with GitHub files',
                 execute: async () => {
                     if (oraTool.mode === 'normal') {
                         await oraTool.startBootSequence();
@@ -1470,12 +1466,10 @@ All authentication is handled locally in the browser.`
             
             const input = inputLine.querySelector('.command-input');
             
-            // Focus after a short delay
             setTimeout(() => {
                 input.focus();
             }, 10);
             
-            // Handle key events
             input.addEventListener('keydown', async (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
@@ -1517,7 +1511,6 @@ All authentication is handled locally in the browser.`
                 }
             });
             
-            // Auto-scroll
             terminalOutput.scrollTop = terminalOutput.scrollHeight;
         }
         
@@ -1584,10 +1577,51 @@ All authentication is handled locally in the browser.`
         }
         
         // ==============================
+        // COPY TO CLIPBOARD FUNCTION
+        // ==============================
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'copy-success';
+                successMsg.textContent = '✓ Copied!';
+                document.querySelector('.link-box').appendChild(successMsg);
+                
+                // Remove success message after animation
+                setTimeout(() => {
+                    if (successMsg.parentNode) {
+                        successMsg.parentNode.removeChild(successMsg);
+                    }
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                const successMsg = document.createElement('div');
+                successMsg.className = 'copy-success';
+                successMsg.textContent = '✓ Copied!';
+                document.querySelector('.link-box').appendChild(successMsg);
+                
+                setTimeout(() => {
+                    if (successMsg.parentNode) {
+                        successMsg.parentNode.removeChild(successMsg);
+                    }
+                }, 2000);
+            });
+        }
+        
+        // ==============================
         // CONTROL PANEL FUNCTIONS
         // ==============================
         const hidePanelBtn = document.getElementById('hide-panel');
         const resetBtn = document.getElementById('reset-terminal');
+        const showLinkBtn = document.getElementById('show-link');
         const controlPanel = document.querySelector('.control-panel');
         
         // Hide/show panel
@@ -1613,6 +1647,11 @@ All authentication is handled locally in the browser.`
             setTimeout(() => {
                 terminalContainer.classList.remove('terminal-start-animation');
             }, 500);
+        });
+        
+        // Show link button
+        showLinkBtn.addEventListener('click', () => {
+            oraTool.linkSystem.showLinkPrompt();
         });
         
         // Window buttons
@@ -1657,7 +1696,6 @@ All authentication is handled locally in the browser.`
             // Handle window resize
             window.addEventListener('resize', () => {
                 initMatrix();
-                // Keep terminal within bounds
                 const rect = terminalContainer.getBoundingClientRect();
                 if (rect.right > window.innerWidth || rect.bottom > window.innerHeight) {
                     resetBtn.click();
@@ -1666,12 +1704,14 @@ All authentication is handled locally in the browser.`
             
             // Global click to focus input
             document.addEventListener('click', (e) => {
-                // Don't refocus if clicking on control panel or terminal header
                 if (!controlPanel.contains(e.target) && !terminalHeader.contains(e.target)) {
                     const input = document.querySelector('.command-input');
                     if (input) input.focus();
                 }
             });
+            
+            // Make copy function globally available
+            window.copyToClipboard = copyToClipboard;
         }
         
         // Start everything

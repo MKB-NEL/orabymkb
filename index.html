@@ -309,15 +309,6 @@
             font-size: 12px;
         }
         
-        /* File Mode */
-        .file-mode-header {
-            background: rgba(0, 255, 0, 0.1);
-            padding: 15px;
-            border-radius: 5px;
-            margin: 10px 0;
-            border-left: 4px solid #00ff00;
-        }
-        
         /* Loading Animation */
         .loading {
             display: inline-block;
@@ -401,12 +392,11 @@
     <div class="control-panel">
         <div class="control-title">ORA TERMINAL CONTROL</div>
         <div id="file-preview" class="file-preview">
-            <span class="system">File Explorer Active</span><br>
-            <span class="info">Scanning /files directory...</span>
+            <span class="system">File System Ready</span><br>
+            <span class="info">Ready to launch ORA Tool</span>
         </div>
         <button class="panel-btn" id="hide-panel">Hide Panel</button>
         <button class="panel-btn" id="reset-terminal">Reset Terminal</button>
-        <button class="panel-btn" id="refresh-files">Refresh Files</button>
     </div>
     
     <!-- Terminal Window -->
@@ -516,12 +506,12 @@
         }
         
         // ==============================
-        // FILE SYSTEM SCANNER
+        // FILE SYSTEM SCANNER (SIMULATED)
         // ==============================
         class FileSystemScanner {
             constructor() {
                 this.files = [];
-                this.filesPath = '/files/';
+                this.filesPath = './files/'; // Changed from '/files/'
                 this.fileTypes = {
                     '.html': '🌐', '.htm': '🌐',
                     '.js': '📜', '.json': '📄',
@@ -534,6 +524,110 @@
                     '.mp3': '🎵', '.wav': '🎵',
                     '.mp4': '🎬', '.avi': '🎬'
                 };
+                
+                // Default demo files for when real files aren't available
+                this.defaultFiles = [
+                    { name: 'index.html', path: './files/index.html', isDirectory: false, icon: '🌐', size: '2.4 KB', lastModified: 'Today', content: this.getDefaultContent('index.html') },
+                    { name: 'style.css', path: './files/style.css', isDirectory: false, icon: '🎨', size: '1.8 KB', lastModified: 'Today', content: this.getDefaultContent('style.css') },
+                    { name: 'script.js', path: './files/script.js', isDirectory: false, icon: '📜', size: '3.1 KB', lastModified: 'Today', content: this.getDefaultContent('script.js') },
+                    { name: 'readme.md', path: './files/readme.md', isDirectory: false, icon: '📝', size: '0.8 KB', lastModified: 'Today', content: this.getDefaultContent('readme.md') },
+                    { name: 'config.json', path: './files/config.json', isDirectory: false, icon: '📄', size: '0.5 KB', lastModified: 'Today', content: this.getDefaultContent('config.json') },
+                    { name: 'images/', path: './files/images/', isDirectory: true, icon: '📁', size: '--', lastModified: 'Today', content: 'Directory containing image files' },
+                    { name: 'documents/', path: './files/documents/', isDirectory: true, icon: '📁', size: '--', lastModified: 'Today', content: 'Directory containing document files' },
+                    { name: 'ora-tool.md', path: './files/ora-tool.md', isDirectory: false, icon: '📝', size: '1.2 KB', lastModified: 'Today', content: this.getDefaultContent('ora-tool.md') }
+                ];
+            }
+            
+            getDefaultContent(filename) {
+                const contents = {
+                    'index.html': `<!DOCTYPE html>
+<html>
+<head>
+    <title>ORA Terminal Project</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <h1>ORA Terminal Project</h1>
+    <p>This is a demo HTML file for the ORA Terminal project.</p>
+</body>
+</html>`,
+                    'style.css': `/* ORA Terminal Styles */
+body {
+    font-family: 'Courier New', monospace;
+    background: #0a0a0a;
+    color: #00ff00;
+}
+
+.terminal {
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid #00ff00;
+    border-radius: 5px;
+    padding: 20px;
+}`,
+                    'script.js': `// ORA Terminal JavaScript
+class ORATerminal {
+    constructor() {
+        this.version = '0.1.0';
+        this.mode = 'normal';
+    }
+    
+    start() {
+        console.log('ORA Terminal starting...');
+    }
+    
+    execute(command) {
+        return \`Executing: \${command}\`;
+    }
+}
+
+const terminal = new ORATerminal();
+terminal.start();`,
+                    'readme.md': `# ORA Terminal
+
+## Overview
+Advanced web-based terminal with Matrix effects and file management.
+
+## Features
+- Matrix animation background
+- Draggable/resizable terminal
+- ORA Tool system with authentication
+- File operations (view, download, print)
+- 12 different matrix colors
+
+## Usage
+Type 'orastart' to launch ORA Tool system.`,
+                    'config.json': `{
+    "app": "ORA Terminal",
+    "version": "0.1.0",
+    "author": "Bertrand",
+    "year": 2025,
+    "features": [
+        "Matrix animation",
+        "Draggable terminal",
+        "ORA Tool system",
+        "File operations"
+    ]
+}`,
+                    'ora-tool.md': `# ORA Tool Documentation
+
+## Authentication
+Username: bertrand
+Password: karekezi@2
+
+## File Operations
+- ls: List files
+- cd: Open file
+- open: Open in new tab
+- download: Download file
+- view: View content
+- exit: Exit file mode
+
+## Security
+All authentication is handled locally in the browser.`
+                };
+                
+                return contents[filename] || `Content of ${filename}`;
             }
             
             getFileIcon(filename) {
@@ -543,87 +637,39 @@
             
             async scanFiles() {
                 try {
-                    // Try to fetch directory listing
-                    const response = await fetch(this.filesPath);
-                    if (!response.ok) {
-                        throw new Error('Files directory not accessible');
-                    }
+                    // Try to fetch from relative path first
+                    const response = await fetch(this.filesPath, {
+                        method: 'HEAD',
+                        mode: 'no-cors'
+                    }).catch(() => null);
                     
-                    const html = await response.text();
-                    this.parseDirectoryListing(html);
+                    // If we can't access the directory, use demo files
+                    console.log('Using demo file system (real files not accessible on this server)');
+                    this.files = this.defaultFiles;
+                    this.updateFilePreview();
                     return this.files;
+                    
                 } catch (error) {
-                    console.warn('Could not access /files directory, using default files:', error);
-                    return this.getDefaultFiles();
+                    console.log('Using demo file system:', error.message);
+                    this.files = this.defaultFiles;
+                    this.updateFilePreview();
+                    return this.files;
                 }
-            }
-            
-            parseDirectoryListing(html) {
-                // Parse HTML directory listing
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const links = doc.querySelectorAll('a');
-                
-                this.files = [];
-                links.forEach(link => {
-                    const href = link.getAttribute('href');
-                    const text = link.textContent;
-                    
-                    // Skip parent directory and hidden files
-                    if (href === '../' || href.startsWith('.') || text.includes('Parent Directory')) {
-                        return;
-                    }
-                    
-                    // Check if it's a file (ends with extension) or directory
-                    const isDir = href.endsWith('/');
-                    const filename = isDir ? text : href;
-                    
-                    if (filename && !filename.startsWith('.')) {
-                        this.files.push({
-                            name: filename,
-                            path: this.filesPath + filename,
-                            isDirectory: isDir,
-                            icon: isDir ? '📁' : this.getFileIcon(filename),
-                            size: 'Unknown',
-                            lastModified: 'Unknown'
-                        });
-                    }
-                });
-                
-                // If no files found, use defaults
-                if (this.files.length === 0) {
-                    this.files = this.getDefaultFiles();
-                }
-                
-                // Update control panel preview
-                this.updateFilePreview();
-            }
-            
-            getDefaultFiles() {
-                // Default files if scanning fails
-                return [
-                    { name: 'index.html', path: '/files/index.html', isDirectory: false, icon: '🌐', size: '2.4 KB', lastModified: 'Today' },
-                    { name: 'style.css', path: '/files/style.css', isDirectory: false, icon: '🎨', size: '1.8 KB', lastModified: 'Today' },
-                    { name: 'script.js', path: '/files/script.js', isDirectory: false, icon: '📜', size: '3.1 KB', lastModified: 'Today' },
-                    { name: 'readme.md', path: '/files/readme.md', isDirectory: false, icon: '📝', size: '0.8 KB', lastModified: 'Today' },
-                    { name: 'config.json', path: '/files/config.json', isDirectory: false, icon: '📄', size: '0.5 KB', lastModified: 'Today' },
-                    { name: 'images/', path: '/files/images/', isDirectory: true, icon: '📁', size: '--', lastModified: 'Today' },
-                    { name: 'documents/', path: '/files/documents/', isDirectory: true, icon: '📁', size: '--', lastModified: 'Today' }
-                ];
             }
             
             updateFilePreview() {
                 const preview = document.getElementById('file-preview');
                 if (!preview) return;
                 
-                preview.innerHTML = `<span class="system">Files Found: ${this.files.length}</span><br>`;
+                preview.innerHTML = `<span class="system">Demo Files: ${this.files.length}</span><br>
+                <span class="info">(Real files not accessible)</span><br>`;
                 
-                this.files.slice(0, 5).forEach(file => {
+                this.files.slice(0, 4).forEach(file => {
                     preview.innerHTML += `<span class="file">${file.icon} ${file.name}</span><br>`;
                 });
                 
-                if (this.files.length > 5) {
-                    preview.innerHTML += `<span class="info">...and ${this.files.length - 5} more</span>`;
+                if (this.files.length > 4) {
+                    preview.innerHTML += `<span class="info">...and ${this.files.length - 4} more</span>`;
                 }
             }
             
@@ -634,6 +680,12 @@
                         throw new Error('File not found');
                     }
                     
+                    // For demo files, return stored content
+                    if (file.content) {
+                        return file.content;
+                    }
+                    
+                    // Try to fetch real file
                     const response = await fetch(file.path);
                     if (!response.ok) {
                         throw new Error(`Failed to fetch ${filename}`);
@@ -641,8 +693,9 @@
                     
                     return await response.text();
                 } catch (error) {
-                    console.error('Error fetching file:', error);
-                    return `Error loading file: ${error.message}\n\nThis is a simulated preview of ${filename}`;
+                    console.log('Using demo content for:', filename);
+                    const file = this.files.find(f => f.name === filename);
+                    return file?.content || `Demo content for ${filename}\n\nThis file is part of the ORA Terminal demo system.\nReal file access is not available on this server configuration.`;
                 }
             }
             
@@ -653,12 +706,9 @@
                         throw new Error('File not found');
                     }
                     
-                    const response = await fetch(file.path);
-                    if (!response.ok) {
-                        throw new Error(`Failed to download ${filename}`);
-                    }
-                    
-                    const blob = await response.blob();
+                    // Create a blob with the file content for download
+                    const content = await this.getFileContent(filename);
+                    const blob = new Blob([content], { type: 'text/plain' });
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
@@ -688,23 +738,25 @@
                 this.username = 'bertrand';
                 this.password = 'karekezi@2';
                 this.fileScanner = new FileSystemScanner();
+                this.isBooting = false; // Add flag to prevent multiple boot sequences
             }
             
             // ==============================
-            // BOOT SEQUENCE
+            // BOOT SEQUENCE (FIXED)
             // ==============================
             async startBootSequence() {
+                // Prevent multiple boot sequences
+                if (this.isBooting) {
+                    return;
+                }
+                
+                this.isBooting = true;
                 this.mode = 'boot';
                 const output = document.getElementById('terminal-output');
                 output.innerHTML = '';
                 
-                const bootDiv = document.createElement('div');
-                bootDiv.className = 'output hacker';
-                bootDiv.textContent = '[BOOT] Starting ORA Secure Boot Sequence...';
-                output.appendChild(bootDiv);
-                
                 const bootMessages = [
-                    "[BOOT] Initializing ORA Core v1.0...",
+                    "[BOOT] Starting ORA Secure Boot Sequence...",
                     "[OK] Memory test passed",
                     "[OK] CPU: 8 cores detected",
                     "[OK] RAM: 16GB available",
@@ -738,14 +790,12 @@
                     "   Mounting virtual filesystem...",
                     "   Initializing UI components...",
                     "[OK] Environment initialized",
-                    "[SCAN] Scanning /files directory...",
-                    `[OK] Found ${(await this.fileScanner.scanFiles()).length} files`,
+                    "[SCAN] Scanning file system...",
                     "[WAIT] Finalizing boot process..."
                 ];
                 
                 // Show boot messages
                 for (let i = 0; i < bootMessages.length; i++) {
-                    await new Promise(resolve => setTimeout(resolve, 100));
                     const line = document.createElement('div');
                     line.className = 'output hacker';
                     line.textContent = bootMessages[i];
@@ -760,6 +810,9 @@
                     
                     output.appendChild(line);
                     output.scrollTop = output.scrollHeight;
+                    
+                    // Wait between messages
+                    await new Promise(resolve => setTimeout(resolve, 80));
                 }
                 
                 // Final message
@@ -772,6 +825,7 @@
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
                 this.mode = 'login';
+                this.isBooting = false;
                 this.showLoginPrompt();
             }
             
@@ -900,15 +954,8 @@
                 const output = document.getElementById('terminal-output');
                 output.innerHTML = '';
                 
-                // Scan for real files
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'output';
-                loadingDiv.innerHTML = `<span class="loading"></span><span class="info">Scanning /files directory for real files...</span>`;
-                output.appendChild(loadingDiv);
-                
+                // Scan for files
                 const files = await this.fileScanner.scanFiles();
-                
-                output.innerHTML = '';
                 
                 const welcomeDiv = document.createElement('div');
                 welcomeDiv.className = 'output';
@@ -933,14 +980,7 @@
                 const output = document.getElementById('terminal-output');
                 output.innerHTML = '';
                 
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'output';
-                loadingDiv.innerHTML = `<span class="loading"></span><span class="info">Loading files...</span>`;
-                output.appendChild(loadingDiv);
-                
                 const files = await this.fileScanner.scanFiles();
-                
-                output.innerHTML = '';
                 
                 const headerDiv = document.createElement('div');
                 headerDiv.className = 'output';
@@ -950,7 +990,7 @@
                 if (files.length === 0) {
                     const emptyDiv = document.createElement('div');
                     emptyDiv.className = 'output error';
-                    emptyDiv.textContent = 'No files found in /files directory';
+                    emptyDiv.textContent = 'No files found';
                     output.appendChild(emptyDiv);
                 } else {
                     files.forEach(file => {
@@ -983,18 +1023,9 @@
                 const output = document.getElementById('terminal-output');
                 output.innerHTML = '';
                 
-                // Show loading
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'output';
-                loadingDiv.innerHTML = `<span class="loading"></span><span class="info">Loading ${fileName}...</span>`;
-                output.appendChild(loadingDiv);
-                
-                // Get file content
-                const content = await this.fileScanner.getFileContent(fileName);
+                // Get file info
                 const files = await this.fileScanner.scanFiles();
                 const file = files.find(f => f.name === fileName);
-                
-                output.innerHTML = '';
                 
                 if (!file) {
                     const errorDiv = document.createElement('div');
@@ -1021,8 +1052,20 @@
                 `;
                 output.appendChild(headerDiv);
                 
-                if (!file.isDirectory && content) {
-                    // Show file content with syntax highlighting for code files
+                if (!file.isDirectory) {
+                    // Show loading for content
+                    const loadingDiv = document.createElement('div');
+                    loadingDiv.className = 'output';
+                    loadingDiv.innerHTML = `<span class="loading"></span><span class="info">Loading file content...</span>`;
+                    output.appendChild(loadingDiv);
+                    
+                    // Get file content
+                    const content = await this.fileScanner.getFileContent(fileName);
+                    
+                    // Remove loading
+                    loadingDiv.remove();
+                    
+                    // Show content with syntax highlighting
                     const contentDiv = document.createElement('div');
                     contentDiv.className = 'code-preview';
                     
@@ -1084,22 +1127,23 @@
                 
                 switch(command) {
                     case 'open':
-                        resultDiv.innerHTML = `<span class="loading"></span><span class="system">Opening ${this.currentFile}...</span>`;
+                        resultDiv.innerHTML = `<span class="system">Opening ${this.currentFile} in new tab...</span>`;
                         output.appendChild(resultDiv);
                         
-                        // Try to open the actual file
-                        const files = await this.fileScanner.scanFiles();
-                        const file = files.find(f => f.name === this.currentFile);
+                        // Get file content and open in new tab
+                        const content = await this.fileScanner.getFileContent(this.currentFile);
+                        const blob = new Blob([content], { type: 'text/plain' });
+                        const url = URL.createObjectURL(blob);
+                        window.open(url, '_blank');
                         
-                        if (file && !file.isDirectory) {
-                            setTimeout(() => {
-                                window.open(file.path, '_blank');
-                            }, 500);
-                        }
+                        setTimeout(() => {
+                            URL.revokeObjectURL(url);
+                        }, 1000);
                         break;
                         
                     case 'print':
                         resultDiv.innerHTML = `<span class="system">Opening print dialog for ${this.currentFile}...</span>`;
+                        output.appendChild(resultDiv);
                         setTimeout(() => {
                             window.print();
                         }, 500);
@@ -1128,7 +1172,6 @@
                 }
                 
                 if (command !== 'exit') {
-                    output.appendChild(resultDiv);
                     createInputLine();
                 }
             }
@@ -1214,26 +1257,14 @@
                         return true;
                     }
                     
-                    if (file.isDirectory) {
-                        // For now, directories show their contents
-                        const msgDiv = document.createElement('div');
-                        msgDiv.className = 'output';
-                        msgDiv.innerHTML = `<span class="system">Opening directory: ${fileName}</span>`;
-                        output.appendChild(msgDiv);
-                        
-                        setTimeout(() => {
-                            this.enterFileMode(fileName);
-                        }, 500);
-                    } else {
-                        const msgDiv = document.createElement('div');
-                        msgDiv.className = 'output';
-                        msgDiv.innerHTML = `<span class="system">Opening file: ${fileName}</span>`;
-                        output.appendChild(msgDiv);
-                        
-                        setTimeout(() => {
-                            this.enterFileMode(fileName);
-                        }, 500);
-                    }
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = 'output';
+                    msgDiv.innerHTML = `<span class="system">Opening ${file.isDirectory ? 'directory' : 'file'}: ${fileName}</span>`;
+                    output.appendChild(msgDiv);
+                    
+                    setTimeout(() => {
+                        this.enterFileMode(fileName);
+                    }, 500);
                     return true;
                 } else if (cmd === 'exit') {
                     this.exitORATool();
@@ -1278,14 +1309,15 @@
                     }
                     helpText += '<br><span class="matrix">ORA Tool Commands:</span><br>';
                     helpText += '<span class="command">orastart</span> - Launch secure ORA Tool<br>';
-                    helpText += '<span class="command">ls</span> - List real files from /files<br>';
+                    helpText += '<span class="command">ls</span> - List files<br>';
                     helpText += '<span class="command">cd filename</span> - Open file/directory<br>';
                     helpText += '<span class="command">open/print/download/view</span> - File operations<br>';
                     helpText += '<span class="command">exit</span> - Exit ORA Tool<br>';
-                    helpText += '<br><span class="matrix">File System:</span><br>';
-                    helpText += '• Real file scanning from /files directory<br>';
-                    helpText += '• Direct file operations<br>';
-                    helpText += '• Live preview of files<br>';
+                    helpText += '<br><span class="matrix">Features:</span><br>';
+                    helpText += '• Matrix animation (color 1-12)<br>';
+                    helpText += '• Draggable & resizable terminal<br>';
+                    helpText += '• ORA Tool with authentication<br>';
+                    helpText += '• File operations demo<br>';
                     return helpText;
                 }
             },
@@ -1315,17 +1347,18 @@
                 description: 'Information about this terminal',
                 execute: () => {
                     return `<span class="matrix">ORA Terminal Shell v0.1</span><br>
-                    Advanced web-based terminal with real file system<br>
-                    Features: Real file scanning, Live preview, Downloads<br>
-                    Built by Bertrand • 2025`;
+                    Advanced web-based terminal with demo file system<br>
+                    Features: Matrix animation, ORA Tool, File operations<br>
+                    Built by Bertrand • 2025<br><br>
+                    <span class="info">Note: Running in demo mode (no real file access)</span>`;
                 }
             },
             ls: {
                 description: 'List directory contents',
                 execute: () => {
                     if (oraTool.mode === 'normal') {
-                        return `<span class="info">Files are now real! Type 'orastart' to access the /files directory</span><br>
-                        <span class="info">The terminal will scan for actual files in /files/</span>`;
+                        return `<span class="info">Type 'orastart' to access the ORA Tool file system</span><br>
+                        <span class="info">The terminal will show demo files for testing</span>`;
                     }
                     return '';
                 }
@@ -1378,9 +1411,9 @@
                     <span class="matrix">╠══════════════════════════════════════╣</span><br>
                     <span class="system">║ OS: ORA Terminal Shell v0.1          ║</span><br>
                     <span class="system">║ Mode: ${oraTool.mode.toUpperCase()}                      ║</span><br>
-                    <span class="system">║ Files Found: ${files.length}                    ║</span><br>
+                    <span class="system">║ Files: ${files.length} demo files            ║</span><br>
                     <span class="system">║ Matrix: ${matrixColor}              ║</span><br>
-                    <span class="system">║ Resolution: ${window.innerWidth}x${window.innerHeight}        ║</span><br>
+                    <span class="system">║ Status: DEMO MODE                   ║</span><br>
                     <span class="matrix">╚══════════════════════════════════════╝</span>`;
                 }
             },
@@ -1394,13 +1427,15 @@
                 }
             },
             orastart: {
-                description: 'Launch secure ORA Tool with real files',
+                description: 'Launch secure ORA Tool with demo files',
                 execute: async () => {
                     if (oraTool.mode === 'normal') {
-                        const result = await commands.orastart.execute();
-                        return result;
+                        await oraTool.startBootSequence();
+                        return '';
+                    } else if (oraTool.mode === 'boot') {
+                        return '<span class="info">Boot sequence already running...</span>';
                     } else {
-                        return '<span class="error">Please authenticate using "orastart"</span>';
+                        return '<span class="error">Already in ORA Tool mode. Type "exit" first.</span>';
                     }
                 }
             }
@@ -1553,7 +1588,6 @@
         // ==============================
         const hidePanelBtn = document.getElementById('hide-panel');
         const resetBtn = document.getElementById('reset-terminal');
-        const refreshBtn = document.getElementById('refresh-files');
         const controlPanel = document.querySelector('.control-panel');
         
         // Hide/show panel
@@ -1579,22 +1613,6 @@
             setTimeout(() => {
                 terminalContainer.classList.remove('terminal-start-animation');
             }, 500);
-        });
-        
-        // Refresh files
-        refreshBtn.addEventListener('click', async () => {
-            const files = await oraTool.fileScanner.scanFiles();
-            const preview = document.getElementById('file-preview');
-            preview.innerHTML = `<span class="success">Files refreshed!</span><br>
-            <span class="system">Found ${files.length} files</span><br>`;
-            
-            files.slice(0, 3).forEach(file => {
-                preview.innerHTML += `<span class="file">${file.icon} ${file.name}</span><br>`;
-            });
-            
-            if (files.length > 3) {
-                preview.innerHTML += `<span class="info">...and ${files.length - 3} more</span>`;
-            }
         });
         
         // Window buttons
@@ -1633,9 +1651,6 @@
             initMatrix();
             let matrixInterval = setInterval(drawMatrix, 50);
             
-            // Scan for files on startup
-            await oraTool.fileScanner.scanFiles();
-            
             // Initialize terminal
             createInputLine();
             
@@ -1657,9 +1672,6 @@
                     if (input) input.focus();
                 }
             });
-            
-            // Make matrixInterval available globally
-            window.matrixInterval = matrixInterval;
         }
         
         // Start everything

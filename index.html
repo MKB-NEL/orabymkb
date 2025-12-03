@@ -451,9 +451,29 @@
             padding: 10px;
         }
         
-        /* Favicon fix */
-        .favicon-fix {
-            display: none;
+        /* File Preview Box */
+        .preview-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #333;
+        }
+        
+        .open-btn {
+            background: #4af626;
+            color: black;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .open-btn:hover {
+            background: #3bd61f;
         }
     </style>
     <!-- Favicon fix -->
@@ -499,7 +519,8 @@
                 <span class="system">> made by Bertrand</span><br>
                 <span class="system">> 2025</span><br><br>
                 <span class="info">Type 'help' to see functions</span><br>
-                <span class="info">Type 'start' to launch ORA Tool</span><br>
+                <span class="info">Type 'start' to launch ORA Tool (GitHub)</span><br>
+                <span class="info">Type 'localfiles' to access local S6 documents</span><br>
                 <span class="info">Type 'link show' to access secure link</span><br>
                 <span class="info">Type 'color 1-12' to change matrix color</span><br><br>
             </div>
@@ -583,6 +604,73 @@
                 if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
                     drops[i] = 0;
                 }
+            }
+        }
+        
+        // ==============================
+        // LOCAL FILE SYSTEM
+        // ==============================
+        class LocalFileSystem {
+            constructor() {
+                this.files = [];
+                this.fileIcons = {
+                    '.pdf': '📕',
+                    '.docx': '📘',
+                    '.doc': '📘',
+                    '.txt': '📝',
+                    '.xlsx': '📊',
+                    '.xls': '📊'
+                };
+            }
+            
+            async loadFiles() {
+                try {
+                    const response = await fetch('./data.json');
+                    if (!response.ok) {
+                        throw new Error('Failed to load data.json');
+                    }
+                    
+                    const data = await response.json();
+                    this.files = data.files || [];
+                    return this.files;
+                    
+                } catch (error) {
+                    console.error('Error loading local files:', error);
+                    return [];
+                }
+            }
+            
+            getFileIcon(filename) {
+                const extension = filename.substring(filename.lastIndexOf('.')).toLowerCase();
+                return this.fileIcons[extension] || '📄';
+            }
+            
+            searchFiles(keyword) {
+                const searchTerm = keyword.toLowerCase();
+                return this.files.filter(file => 
+                    file.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            getFileUrl(filename) {
+                const extension = filename.split('.').pop().toLowerCase();
+                const filePath = `files/${encodeURIComponent(filename)}`;
+                
+                if (extension === 'pdf') {
+                    return filePath;
+                } else if (extension === 'docx' || extension === 'doc') {
+                    const currentUrl = window.location.href;
+                    const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/'));
+                    return `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(baseUrl + '/' + filePath)}`;
+                } else {
+                    return filePath;
+                }
+            }
+            
+            openFile(filename) {
+                const url = this.getFileUrl(filename);
+                window.open(url, '_blank');
+                return true;
             }
         }
         
@@ -929,6 +1017,7 @@
                 this.password = 'karekezi@2';
                 this.fileSystem = new ORAFileSystem();
                 this.linkSystem = new LinkSystem();
+                this.localFileSystem = new LocalFileSystem();
                 this.isBooting = false;
             }
             
@@ -1335,6 +1424,7 @@
                         <span class="system">> 2025</span><br><br>
                         <span class="info">Type 'help' to see functions</span><br>
                         <span class="info">Type 'start' to launch ORA Tool</span><br>
+                        <span class="info">Type 'localfiles' to access local S6 documents</span><br>
                         <span class="info">Type 'link show' to access secure link</span><br>
                         <span class="info">Type 'color 1-12' to change matrix color</span><br><br>
                     `;
@@ -1446,6 +1536,19 @@
         const terminalContainer = document.querySelector('.terminal-container');
         const terminalHeader = document.getElementById('terminal-header');
         const oraTool = new ORATool();
+        const localFileSystem = new LocalFileSystem();
+        
+        // Global function to open local files from buttons
+        window.openLocalFile = async function(filename) {
+            const success = localFileSystem.openFile(filename);
+            if (success) {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'output success';
+                resultDiv.textContent = `Opening: ${filename}`;
+                terminalOutput.appendChild(resultDiv);
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+        };
         
         // Command definitions
         const commands = {
@@ -1455,13 +1558,18 @@
                     let helpText = '<span class="info">=== TERMINAL COMMANDS ===</span><br><br>';
                     helpText += '<span class="ora">System Commands:</span><br>';
                     for (const [cmd, info] of Object.entries(commands)) {
-                        if (cmd !== 'start' && cmd !== 'link' && cmd !== 'ls' && cmd !== 'open' && cmd !== 'info' && cmd !== 'get' && cmd !== 'view') {
+                        if (cmd !== 'start' && cmd !== 'link' && cmd !== 'ls' && cmd !== 'open' && cmd !== 'info' && cmd !== 'get' && cmd !== 'view' && cmd !== 'localfiles') {
                             helpText += `<span class="command">${cmd}</span> - ${info.description}<br>`;
                         }
                     }
                     helpText += '<br><span class="ora">Link System:</span><br>';
                     helpText += '<span class="command">link show</span> - Access secure Google Drive link<br>';
-                    helpText += '<br><span class="ora">ORA Tool Commands:</span><br>';
+                    helpText += '<br><span class="ora">Local Files System:</span><br>';
+                    helpText += '<span class="command">localfiles</span> - Access local S6 documents<br>';
+                    helpText += '<span class="command">open filename</span> - Open local file (after localfiles)<br>';
+                    helpText += '<span class="command">search keyword</span> - Search local files (after localfiles)<br>';
+                    helpText += '<span class="command">count</span> - Show file statistics (after localfiles)<br>';
+                    helpText += '<br><span class="ora">ORA Tool Commands (GitHub):</span><br>';
                     helpText += '<span class="command">start</span> - Launch ORA Tool (GitHub files)<br>';
                     helpText += '<span class="command">ls</span> - List ORA files (in ORA Tool)<br>';
                     helpText += '<span class="command">open filename</span> - Open ORA file (in ORA Tool)<br>';
@@ -1469,12 +1577,11 @@
                     helpText += '<span class="command">get filename</span> - Download file (in ORA Tool)<br>';
                     helpText += '<span class="command">view filename</span> - Preview file (in ORA Tool)<br>';
                     helpText += '<span class="command">exit</span> - Exit ORA Tool<br>';
-                    helpText += '<br><span class="ora">Repository:</span><br>';
-                    helpText += '• https://github.com/MKB-NEL/orabymkb<br>';
-                    helpText += '• Files: /files directory<br>';
+                    helpText += '<br><span class="info">Type the command to see specific help</span>';
                     return helpText;
                 }
             },
+            
             clear: {
                 description: 'Clear the terminal screen',
                 execute: () => {
@@ -1485,45 +1592,144 @@
                     return '';
                 }
             },
+            
+            localfiles: {
+                description: 'Access local S6 documents',
+                execute: async () => {
+                    const loadingDiv = document.createElement('div');
+                    loadingDiv.className = 'output';
+                    loadingDiv.innerHTML = `<span class="loading"></span><span class="info">Loading local documents...</span>`;
+                    terminalOutput.appendChild(loadingDiv);
+                    
+                    const files = await localFileSystem.loadFiles();
+                    
+                    loadingDiv.remove();
+                    
+                    if (files.length === 0) {
+                        return '<span class="error">No local files found. Check data.json and files/ folder</span>';
+                    }
+                    
+                    let result = `<span class="ora">=== S6 DOCUMENTS (${files.length} files) ===</span><br><br>`;
+                    result += `<span class="info">Local files from data.json:</span><br><br>`;
+                    
+                    files.forEach((filename, index) => {
+                        const icon = localFileSystem.getFileIcon(filename);
+                        const extension = filename.split('.').pop().toUpperCase();
+                        
+                        result += `<div class="file-item">
+                            <span class="file-icon">${icon}</span>
+                            <span class="file">${filename}</span>
+                            <span class="file-size">${extension}</span>
+                            <button class="open-btn" onclick="openLocalFile('${filename.replace(/'/g, "\\'")}')">OPEN</button>
+                        </div>`;
+                    });
+                    
+                    result += `<br><span class="info">Commands for local files:</span><br>`;
+                    result += `<span class="command">open filename</span> - Open a document<br>`;
+                    result += `<span class="command">search keyword</span> - Search for files<br>`;
+                    result += `<span class="command">count</span> - Show file statistics<br>`;
+                    result += `<span class="command">help</span> - Show all commands<br>`;
+                    
+                    return result;
+                }
+            },
+            
+            search: {
+                description: 'Search local files',
+                execute: async (args) => {
+                    if (args.length === 0) {
+                        return '<span class="error">Usage: search keyword</span><br>Example: search math';
+                    }
+                    
+                    const keyword = args.join(' ');
+                    const files = await localFileSystem.loadFiles();
+                    const results = localFileSystem.searchFiles(keyword);
+                    
+                    if (results.length === 0) {
+                        return `<span class="warning">No files found matching: ${keyword}</span>`;
+                    }
+                    
+                    let result = `<span class="ora">=== SEARCH RESULTS (${results.length} files) ===</span><br>`;
+                    result += `<span class="info">Searching for: ${keyword}</span><br><br>`;
+                    
+                    results.forEach(filename => {
+                        const icon = localFileSystem.getFileIcon(filename);
+                        result += `<div class="file-item">
+                            <span class="file-icon">${icon}</span>
+                            <span class="file">${filename}</span>
+                            <button class="open-btn" onclick="openLocalFile('${filename.replace(/'/g, "\\'")}')">OPEN</button>
+                        </div>`;
+                    });
+                    
+                    return result;
+                }
+            },
+            
+            count: {
+                description: 'Show local file statistics',
+                execute: async () => {
+                    const files = await localFileSystem.loadFiles();
+                    
+                    const pdfCount = files.filter(f => f.toLowerCase().endsWith('.pdf')).length;
+                    const docxCount = files.filter(f => f.toLowerCase().endsWith('.docx')).length;
+                    const docCount = files.filter(f => f.toLowerCase().endsWith('.doc')).length;
+                    const otherCount = files.length - pdfCount - docxCount - docCount;
+                    
+                    let stats = `<span class="ora">=== LOCAL FILE STATISTICS ===</span><br><br>`;
+                    stats += `<span class="info">Total files: ${files.length}</span><br>`;
+                    stats += `<span class="info">PDF files: ${pdfCount}</span><br>`;
+                    stats += `<span class="info">DOCX files: ${docxCount}</span><br>`;
+                    stats += `<span class="info">DOC files: ${docCount}</span><br>`;
+                    stats += `<span class="info">Other files: ${otherCount}</span><br>`;
+                    
+                    return stats;
+                }
+            },
+            
             date: {
                 description: 'Show current date and time',
                 execute: () => {
                     return new Date().toLocaleString();
                 }
             },
+            
             echo: {
                 description: 'Echo back the input text',
                 execute: (args) => {
                     return args.join(' ');
                 }
             },
+            
             about: {
                 description: 'Information about this terminal',
                 execute: () => {
-                    return `<span class="ora">Terminal Shell v0.1</span><br>
-                    Advanced web-based terminal with ORA integration<br>
-                    Features: Real GitHub API, Secure link system, ORA Tool<br>
+                    return `<span class="ora">Terminal Shell v1.0</span><br>
+                    Advanced web-based terminal with multiple file systems<br>
+                    Features: GitHub API, Local files, Secure link system<br>
                     Built by Bertrand • 2025<br><br>
-                    <span class="info">GitHub: MKB-NEL/orabymkb</span><br>
-                    <span class="info">Files: /files directory (real API access)</span>`;
+                    <span class="info">GitHub Repository: MKB-NEL/orabymkb</span><br>
+                    <span class="info">Local Files: /files directory (S6 documents)</span>`;
                 }
             },
+            
             ls: {
                 description: 'List ORA directory contents',
                 execute: () => {
                     if (oraTool.mode === 'normal') {
-                        return `<span class="info">Type 'start' to access ORA files</span><br>
-                        <span class="info">Repository: github.com/MKB-NEL/orabymkb</span>`;
+                        return `<span class="info">Type 'start' to access ORA files (GitHub)</span><br>
+                        <span class="info">Type 'localfiles' to access local S6 documents</span>`;
                     }
                     return '';
                 }
             },
+            
             pwd: {
                 description: 'Print working directory',
                 execute: () => {
                     return oraTool.mode === 'normal' ? '/home/user' : oraTool.currentPath;
                 }
             },
+            
             color: {
                 description: 'Change matrix animation color (1-12)',
                 execute: (args) => {
@@ -1544,6 +1750,7 @@
                     }
                 }
             },
+            
             calc: {
                 description: 'Simple calculator',
                 execute: (args) => {
@@ -1556,23 +1763,27 @@
                     }
                 }
             },
+            
             neofetch: {
                 description: 'Display system information',
                 execute: async () => {
                     const files = await oraTool.fileSystem.scanORAFiles();
+                    const localFiles = await localFileSystem.loadFiles();
+                    
                     return `
                     <span class="ora">╔══════════════════════════════════════╗</span><br>
                     <span class="ora">║        TERMINAL INFO                 ║</span><br>
                     <span class="ora">╠══════════════════════════════════════╣</span><br>
-                    <span class="system">║ OS: Terminal Shell v0.1              ║</span><br>
+                    <span class="system">║ OS: Terminal Shell v1.0              ║</span><br>
                     <span class="system">║ Mode: ${oraTool.mode.toUpperCase()}                      ║</span><br>
-                    <span class="system">║ ORA Files: ${files.length}                  ║</span><br>
-                    <span class="system">║ Repository: MKB-NEL/orabymkb         ║</span><br>
+                    <span class="system">║ GitHub Files: ${files.length}                ║</span><br>
+                    <span class="system">║ Local Files: ${localFiles.length}                ║</span><br>
                     <span class="system">║ Matrix: ${matrixColor}              ║</span><br>
-                    <span class="system">║ Status: REAL API ACCESS             ║</span><br>
+                    <span class="system">║ Status: DUAL SYSTEM ACTIVE         ║</span><br>
                     <span class="ora">╚══════════════════════════════════════╝</span>`;
                 }
             },
+            
             reboot: {
                 description: 'Reboot terminal interface',
                 execute: () => {
@@ -1582,6 +1793,7 @@
                     return '<span class="warning">Rebooting terminal...</span>';
                 }
             },
+            
             link: {
                 description: 'Access secure link system',
                 execute: (args) => {
@@ -1599,6 +1811,7 @@
                     return '<span class="error">Usage: link show</span>';
                 }
             },
+            
             start: {
                 description: 'Launch ORA Tool with real GitHub API',
                 execute: async () => {
@@ -1612,16 +1825,59 @@
                     }
                 }
             },
+            
             // ORA Tool commands (only work in ORA Tool mode)
             open: {
-                description: 'Open ORA file in repository',
+                description: 'Open file in current mode',
                 execute: async (args) => {
-                    if (oraTool.mode !== 'ora-tool') {
-                        return '<span class="error">ORA Tool not active. Type "start" first.</span>';
+                    if (oraTool.mode === 'ora-tool') {
+                        return await oraTool.handleORAToolCommand('open', args) ? '' : '<span class="error">Failed to open ORA file</span>';
+                    } else {
+                        // Handle local file opening
+                        if (args.length === 0) {
+                            return '<span class="error">Usage: open filename</span><br>Example: open S6 ALL-ENGLISH.pdf<br>Type "localfiles" first to see available files';
+                        }
+                        
+                        const filename = args.join(' ');
+                        const files = await localFileSystem.loadFiles();
+                        
+                        // Find exact match first
+                        let file = files.find(f => f === filename);
+                        
+                        // If not found, try case-insensitive
+                        if (!file) {
+                            file = files.find(f => f.toLowerCase() === filename.toLowerCase());
+                        }
+                        
+                        // If still not found, try partial match
+                        if (!file) {
+                            const matches = files.filter(f => f.toLowerCase().includes(filename.toLowerCase()));
+                            if (matches.length === 1) {
+                                file = matches[0];
+                            } else if (matches.length > 1) {
+                                let msg = `<span class="warning">Multiple matches found:</span><br>`;
+                                matches.forEach(match => {
+                                    msg += `<span class="info">${match}</span><br>`;
+                                });
+                                msg += `<br><span class="info">Be more specific</span>`;
+                                return msg;
+                            }
+                        }
+                        
+                        if (!file) {
+                            return `<span class="error">File not found: ${filename}</span><br>Type 'localfiles' to see available files`;
+                        }
+                        
+                        const success = localFileSystem.openFile(file);
+                        if (success) {
+                            return `<span class="success">Opening: ${file}</span>`;
+                        } else {
+                            return `<span class="error">Failed to open: ${file}</span>`;
+                        }
                     }
-                    return await oraTool.handleORAToolCommand('open', args) ? '' : '<span class="error">Failed to open file</span>';
                 }
             },
+            
             info: {
                 description: 'Show ORA file details',
                 execute: async (args) => {
@@ -1631,6 +1887,7 @@
                     return await oraTool.handleORAToolCommand('info', args) ? '' : '<span class="error">Failed to get file info</span>';
                 }
             },
+            
             get: {
                 description: 'Download ORA file',
                 execute: async (args) => {
@@ -1640,6 +1897,7 @@
                     return await oraTool.handleORAToolCommand('get', args) ? '' : '<span class="error">Failed to download file</span>';
                 }
             },
+            
             view: {
                 description: 'Preview ORA file content',
                 execute: async (args) => {

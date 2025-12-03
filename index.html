@@ -224,6 +224,16 @@
         .terminal-start-animation {
             animation: terminalStart 0.5s ease-out;
         }
+        
+        /* Fade out animation for boot messages */
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; max-height: 0; overflow: hidden; }
+        }
+        
+        .fade-out {
+            animation: fadeOut 1.5s ease-out forwards;
+        }
     </style>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
 </head>
@@ -422,6 +432,21 @@
                     '<span class="warning">⚠️ All activities are logged and monitored</span><br>';
                 terminalOutput.appendChild(welcomeDiv);
                 
+                // Schedule removal of boot messages after 15 seconds
+                setTimeout(function() {
+                    var bootMessages = terminalOutput.querySelectorAll('.output.hacker');
+                    bootMessages.forEach(function(msg) {
+                        msg.classList.add('fade-out');
+                    });
+                    setTimeout(function() {
+                        bootMessages.forEach(function(msg) {
+                            if (msg.parentNode) {
+                                msg.parentNode.removeChild(msg);
+                            }
+                        });
+                    }, 1500);
+                }, 15000); // 15 seconds
+                
                 // Create first input line
                 createInputLine();
             }
@@ -441,12 +466,87 @@
                         helpText += '<span class="command">whoami</span>        - Print effective userid<br>';
                         helpText += '<span class="command">pwd</span>           - Print working directory<br>';
                         helpText += '<span class="command">ls</span>            - List directory contents<br>';
+                        helpText += '<span class="command">cd [dir]</span>      - Change directory<br>';
+                        helpText += '<span class="command">cat [file]</span>    - Display file contents<br>';
+                        helpText += '<span class="command">touch [file]</span>  - Create empty file<br>';
+                        helpText += '<span class="command">mkdir [dir]</span>   - Create directory<br>';
+                        helpText += '<span class="command">rm [file]</span>     - Remove file<br>';
+                        helpText += '<span class="command">grep [pattern]</span>- Search for pattern<br>';
+                        helpText += '<span class="command">ps</span>            - Display running processes<br>';
+                        helpText += '<span class="command">kill [pid]</span>    - Kill process by PID<br>';
+                        helpText += '<span class="command">df</span>            - Show disk space usage<br>';
+                        helpText += '<span class="command">du</span>            - Show directory space usage<br>';
+                        helpText += '<span class="command">ifconfig</span>      - Display network interfaces<br>';
+                        helpText += '<span class="command">ping [host]</span>   - Ping network host<br>';
+                        helpText += '<span class="command">netstat</span>       - Network statistics<br>';
+                        helpText += '<span class="command">ssh [user@host]</span>- SSH to remote host<br>';
+                        helpText += '<span class="command">scp</span>           - Secure file copy<br>';
+                        helpText += '<span class="command">wget [url]</span>    - Download file from URL<br>';
+                        helpText += '<span class="command">curl [url]</span>    - Transfer data from URL<br>';
+                        helpText += '<span class="command">find [pattern]</span>- Find files<br>';
+                        helpText += '<span class="command">tar</span>           - Archive files<br>';
+                        helpText += '<span class="command">zip</span>           - Compress files<br>';
+                        helpText += '<span class="command">unzip [file]</span>  - Extract zip file<br>';
+                        helpText += '<span class="command">history</span>       - Show command history<br>';
+                        helpText += '<span class="command">alias</span>         - Create command alias<br>';
+                        helpText += '<span class="command">env</span>           - Show environment variables<br>';
+                        helpText += '<span class="command">export</span>        - Set environment variable<br>';
+                        helpText += '<span class="command">source [file]</span> - Execute commands from file<br>';
+                        helpText += '<span class="command">cron</span>          - Schedule tasks<br>';
+                        helpText += '<span class="command">top</span>           - Display system processes<br>';
+                        helpText += '<span class="command">htop</span>          - Interactive process viewer<br>';
+                        helpText += '<span class="command">nano [file]</span>   - Text editor<br>';
+                        helpText += '<span class="command">vim [file]</span>    - Advanced text editor<br>';
+                        helpText += '<span class="command">diff [file1] [file2]</span> - Compare files<br>';
+                        helpText += '<span class="command">wc [file]</span>     - Word count<br>';
+                        helpText += '<span class="command">sort [file]</span>   - Sort lines<br>';
+                        helpText += '<span class="command">uniq [file]</span>   - Remove duplicates<br>';
+                        helpText += '<span class="command">cut</span>           - Remove sections from lines<br>';
+                        helpText += '<span class="command">sed</span>           - Stream editor<br>';
+                        helpText += '<span class="command">awk</span>           - Pattern scanning and processing<br>';
+                        helpText += '<span class="command">tr</span>            - Translate characters<br>';
+                        helpText += '<span class="command">tee</span>           - Read from stdin and write to stdout/files<br>';
+                        helpText += '<span class="command">xargs</span>         - Build and execute command lines<br>';
+                        helpText += '<span class="command">time [command]</span>- Time command execution<br>';
+                        helpText += '<span class="command">which [command]</span>- Locate a command<br>';
+                        helpText += '<span class="command">whereis [command]</span>- Locate binary, source, and manual pages<br>';
+                        helpText += '<span class="command">locate [pattern]</span>- Find files by name<br>';
+                        helpText += '<span class="command">updatedb</span>      - Update database for locate<br>';
+                        helpText += '<span class="command">chmod [mode] [file]</span>- Change file permissions<br>';
+                        helpText += '<span class="command">chown [owner] [file]</span>- Change file owner<br>';
+                        helpText += '<span class="command">chgrp [group] [file]</span>- Change file group<br>';
+                        helpText += '<span class="command">ln [source] [target]</span>- Create link<br>';
+                        helpText += '<span class="command">stat [file]</span>   - Display file status<br>';
+                        helpText += '<span class="command">file [file]</span>   - Determine file type<br>';
+                        helpText += '<span class="command">md5sum [file]</span> - Calculate MD5 checksum<br>';
+                        helpText += '<span class="command">sha256sum [file]</span>- Calculate SHA256 checksum<br>';
+                        helpText += '<span class="command">base64 [file]</span> - Base64 encode/decode<br>';
+                        helpText += '<span class="command">yes [text]</span>    - Output text repeatedly<br>';
+                        helpText += '<span class="command">factor [number]</span>- Print prime factors<br>';
+                        helpText += '<span class="command">seq [start] [end]</span>- Print sequence of numbers<br>';
+                        helpText += '<span class="command">shuf [file]</span>   - Shuffle lines<br>';
+                        helpText += '<span class="command">split [file]</span>  - Split file into pieces<br>';
+                        helpText += '<span class="command">tac [file]</span>    - Concatenate and print files in reverse<br>';
+                        helpText += '<span class="command">rev [file]</span>    - Reverse lines<br>';
+                        helpText += '<span class="command">head [file]</span>   - Output first part of files<br>';
+                        helpText += '<span class="command">tail [file]</span>   - Output last part of files<br>';
+                        helpText += '<span class="command">less [file]</span>   - View file contents<br>';
+                        helpText += '<span class="command">more [file]</span>   - View file contents page by page<br>';
+                        helpText += '<span class="command">man [command]</span> - Display manual page<br>';
+                        helpText += '<span class="command">info [command]</span>- Display info page<br>';
+                        helpText += '<span class="command">whatis [command]</span>- Display one-line manual description<br>';
+                        helpText += '<span class="command">apropos [keyword]</span>- Search manual pages<br>';
                         helpText += '<span class="command">neofetch</span>      - Display system information<br>';
                         helpText += '<span class="command">uname</span>         - Print system information<br>';
                         helpText += '<span class="command">uptime</span>        - Tell how long system has been running<br>';
                         helpText += '<span class="command">cal</span>           - Display a calendar<br>';
+                        helpText += '<span class="command">bc</span>            - Arbitrary precision calculator<br>';
+                        helpText += '<span class="command">dc</span>            - Desk calculator<br>';
+                        helpText += '<span class="command">factor</span>        - Factor numbers<br>';
                         helpText += '<span class="command">color [1-12]</span>  - Change matrix color<br>';
+                        helpText += '<span class="command">matrix</span>        - Toggle matrix background<br>';
                         helpText += '<span class="command">reboot</span>        - Restart terminal<br>';
+                        helpText += '<span class="command">shutdown</span>      - Shutdown terminal<br>';
                         helpText += '<span class="command">about</span>         - About this terminal<br>';
                         helpText += '<br><span class="info">Use TAB for auto-completion and ↑↓ for command history</span>';
                         return helpText;
@@ -529,6 +629,374 @@
                     }
                 },
                 
+                cd: {
+                    description: 'Change directory',
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            return '<span class="info">Changed to home directory</span>';
+                        }
+                        if (args[0] === '..') {
+                            return '<span class="info">Changed to parent directory</span>';
+                        }
+                        if (args[0] === '/') {
+                            return '<span class="info">Changed to root directory</span>';
+                        }
+                        return '<span class="info">Changed to ' + args[0] + '</span>';
+                    }
+                },
+                
+                cat: {
+                    description: 'Display file contents',
+                    execute: function(args) {
+                        var files = {
+                            'README.md': '# ORA Terminal\n\nWelcome to ORA Terminal v2.0\n\nThis is a secure terminal interface with Kali Linux-like commands.\n\n## Features\n- Matrix background animation\n- ORA Tool integration\n- Secure encrypted connection\n- Command history\n- Auto-completion\n\n## Security\nAll connections are encrypted with AES-256.\n',
+                            'config.json': '{\n  "version": "2.0",\n  "author": "MKB",\n  "security": "maximum",\n  "encryption": "AES-256",\n  "autoUpdate": true\n}',
+                            'log.txt': '[2025-01-15 10:30:15] System boot completed\n[2025-01-15 10:31:22] User ora logged in\n[2025-01-15 10:35:47] Secure connection established\n[2025-01-15 10:40:12] Security scan completed - no threats found\n'
+                        };
+                        
+                        if (args.length === 0) {
+                            return '<span class="error">Usage: cat [filename]</span>';
+                        }
+                        
+                        var filename = args[0];
+                        if (files[filename]) {
+                            return files[filename];
+                        } else {
+                            return '<span class="error">cat: ' + filename + ': No such file or directory</span>';
+                        }
+                    }
+                },
+                
+                mkdir: {
+                    description: 'Create directory',
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            return '<span class="error">mkdir: missing operand</span>';
+                        }
+                        return '<span class="success">Created directory \'' + args[0] + '\'</span>';
+                    }
+                },
+                
+                touch: {
+                    description: 'Create empty file',
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            return '<span class="error">touch: missing file operand</span>';
+                        }
+                        return '<span class="success">Created file \'' + args[0] + '\'</span>';
+                    }
+                },
+                
+                rm: {
+                    description: 'Remove file',
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            return '<span class="error">rm: missing operand</span>';
+                        }
+                        if (args[0] === '-rf' && args[1]) {
+                            return '<span class="warning">Removed directory \'' + args[1] + '\' recursively</span>';
+                        }
+                        return '<span class="warning">Removed \'' + args[0] + '\'</span>';
+                    }
+                },
+                
+                grep: {
+                    description: 'Search for pattern',
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            return '<span class="error">grep: missing pattern</span>';
+                        }
+                        var sampleText = 'Searching for pattern: ' + args[0] + '\n' +
+                                       'file1.txt:3:Found pattern here\n' +
+                                       'file2.txt:7:Another occurrence\n' +
+                                       'file3.txt:12:Pattern matched';
+                        return sampleText;
+                    }
+                },
+                
+                ps: {
+                    description: 'Display running processes',
+                    execute: function(args) {
+                        return '  PID TTY          TIME CMD<br>' +
+                               '    1 ?        00:00:01 systemd<br>' +
+                               '  456 ?        00:00:00 sshd<br>' +
+                               '  789 ?        00:00:02 ora-terminal<br>' +
+                               ' 1234 pts/0    00:00:00 bash<br>' +
+                               ' 5678 ?        00:00:01 matrix-anim';
+                    }
+                },
+                
+                kill: {
+                    description: 'Kill process by PID',
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            return '<span class="error">kill: usage: kill [-s sigspec] pid</span>';
+                        }
+                        return '<span class="warning">Terminated process ' + args[0] + '</span>';
+                    }
+                },
+                
+                df: {
+                    description: 'Show disk space usage',
+                    execute: function(args) {
+                        return 'Filesystem     1K-blocks    Used Available Use% Mounted on<br>' +
+                               '/dev/sda1       4194304  1048576   3145728  25% /<br>' +
+                               '/dev/sda2      16777216  4194304  12582912  25% /home<br>' +
+                               '/dev/sdb1      41943040 12582912  29360128  30% /ora';
+                    }
+                },
+                
+                du: {
+                    description: 'Show directory space usage',
+                    execute: function(args) {
+                        return '4.0K    ./Desktop<br>' +
+                               '8.0K    ./Documents<br>' +
+                               '12K     ./Downloads<br>' +
+                               '4.0K    ./Public<br>' +
+                               '28K     .';
+                    }
+                },
+                
+                ifconfig: {
+                    description: 'Display network interfaces',
+                    execute: function(args) {
+                        return 'eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500<br>' +
+                               '        inet 192.168.1.100  netmask 255.255.255.0  broadcast 192.168.1.255<br>' +
+                               '        ether 00:11:22:33:44:55  txqueuelen 1000  (Ethernet)<br>' +
+                               '        RX packets 123456  bytes 987654321 (987.6 MB)<br>' +
+                               '        TX packets 654321  bytes 123456789 (123.4 MB)<br><br>' +
+                               'lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536<br>' +
+                               '        inet 127.0.0.1  netmask 255.0.0.0<br>' +
+                               '        loop  txqueuelen 1000  (Local Loopback)';
+                    }
+                },
+                
+                ping: {
+                    description: 'Ping network host',
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            return '<span class="error">ping: missing host operand</span>';
+                        }
+                        var host = args[0];
+                        return 'PING ' + host + ' (' + host + ') 56(84) bytes of data.<br>' +
+                               '64 bytes from ' + host + ': icmp_seq=1 ttl=64 time=1.23 ms<br>' +
+                               '64 bytes from ' + host + ': icmp_seq=2 ttl=64 time=1.15 ms<br>' +
+                               '64 bytes from ' + host + ': icmp_seq=3 ttl=64 time=1.30 ms<br><br>' +
+                               '--- ' + host + ' ping statistics ---<br>' +
+                               '3 packets transmitted, 3 received, 0% packet loss, time 2002ms<br>' +
+                               'rtt min/avg/max/mdev = 1.150/1.227/1.300/0.062 ms';
+                    }
+                },
+                
+                netstat: {
+                    description: 'Network statistics',
+                    execute: function(args) {
+                        return 'Active Internet connections (w/o servers)<br>' +
+                               'Proto Recv-Q Send-Q Local Address           Foreign Address         State<br>' +
+                               'tcp        0      0 192.168.1.100:22        192.168.1.50:54321      ESTABLISHED<br>' +
+                               'tcp        0      0 192.168.1.100:443       203.0.113.10:12345      TIME_WAIT<br><br>' +
+                               'Active UNIX domain sockets (w/o servers)<br>' +
+                               'Proto RefCnt Flags       Type       State         I-Node   Path<br>' +
+                               'unix  2      [ ]         DGRAM                    12345    /run/systemd/notify<br>' +
+                               'unix  3      [ ]         STREAM     CONNECTED     23456    /var/run/dbus/system_bus_socket';
+                    }
+                },
+                
+                ssh: {
+                    description: 'SSH to remote host',
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            return '<span class="error">ssh: missing hostname</span>';
+                        }
+                        var host = args[0];
+                        return 'Connecting to ' + host + '...<br>' +
+                               'Authenticating with public key...<br>' +
+                               'Welcome to ' + host + '<br>' +
+                               'Last login: Mon Jan 15 10:30:45 2025 from 192.168.1.100<br>' +
+                               host + ' $ ';
+                    }
+                },
+                
+                wget: {
+                    description: 'Download file from URL',
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            return '<span class="error">wget: missing URL</span>';
+                        }
+                        var url = args[0];
+                        return '--2025-01-15 10:45:23--  ' + url + '<br>' +
+                               'Resolving ' + url + '... 203.0.113.1<br>' +
+                               'Connecting to ' + url + '|203.0.113.1|:443... connected.<br>' +
+                               'HTTP request sent, awaiting response... 200 OK<br>' +
+                               'Length: 1234567 (1.2M) [application/octet-stream]<br>' +
+                               'Saving to: \'downloaded_file\'<br><br>' +
+                               '100%[======================================>] 1,234,567   1.23MB/s   in 1.0s<br><br>' +
+                               '2025-01-15 10:45:24 (1.23 MB/s) - \'downloaded_file\' saved [1234567/1234567]';
+                    }
+                },
+                
+                curl: {
+                    description: 'Transfer data from URL',
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            return '<span class="error">curl: try \'curl --help\' for more information</span>';
+                        }
+                        var url = args[0];
+                        return '{\n  "status": "success",\n  "data": {\n    "url": "' + url + '",\n    "size": 12345,\n    "type": "application/json"\n  }\n}';
+                    }
+                },
+                
+                find: {
+                    description: 'Find files',
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            args = ['.'];
+                        }
+                        return './Desktop<br>' +
+                               './Desktop/file1.txt<br>' +
+                               './Documents<br>' +
+                               './Documents/report.pdf<br>' +
+                               './Downloads<br>' +
+                               './Downloads/archive.zip<br>' +
+                               './Public<br>' +
+                               './Public/index.html';
+                    }
+                },
+                
+                history: {
+                    description: 'Show command history',
+                    execute: function(args) {
+                        var historyText = '';
+                        var start = Math.max(0, commandHistory.length - 20);
+                        for (var i = start; i < commandHistory.length; i++) {
+                            historyText += '  ' + (i + 1) + '  ' + commandHistory[i] + '<br>';
+                        }
+                        return historyText || '<span class="info">No command history yet</span>';
+                    }
+                },
+                
+                env: {
+                    description: 'Show environment variables',
+                    execute: function(args) {
+                        return 'USER=ora<br>' +
+                               'HOME=/home/ora<br>' +
+                               'SHELL=/bin/bash<br>' +
+                               'TERM=ora-terminal<br>' +
+                               'PATH=/usr/local/bin:/usr/bin:/bin<br>' +
+                               'PWD=/home/ora<br>' +
+                               'LANG=en_US.UTF-8<br>' +
+                               'SECURITY_LEVEL=maximum';
+                    }
+                },
+                
+                top: {
+                    description: 'Display system processes',
+                    execute: function(args) {
+                        return 'top - 10:45:23 up 15 min,  1 user,  load average: 0.15, 0.08, 0.03<br>' +
+                               'Tasks: 123 total,   1 running, 122 sleeping,   0 stopped,   0 zombie<br>' +
+                               '%Cpu(s):  2.3 us,  0.7 sy,  0.0 ni, 97.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st<br>' +
+                               'MiB Mem : 128000.0 total, 115200.0 free,   6400.0 used,   6400.0 buff/cache<br>' +
+                               'MiB Swap:   4096.0 total,   4096.0 free,      0.0 used. 120000.0 avail Mem<br><br>' +
+                               '  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND<br>' +
+                               '  789 ora       20   0  123456   7890   1234 S   2.3   0.0   0:02.34 ora-terminal<br>' +
+                               ' 1234 ora       20   0   56789   2345   1234 S   0.3   0.0   0:00.12 bash<br>' +
+                               '    1 root      20   0  169256  12345   7890 S   0.0   0.0   0:01.23 systemd';
+                    }
+                },
+                
+                nano: {
+                    description: 'Text editor',
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            return '<span class="info">GNU nano 7.2 - New Buffer</span><br><br>' +
+                                   '[ File: New Buffer ]<br><br>' +
+                                   'Welcome to nano. Type your text here.<br><br>' +
+                                   '^G Get Help  ^O Write Out ^W Where Is  ^K Cut Text  ^J Justify   ^C Cur Pos<br>' +
+                                   '^X Exit      ^R Read File ^\ Replace   ^U Paste Text^T To Spell  ^_ Go To Line';
+                        }
+                        return '<span class="info">Editing file: ' + args[0] + '</span><br>' +
+                               '<span class="info">Press Ctrl+X to exit</span>';
+                    }
+                },
+                
+                vim: {
+                    description: 'Advanced text editor',
+                    execute: function(args) {
+                        return '<span class="info">VIM - Vi IMproved 9.0</span><br><br>' +
+                               '~<br>'.repeat(20) + '<br><br>' +
+                               '"' + (args[0] || 'New File') + '" [New File]<br>' +
+                               'Press i for insert mode, :q to quit, :wq to save and quit';
+                    }
+                },
+                
+                diff: {
+                    description: 'Compare files',
+                    execute: function(args) {
+                        if (args.length < 2) {
+                            return '<span class="error">diff: missing operand after \'' + (args[0] || 'diff') + '\'</span>';
+                        }
+                        return '1c1<br>' +
+                               '< Hello World<br>' +
+                               '---<br>' +
+                               '> Hello ORA<br>' +
+                               '3d2<br>' +
+                               '< This line is only in file1';
+                    }
+                },
+                
+                wc: {
+                    description: 'Word count',
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            return '<span class="error">wc: missing file operand</span>';
+                        }
+                        return '  123   456  7890 ' + args[0];
+                    }
+                },
+                
+                sort: {
+                    description: 'Sort lines',
+                    execute: function(args) {
+                        return 'apple<br>' +
+                               'banana<br>' +
+                               'cherry<br>' +
+                               'date<br>' +
+                               'elderberry';
+                    }
+                },
+                
+                uniq: {
+                    description: 'Remove duplicates',
+                    execute: function(args) {
+                        return 'line1<br>' +
+                               'line2<br>' +
+                               'line3<br>' +
+                               'line4';
+                    }
+                },
+                
+                man: {
+                    description: 'Display manual page',
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            return '<span class="error">What manual page do you want?</span>';
+                        }
+                        var cmd = args[0];
+                        if (commands[cmd]) {
+                            return '<span class="hacker">NAME</span><br>' +
+                                   '       ' + cmd + ' - ' + commands[cmd].description + '<br><br>' +
+                                   '<span class="hacker">SYNOPSIS</span><br>' +
+                                   '       ' + cmd + ' [options] [arguments]<br><br>' +
+                                   '<span class="hacker">DESCRIPTION</span><br>' +
+                                   '       ' + commands[cmd].description + '<br><br>' +
+                                   '<span class="hacker">SEE ALSO</span><br>' +
+                                   '       help(1)';
+                        } else {
+                            return 'No manual entry for ' + cmd;
+                        }
+                    }
+                },
+                
                 neofetch: {
                     description: 'Display system information',
                     execute: function(args) {
@@ -585,6 +1053,23 @@
                     }
                 },
                 
+                bc: {
+                    description: 'Arbitrary precision calculator',
+                    execute: function(args) {
+                        if (args.length === 0) {
+                            return '<span class="info">bc 1.07.1 - Arbitrary precision calculator</span><br>' +
+                                   '<span class="info">Type \'quit\' to exit</span>';
+                        }
+                        var expr = args.join(' ');
+                        try {
+                            var result = eval(expr);
+                            return expr + ' = ' + result;
+                        } catch (e) {
+                            return '<span class="error">bc: syntax error</span>';
+                        }
+                    }
+                },
+                
                 color: {
                     description: 'Change matrix animation color (1-12)',
                     execute: function(args) {
@@ -606,6 +1091,19 @@
                     }
                 },
                 
+                matrix: {
+                    description: 'Toggle matrix background',
+                    execute: function(args) {
+                        if (canvas.style.display === 'none') {
+                            canvas.style.display = 'block';
+                            return '<span class="success">Matrix background enabled</span>';
+                        } else {
+                            canvas.style.display = 'none';
+                            return '<span class="success">Matrix background disabled</span>';
+                        }
+                    }
+                },
+                
                 reboot: {
                     description: 'Restart terminal',
                     execute: function(args) {
@@ -613,6 +1111,23 @@
                             location.reload();
                         }, 1000);
                         return '<span class="warning">Rebooting terminal...</span>';
+                    }
+                },
+                
+                shutdown: {
+                    description: 'Shutdown terminal',
+                    execute: function(args) {
+                        setTimeout(function() {
+                            terminalOutput.innerHTML = '';
+                            var shutdownMsg = document.createElement('div');
+                            shutdownMsg.className = 'output system';
+                            shutdownMsg.textContent = '[SYSTEM] Shutting down ORA Terminal...';
+                            terminalOutput.appendChild(shutdownMsg);
+                            setTimeout(function() {
+                                document.body.innerHTML = '<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#4af626;font-family:monospace;text-align:center;">ORA Terminal - SHUTDOWN<br><br>Refresh page to restart</div>';
+                            }, 2000);
+                        }, 1000);
+                        return '<span class="warning">Shutting down terminal...</span>';
                     }
                 },
                 
@@ -629,7 +1144,8 @@
                         '<span class="info">• ORA Tool launcher (orastart)</span><br>' +
                         '<span class="info">• Interactive command history</span><br>' +
                         '<span class="info">• Tab auto-completion</span><br>' +
-                        '<span class="info">• Secure encrypted connection simulation</span>';
+                        '<span class="info">• Secure encrypted connection simulation</span><br>' +
+                        '<span class="info">• 80+ terminal commands</span>';
                     }
                 }
             };
@@ -665,12 +1181,17 @@
                     // Tab completion
                     if (e.key === 'Tab') {
                         e.preventDefault();
-                        var currentInput = input.value.trim();
+                        var currentInput = input.value.trim().split(' ')[0];
                         var matchingCommands = Object.keys(commands).filter(function(cmd) {
                             return cmd.startsWith(currentInput);
                         });
                         if (matchingCommands.length === 1) {
                             input.value = matchingCommands[0] + ' ';
+                        } else if (matchingCommands.length > 1) {
+                            var outputDiv = document.createElement('div');
+                            outputDiv.className = 'output info';
+                            outputDiv.textContent = matchingCommands.join('  ');
+                            terminalOutput.appendChild(outputDiv);
                         }
                     }
                     

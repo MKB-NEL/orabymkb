@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>VaultDrop · File Preview</title>
+    <title>VaultDrop · Preview</title>
     <meta name="theme-color" content="#6c47ff">
     
     <!-- Supabase SDK -->
@@ -13,335 +13,219 @@
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
             --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-            --radius-sm: 0.375rem;
-            --radius-md: 0.5rem;
-            --radius-lg: 0.75rem;
-            --radius-xl: 1rem;
-            --radius-2xl: 1.5rem;
-            --radius-full: 9999px;
         }
 
-        .theme-light {
-            --bg-main: #f4f2ee;
-            --bg-surface: #ffffff;
-            --bg-hover: #f9fafb;
-            --bg-input: #eef3f8;
-            --border: #e5e7eb;
-            --border-light: #f0f0f0;
-            --text-primary: #191919;
-            --text-secondary: #595856;
-            --text-tertiary: #868482;
-            --primary: #6c47ff;
-            --primary-hover: #5835e8;
-            --primary-light: #f0ebff;
-            --secondary: #3b82f6;
-            --success: #057642;
-            --success-bg: #e9f7ef;
-            --danger: #d11124;
-            --danger-bg: #fdecea;
-            --card-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
-            --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        .theme-dark {
-            --bg-main: #1a1a2e;
-            --bg-surface: #16213e;
-            --bg-hover: #1a2744;
-            --bg-input: #0f3460;
-            --border: #2a3a5e;
-            --border-light: #1e2d4a;
-            --text-primary: #e8e8e8;
-            --text-secondary: #b0b0b0;
-            --text-tertiary: #8a8a8a;
-            --primary: #8b6cff;
-            --primary-hover: #7b5ce8;
-            --primary-light: #1e1a3a;
-            --secondary: #60a5fa;
-            --success: #22c55e;
-            --success-bg: #0a2a1a;
-            --danger: #ef4444;
-            --danger-bg: #2a0a0a;
-            --card-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
-            --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-        html {
+        html, body {
+            width: 100%; height: 100%; overflow: hidden;
+            font-family: var(--font-family);
+            background: #1a1a1a;
+            color: #fff;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            font-size: 16px;
-            scroll-behavior: smooth;
         }
 
-        body {
-            font-family: var(--font-family);
-            background: var(--bg-main);
-            color: var(--text-primary);
-            line-height: 1.5;
-            min-height: 100vh;
-            transition: background var(--transition-base), color var(--transition-base);
+        /* Full-page preview area */
+        .preview-fullscreen {
+            width: 100%; height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background: #1a1a1a;
         }
 
-        a { color: inherit; text-decoration: none; }
-        button { cursor: pointer; font-family: inherit; border: none; background: transparent; }
-        button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-        input, textarea { font-family: inherit; font-size: inherit; }
-
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes toastUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
-
-        .loading-spinner { display: flex; align-items: center; justify-content: center; padding: 3rem; }
-        .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
-
-        /* Navbar */
-        .navbar {
-            position: sticky; top: 0; z-index: 100; background: var(--bg-surface);
-            border-bottom: 1px solid var(--border); height: 52px; display: flex;
-            align-items: center; padding: 0 1rem; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
-        }
-        .navbar-inner {
-            max-width: 1200px; margin: 0 auto; width: 100%; display: flex;
-            align-items: center; justify-content: space-between; gap: 0.75rem;
-        }
-        .navbar-brand { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
-        .navbar-logo {
-            width: 34px; height: 34px; background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 18px;
-        }
-        .navbar-title { font-size: 1rem; font-weight: 700; }
-        .navbar-actions { display: flex; align-items: center; gap: 0.25rem; }
-
-        .btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;
-            padding: 0.5rem 1rem; border-radius: var(--radius-full); font-weight: 600;
-            font-size: 0.875rem; transition: all var(--transition-fast); white-space: nowrap;
-            font-family: var(--font-family);
-        }
-        .btn:active { transform: scale(0.97); }
-        .btn-primary { background: var(--primary); color: #fff; }
-        .btn-primary:hover { background: var(--primary-hover); }
-        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
-        .btn-outline:hover { background: var(--primary-light); }
-        .btn-ghost { background: transparent; color: var(--text-secondary); font-weight: 500; }
-        .btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); }
-        .btn-sm { padding: 0.3rem 0.75rem; font-size: 0.8125rem; }
-        .btn-icon { width: 34px; height: 34px; padding: 0; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; }
-        .btn-danger { background: var(--danger); color: #fff; }
-        .btn-danger:hover { background: #b91c1c; }
-
-        /* Main Container */
-        .preview-container {
-            max-width: 1200px; margin: 0 auto; padding: 1rem; display: flex;
-            flex-direction: column; gap: 1rem; padding-bottom: 3rem;
+        .preview-fullscreen iframe,
+        .preview-fullscreen img,
+        .preview-fullscreen video,
+        .preview-fullscreen .text-content {
+            width: 100%; height: 100%;
+            border: none; object-fit: contain;
         }
 
-        /* File Info Card */
-        .file-info-card {
-            background: var(--bg-surface); border: 1px solid var(--border);
-            border-radius: var(--radius-lg); padding: 1.25rem;
-            box-shadow: var(--card-shadow); display: flex; align-items: center;
-            gap: 1rem; flex-wrap: wrap;
-        }
-        .file-icon-large {
-            width: 64px; height: 64px; border-radius: var(--radius-lg); flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center; font-size: 34px;
-        }
-        .file-icon-large.pdf { background: linear-gradient(135deg, #fce4ec, #f8bbd0); color: #c62828; }
-        .file-icon-large.word { background: linear-gradient(135deg, #e3f2fd, #bbdefb); color: #1565c0; }
-        .file-icon-large.excel { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); color: #2e7d32; }
-        .file-icon-large.ppt { background: linear-gradient(135deg, #fff3e0, #ffe0b2); color: #e65100; }
-        .file-icon-large.txt, .file-icon-large.csv, .file-icon-large.md, .file-icon-large.rtf { background: linear-gradient(135deg, #f5f5f5, #e0e0e0); color: #424242; }
-        .file-icon-large.image { background: linear-gradient(135deg, #e8eaf6, #c5cae9); color: #283593; }
-        .file-icon-large.video { background: linear-gradient(135deg, #fce4ec, #f8bbd0); color: #880e4f; }
-        .file-icon-large.other { background: linear-gradient(135deg, #eceff1, #cfd8dc); color: #455a64; }
-        .file-info-details { flex: 1; min-width: 200px; }
-        .file-info-name { font-size: 1.25rem; font-weight: 700; word-break: break-word; margin-bottom: 0.25rem; }
-        .file-info-meta {
-            font-size: 0.8125rem; color: var(--text-tertiary); display: flex;
-            align-items: center; gap: 0.5rem; flex-wrap: wrap;
-        }
-        .file-info-subject {
-            display: inline-block; padding: 3px 10px; border-radius: var(--radius-full);
-            font-size: 0.75rem; font-weight: 600; background: var(--primary-light);
-            color: var(--primary); margin-top: 0.35rem;
-        }
-        .file-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-
-        /* Preview Area */
-        .preview-card {
-            background: var(--bg-surface); border: 1px solid var(--border);
-            border-radius: var(--radius-lg); box-shadow: var(--card-shadow);
-            overflow: hidden; min-height: 400px;
-        }
-        .preview-card-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0.75rem 1rem; border-bottom: 1px solid var(--border);
-            background: var(--bg-hover);
-        }
-        .preview-card-title { font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
-        .preview-card-body {
-            padding: 1rem; display: flex; align-items: center; justify-content: center;
-            min-height: 350px; max-height: 70vh; overflow: auto;
+        .preview-fullscreen .text-content {
+            padding: 2rem; overflow-y: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem; line-height: 1.6;
+            white-space: pre-wrap; color: #e0e0e0;
+            text-align: left;
         }
 
-        /* Document Preview */
-        .doc-preview {
-            width: 100%; max-width: 800px; margin: 0 auto;
-        }
-        .doc-preview-content {
-            background: var(--bg-hover); border: 1px solid var(--border);
-            border-radius: var(--radius-md); padding: 2rem; white-space: pre-wrap;
-            font-family: 'Courier New', Courier, monospace; font-size: 0.875rem;
-            line-height: 1.6; max-height: 500px; overflow-y: auto; color: var(--text-primary);
-        }
-        .doc-preview-content.csv-preview {
-            font-family: var(--font-family);
+        .csv-table-wrap {
+            width: 100%; height: 100%; overflow: auto;
+            padding: 1rem;
         }
         .csv-table {
-            width: 100%; border-collapse: collapse; font-size: 0.8125rem;
+            width: 100%; border-collapse: collapse;
+            font-size: 0.8125rem; color: #e0e0e0;
         }
         .csv-table th {
-            background: var(--primary); color: #fff; padding: 8px 12px;
-            text-align: left; font-weight: 600; position: sticky; top: 0;
+            background: #333; padding: 10px 14px;
+            text-align: left; font-weight: 600;
+            position: sticky; top: 0; z-index: 1;
+            border-bottom: 2px solid #555;
         }
-        .csv-table td { padding: 6px 12px; border-bottom: 1px solid var(--border-light); }
-        .csv-table tr:nth-child(even) { background: var(--bg-hover); }
-        .csv-table-wrapper { max-height: 500px; overflow: auto; border-radius: var(--radius-md); border: 1px solid var(--border); }
+        .csv-table td {
+            padding: 8px 14px; border-bottom: 1px solid #333;
+        }
+        .csv-table tr:hover td { background: #2a2a2a; }
 
-        /* PDF Preview */
-        .pdf-viewer {
-            width: 100%; height: 70vh; border: none; border-radius: var(--radius-md);
+        .audio-wrap {
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 100%;
         }
+        .audio-wrap audio { width: 80%; max-width: 500px; }
 
-        /* Image Preview */
-        .image-preview-container {
-            text-align: center;
-        }
-        .image-preview {
-            max-width: 100%; max-height: 65vh; object-fit: contain;
-            border-radius: var(--radius-md); box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        /* Video Preview */
-        .video-preview {
-            max-width: 100%; max-height: 65vh; border-radius: var(--radius-md);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        /* Audio Preview */
-        .audio-preview {
-            width: 100%; max-width: 500px;
+        /* Corner info box */
+        .corner-info {
+            position: fixed; bottom: 16px; left: 16px;
+            background: rgba(30, 30, 30, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px; padding: 12px 16px;
+            display: flex; align-items: center; gap: 12px;
+            z-index: 100; max-width: calc(100vw - 32px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            transition: all var(--transition-fast);
         }
 
-        /* Office Document Viewer */
-        .office-viewer {
-            width: 100%; height: 70vh; border: none; border-radius: var(--radius-md);
+        .corner-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+        }
+        .corner-icon.pdf { background: #fce4ec; color: #c62828; }
+        .corner-icon.word { background: #e3f2fd; color: #1565c0; }
+        .corner-icon.excel { background: #e8f5e9; color: #2e7d32; }
+        .corner-icon.ppt { background: #fff3e0; color: #e65100; }
+        .corner-icon.txt, .corner-icon.csv, .corner-icon.md, .corner-icon.rtf,
+        .corner-icon.json, .corner-icon.xml, .corner-icon.log { background: #f5f5f5; color: #424242; }
+        .corner-icon.image { background: #e8eaf6; color: #283593; }
+        .corner-icon.video { background: #fce4ec; color: #880e4f; }
+        .corner-icon.audio { background: #e8f5e9; color: #1b5e20; }
+        .corner-icon.other { background: #eceff1; color: #455a64; }
+
+        .corner-details { min-width: 0; }
+        .corner-name {
+            font-size: 0.8rem; font-weight: 600; color: #fff;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            max-width: 200px; margin-bottom: 2px;
+        }
+        .corner-meta {
+            font-size: 0.65rem; color: #aaa; display: flex;
+            align-items: center; gap: 6px;
+        }
+        .corner-subject {
+            display: inline-block; padding: 1px 8px; border-radius: 10px;
+            font-size: 0.6rem; font-weight: 600; background: rgba(108, 71, 255, 0.25);
+            color: #b4a5ff; margin-top: 3px; max-width: 180px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
-        /* Unsupported Preview */
-        .unsupported-preview {
-            text-align: center; padding: 3rem 1rem;
+        .corner-actions {
+            display: flex; gap: 6px; flex-shrink: 0;
         }
-        .unsupported-preview i { font-size: 64px; color: var(--border); margin-bottom: 1rem; display: block; }
-        .unsupported-preview h3 { font-size: 1.1rem; color: var(--text-primary); margin-bottom: 0.5rem; }
-        .unsupported-preview p { font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
+        .corner-btn {
+            width: 32px; height: 32px; border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.06);
+            color: #ccc; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 16px; transition: all var(--transition-fast);
+        }
+        .corner-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff; border-color: rgba(255, 255, 255, 0.35);
+        }
+        .corner-btn.primary {
+            background: #6c47ff; border-color: #6c47ff; color: #fff;
+        }
+        .corner-btn.primary:hover { background: #7b5ce8; }
 
-        /* File Details Table */
-        .details-card {
-            background: var(--bg-surface); border: 1px solid var(--border);
-            border-radius: var(--radius-lg); padding: 1rem;
-            box-shadow: var(--card-shadow);
+        .corner-close {
+            position: absolute; top: -8px; right: -8px;
+            width: 22px; height: 22px; border-radius: 50%;
+            background: #444; border: none; color: #ccc;
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: center; font-size: 14px;
+            opacity: 0; transition: all var(--transition-fast);
         }
-        .details-card-title {
-            font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem;
-            display: flex; align-items: center; gap: 0.5rem;
-        }
-        .details-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 0.75rem;
-        }
-        .detail-item {
-            background: var(--bg-hover); border-radius: var(--radius-md); padding: 0.75rem 1rem;
-        }
-        .detail-label { font-size: 0.65rem; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem; font-weight: 600; }
-        .detail-value { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); word-break: break-all; }
+        .corner-info:hover .corner-close { opacity: 1; }
+        .corner-close:hover { background: #e53935; color: #fff; }
+
+        .corner-info.minimized .corner-details,
+        .corner-info.minimized .corner-actions { display: none; }
+        .corner-info.minimized { padding: 8px; border-radius: 50%; cursor: pointer; }
+        .corner-info.minimized .corner-close { opacity: 1; top: -4px; right: -4px; }
 
         /* Toast */
         .toast-container {
-            position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%);
-            z-index: 400; display: flex; flex-direction: column; gap: 0.5rem;
-            width: 90%; max-width: 400px;
+            position: fixed; bottom: 90px; left: 16px;
+            z-index: 200; display: flex; flex-direction: column; gap: 6px;
+            max-width: 320px;
         }
         .toast {
-            padding: 0.75rem 1rem; border-radius: var(--radius-md); font-size: 0.8125rem;
-            font-weight: 500; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            animation: toastUp .3s ease-out; display: flex; align-items: center; gap: 0.5rem;
+            padding: 10px 14px; border-radius: 8px; font-size: 0.75rem;
+            font-weight: 500; animation: toastIn 0.3s ease;
+            background: #333; color: #fff; border: 1px solid #555;
         }
-        .toast.success { background: var(--success-bg); color: var(--success); border: 1px solid #a7f3d0; }
-        .toast.error { background: var(--danger-bg); color: var(--danger); border: 1px solid #fecaca; }
-        .toast.info { background: var(--primary-light); color: var(--primary); border: 1px solid #c4b5fd; }
+        .toast.success { background: #0d3b1e; border-color: #22c55e; color: #86efac; }
+        .toast.error { background: #3b0d0d; border-color: #ef4444; color: #fca5a5; }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            .preview-container { padding: 0.75rem; gap: 0.75rem; }
-            .file-info-card { padding: 1rem; gap: 0.75rem; }
-            .file-icon-large { width: 48px; height: 48px; font-size: 24px; }
-            .file-info-name { font-size: 1rem; }
-            .file-actions { width: 100%; }
-            .file-actions .btn { flex: 1; justify-content: center; font-size: 0.75rem; padding: 0.4rem 0.5rem; }
-            .details-grid { grid-template-columns: 1fr 1fr; }
-            .pdf-viewer, .office-viewer { height: 50vh; }
-            .preview-card-body { padding: 0.5rem; min-height: 250px; }
-            .doc-preview-content { padding: 1rem; font-size: 0.75rem; }
-        }
-        @media (max-width: 480px) {
-            .navbar-title { display: none; }
-            .navbar { padding: 0 0.5rem; height: 48px; }
-            .navbar-logo { width: 28px; height: 28px; font-size: 14px; }
-            .details-grid { grid-template-columns: 1fr; }
-            .file-actions .btn span { display: none; }
-            .file-actions .btn { padding: 0.5rem; }
-            .file-actions .btn i { font-size: 1.1rem; }
-            .pdf-viewer, .office-viewer { height: 40vh; }
+        @media (max-width: 600px) {
+            .corner-info {
+                bottom: 10px; left: 8px; right: 8px;
+                padding: 10px 12px; gap: 8px;
+                border-radius: 10px;
+            }
+            .corner-icon { width: 32px; height: 32px; font-size: 18px; border-radius: 8px; }
+            .corner-name { font-size: 0.72rem; max-width: 120px; }
+            .corner-meta { font-size: 0.6rem; }
+            .corner-btn { width: 28px; height: 28px; font-size: 14px; border-radius: 6px; }
+            .corner-actions { gap: 4px; }
         }
     </style>
 </head>
-<body class="theme-light">
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-inner">
-            <div class="navbar-brand" onclick="goBack()">
-                <div class="navbar-logo"><i class="bx bx-cloud-lightning"></i></div>
-                <span class="navbar-title">VaultDrop</span>
-            </div>
-            <div class="navbar-actions">
-                <button class="btn btn-icon btn-ghost" id="themeToggle" title="Toggle theme">
-                    <i class="bx bx-moon" style="font-size:18px;" id="themeIcon"></i>
-                </button>
-            </div>
+<body>
+    <!-- Full-screen preview -->
+    <div class="preview-fullscreen" id="previewArea">
+        <div style="text-align:center;color:#888;">
+            <div style="width:32px;height:32px;border:3px solid #444;border-top-color:#6c47ff;border-radius:50%;animation:spin 0.6s linear infinite;margin:0 auto 12px;"></div>
+            Loading preview...
         </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="preview-container" id="previewContainer">
-        <div class="loading-spinner"><div class="spinner"></div></div>
     </div>
 
-    <!-- Toast Container -->
+    <!-- Corner info box -->
+    <div class="corner-info" id="cornerInfo" style="display:none;">
+        <button class="corner-close" id="cornerClose" title="Close panel">×</button>
+        <div class="corner-icon" id="cornerIcon"><i class="bx bx-file"></i></div>
+        <div class="corner-details">
+            <div class="corner-name" id="cornerName">file.txt</div>
+            <div class="corner-meta">
+                <span id="cornerType">Text</span>
+                <span>·</span>
+                <span id="cornerSize">0 B</span>
+            </div>
+            <div class="corner-subject" id="cornerSubject" style="display:none;"></div>
+        </div>
+        <div class="corner-actions">
+            <button class="corner-btn primary" id="btnDownload" title="Download"><i class="bx bx-download"></i></button>
+            <button class="corner-btn" id="btnOpenRaw" title="Open Raw"><i class="bx bx-open-in-new"></i></button>
+            <button class="corner-btn" id="btnCopy" title="Copy Link"><i class="bx bx-link"></i></button>
+        </div>
+    </div>
+
+    <!-- Toast container -->
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
@@ -351,541 +235,275 @@
             const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkcmdkbnJ3aWJ1cXB2aWtqYXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNjE4ODMsImV4cCI6MjA5NjkzNzg4M30.9wEbcIDziq9xDWZQ_BF0X-p25g4SQkuCCQV-5fhDnbY";
             const STORAGE_BUCKET = "exams";
             
-            // ==================== INITIALIZATION ====================
             let supabase;
             try {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
                     auth: { persistSession: false, autoRefreshToken: false },
                 });
-            } catch (initError) {
-                console.error('Supabase init error:', initError);
-            }
+            } catch (e) { console.error('Supabase init:', e); }
             
-            // Get URL parameters
             const urlParams = new URLSearchParams(window.location.search);
             const fileName = urlParams.get('file') || '';
             const fileUrl = urlParams.get('url') || '';
             const fileSubject = urlParams.get('subject') || '';
             
-            // State
-            let fileMetadata = null;
+            // ==================== HELPERS ====================
+            function $(id) { return document.getElementById(id); }
             
-            // ==================== TOAST ====================
-            function showToast(message, type = 'success') {
-                const container = document.getElementById('toastContainer');
-                const toast = document.createElement('div');
-                toast.className = `toast ${type}`;
-                toast.innerHTML = `<span>${message}</span>`;
-                container.appendChild(toast);
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    toast.style.transform = 'translateY(10px)';
-                    toast.style.transition = 'all 0.25s';
-                    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 250);
-                }, 3000);
-            }
-            
-            // ==================== UTILITY FUNCTIONS ====================
             function formatSize(bytes) {
                 if (!bytes || bytes === 0) return '0 B';
-                const k = 1024;
-                const sizes = ['B', 'KB', 'MB', 'GB'];
+                const k = 1024, sizes = ['B', 'KB', 'MB', 'GB'];
                 const i = Math.floor(Math.log(bytes) / Math.log(k));
                 return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
             }
             
-            function getFileExtension(filename) {
-                return (filename || '').split('.').pop().toLowerCase();
-            }
+            function getExt(fn) { return (fn || '').split('.').pop().toLowerCase(); }
             
-            function getFileTypeLabel(filename) {
-                const ext = getFileExtension(filename);
-                const docTypes = {
-                    'pdf': 'PDF Document',
-                    'doc': 'Word Document', 'docx': 'Word Document',
-                    'xls': 'Excel Spreadsheet', 'xlsx': 'Excel Spreadsheet',
-                    'ppt': 'PowerPoint Presentation', 'pptx': 'PowerPoint Presentation',
-                    'txt': 'Plain Text File', 'csv': 'CSV Spreadsheet', 'md': 'Markdown File',
-                    'rtf': 'Rich Text Format', 'odt': 'OpenDocument Text',
-                    'ods': 'OpenDocument Spreadsheet', 'odp': 'OpenDocument Presentation',
-                    'jpg': 'JPEG Image', 'jpeg': 'JPEG Image', 'png': 'PNG Image',
-                    'gif': 'GIF Image', 'svg': 'SVG Image', 'webp': 'WebP Image',
-                    'bmp': 'Bitmap Image', 'ico': 'Icon File',
-                    'mp4': 'MP4 Video', 'avi': 'AVI Video', 'mov': 'MOV Video',
-                    'mkv': 'MKV Video', 'webm': 'WebM Video',
-                    'mp3': 'MP3 Audio', 'wav': 'WAV Audio', 'ogg': 'OGG Audio',
-                    'zip': 'ZIP Archive', 'rar': 'RAR Archive', '7z': '7Z Archive',
-                };
-                return docTypes[ext] || ext.toUpperCase() + ' File';
-            }
-            
-            function getFileCategory(filename) {
-                const ext = getFileExtension(filename);
-                const docExts = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'md', 'rtf', 'odt', 'ods', 'odp'];
-                const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp', 'ico', 'heic', 'heif', 'tiff', 'raw'];
-                const videoExts = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm', 'm4v', '3gp'];
-                const audioExts = ['mp3', 'wav', 'ogg', 'aac', 'flac', 'm4a'];
-                
-                if (docExts.includes(ext)) return ext;
-                if (imageExts.includes(ext)) return 'image';
-                if (videoExts.includes(ext)) return 'video';
-                if (audioExts.includes(ext)) return 'audio';
+            function getCategory(fn) {
+                const ext = getExt(fn);
+                const docs = ['pdf','doc','docx','xls','xlsx','ppt','pptx','txt','csv','md','rtf','odt','ods','odp','json','xml','yml','yaml','log','ini','cfg','conf'];
+                const images = ['jpg','jpeg','png','gif','svg','webp','bmp','ico','heic','heif','tiff'];
+                const videos = ['mp4','avi','mov','wmv','flv','mkv','webm','m4v','3gp'];
+                const audios = ['mp3','wav','ogg','aac','flac','m4a'];
+                if (docs.includes(ext)) return ext;
+                if (images.includes(ext)) return 'image';
+                if (videos.includes(ext)) return 'video';
+                if (audios.includes(ext)) return 'audio';
                 return 'other';
             }
             
-            function getFileIcon(filename) {
-                const category = getFileCategory(filename);
-                const iconMap = {
-                    'pdf': 'bx bxs-file-pdf',
-                    'doc': 'bx bxs-file-doc', 'docx': 'bx bxs-file-doc',
-                    'xls': 'bx bx-spreadsheet', 'xlsx': 'bx bx-spreadsheet',
-                    'ppt': 'bx bxs-slideshow', 'pptx': 'bx bxs-slideshow',
-                    'txt': 'bx bx-text', 'csv': 'bx bx-spreadsheet',
-                    'md': 'bx bx-text', 'rtf': 'bx bx-text',
-                    'image': 'bx bx-image-alt',
-                    'video': 'bx bx-video',
-                    'audio': 'bx bx-music',
+            function getIcon(fn) {
+                const c = getCategory(fn);
+                const map = {
+                    'pdf':'bx bxs-file-pdf','doc':'bx bxs-file-doc','docx':'bx bxs-file-doc',
+                    'xls':'bx bx-spreadsheet','xlsx':'bx bx-spreadsheet',
+                    'ppt':'bx bxs-slideshow','pptx':'bx bxs-slideshow',
+                    'txt':'bx bx-text','csv':'bx bx-spreadsheet','md':'bx bx-text',
+                    'rtf':'bx bx-text','json':'bx bx-code','xml':'bx bx-code',
+                    'image':'bx bx-image-alt','video':'bx bx-video','audio':'bx bx-music'
                 };
-                return iconMap[category] || 'bx bx-file-blank';
+                return map[c] || 'bx bx-file-blank';
             }
             
-            function escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text || '';
-                return div.innerHTML;
+            function typeLabel(fn) {
+                const ext = getExt(fn);
+                const labels = {
+                    'pdf':'PDF','doc':'Word','docx':'Word','xls':'Excel','xlsx':'Excel',
+                    'ppt':'PowerPoint','pptx':'PowerPoint','txt':'Text','csv':'CSV',
+                    'md':'Markdown','rtf':'Rich Text','json':'JSON','xml':'XML',
+                    'jpg':'JPEG','jpeg':'JPEG','png':'PNG','gif':'GIF','svg':'SVG',
+                    'webp':'WebP','mp4':'MP4','mkv':'MKV','webm':'WebM',
+                    'mp3':'MP3','wav':'WAV','ogg':'OGG','zip':'ZIP','rar':'RAR'
+                };
+                return labels[ext] || ext.toUpperCase();
             }
             
-            function formatDate(dateString) {
-                if (!dateString) return 'Unknown';
-                return new Date(dateString).toLocaleDateString('en-US', {
-                    month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
-                });
+            function esc(s) {
+                const d = document.createElement('div');
+                d.textContent = s || '';
+                return d.innerHTML;
             }
             
-            // ==================== FILE OPERATIONS ====================
-            async function fetchFileMetadata() {
-                if (!supabase || !fileName) return null;
-                
-                try {
-                    const { data, error } = await supabase
-                        .storage
-                        .from(STORAGE_BUCKET)
-                        .list('', { limit: 200, offset: 0, sortBy: { column: 'created_at', order: 'desc' } });
-                    
-                    if (error) throw error;
-                    
-                    const files = (data || []).filter(item => item && item.name === fileName);
-                    return files.length > 0 ? files[0] : null;
-                } catch (err) {
-                    console.error('Metadata fetch error:', err);
-                    return null;
-                }
+            function showToast(msg, type) {
+                const t = document.createElement('div');
+                t.className = 'toast ' + (type || 'success');
+                t.textContent = msg;
+                $('toastContainer').appendChild(t);
+                setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(() => t.remove(), 300); }, 2500);
             }
             
-            function getPublicUrl(fileName) {
+            function getPublicUrl(fn) {
                 if (!supabase) return fileUrl || '';
-                const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
+                const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fn);
                 return data?.publicUrl || fileUrl || '';
             }
             
-            async function copyFileUrl() {
+            // ==================== CORNER INFO ====================
+            function updateCornerInfo(metadata) {
+                const cat = getCategory(fileName);
+                const icon = getIcon(fileName);
+                const size = metadata?.metadata?.size || 0;
+                const type = typeLabel(fileName);
+                
+                $('cornerIcon').className = 'corner-icon ' + (['pdf','doc','docx','xls','xlsx','ppt','pptx','txt','csv','md','rtf','json','xml'].includes(cat) ? cat : cat);
+                $('cornerIcon').innerHTML = '<i class="' + icon + '"></i>';
+                $('cornerName').textContent = fileName;
+                $('cornerName').title = fileName;
+                $('cornerType').textContent = type;
+                $('cornerSize').textContent = formatSize(size);
+                
+                if (fileSubject) {
+                    $('cornerSubject').style.display = 'inline-block';
+                    $('cornerSubject').textContent = fileSubject;
+                }
+                
+                $('cornerInfo').style.display = 'flex';
+            }
+            
+            // ==================== PREVIEW ====================
+            function renderPreview(metadata) {
+                const ext = getExt(fileName);
+                const cat = getCategory(fileName);
+                const url = getPublicUrl(fileName);
+                const area = $('previewArea');
+                
+                const textTypes = ['txt','md','rtf','log','json','xml','yml','yaml','ini','cfg','conf'];
+                const googleTypes = ['pdf','doc','docx','xls','xlsx','ppt','pptx','odt','ods','odp'];
+                const imageTypes = ['jpg','jpeg','png','gif','svg','webp','bmp','ico'];
+                const videoTypes = ['mp4','webm','ogg','mov'];
+                const audioTypes = ['mp3','wav','ogg','aac','flac'];
+                
+                if (textTypes.includes(ext)) {
+                    renderTextPreview(area, url, ext);
+                } else if (ext === 'csv') {
+                    renderCsvPreview(area, url);
+                } else if (googleTypes.includes(ext)) {
+                    renderGooglePreview(area, url, ext);
+                } else if (imageTypes.includes(ext)) {
+                    area.innerHTML = '<img src="' + url + '" alt="' + esc(fileName) + '" style="width:100%;height:100%;object-fit:contain;" onerror="this.parentElement.innerHTML=\'<div style=text-align:center;color:#888;padding:2rem;><i class=bx bx-error-circle style=font-size:48px;display:block;margin-bottom:12px;></i><p>Image could not be loaded</p></div>\'">';
+                } else if (videoTypes.includes(ext)) {
+                    area.innerHTML = '<video controls style="width:100%;height:100%;object-fit:contain;"><source src="' + url + '" type="video/' + ext + '"></video>';
+                } else if (audioTypes.includes(ext)) {
+                    area.innerHTML = '<div class="audio-wrap"><audio controls><source src="' + url + '" type="audio/' + ext + '"></audio></div>';
+                } else {
+                    area.innerHTML = '<div style="text-align:center;color:#888;padding:2rem;"><i class="bx bx-file-blank" style="font-size:64px;display:block;margin-bottom:16px;"></i><p style="font-size:1rem;margin-bottom:8px;">Preview not available</p><p style="font-size:0.8rem;">Use the buttons below to download or open this file.</p></div>';
+                }
+            }
+            
+            async function renderTextPreview(area, url, ext) {
                 try {
-                    const url = getPublicUrl(fileName);
-                    await navigator.clipboard.writeText(url);
-                    showToast('Link copied to clipboard!', 'success');
-                } catch (err) {
-                    const url = getPublicUrl(fileName);
-                    const textarea = document.createElement('textarea');
-                    textarea.value = url;
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error('Failed to load');
+                    let text = await res.text();
+                    
+                    if (ext === 'json') {
+                        try { text = JSON.stringify(JSON.parse(text), null, 2); } catch(e) {}
+                    }
+                    
+                    area.innerHTML = '<div class="text-content">' + esc(text) + '</div>';
+                } catch(e) {
+                    area.innerHTML = '<div style="text-align:center;color:#888;padding:2rem;"><i class="bx bx-error-circle" style="font-size:48px;display:block;margin-bottom:12px;"></i><p>Could not load file</p></div>';
+                }
+            }
+            
+            async function renderCsvPreview(area, url) {
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error('Failed to load');
+                    const text = await res.text();
+                    const lines = text.trim().split('\n');
+                    if (lines.length === 0) throw new Error('Empty');
+                    
+                    const parseLine = (line) => {
+                        const r = []; let c = '', q = false;
+                        for (let i = 0; i < line.length; i++) {
+                            const ch = line[i];
+                            if (q) { if (ch === '"') { if (line[i+1]==='"') { c+='"'; i++; } else q=false; } else c+=ch; }
+                            else { if (ch==='"') q=true; else if (ch===',') { r.push(c.trim()); c=''; } else c+=ch; }
+                        }
+                        r.push(c.trim()); return r;
+                    };
+                    
+                    const headers = parseLine(lines[0]);
+                    const rows = lines.slice(1).map(parseLine);
+                    
+                    let html = '<div class="csv-table-wrap"><table class="csv-table"><thead><tr>';
+                    headers.forEach(h => html += '<th>' + esc(h) + '</th>');
+                    html += '</tr></thead><tbody>';
+                    rows.forEach(row => {
+                        html += '<tr>';
+                        headers.forEach((_, i) => html += '<td>' + esc(row[i] || '') + '</td>');
+                        html += '</tr>';
+                    });
+                    html += '</tbody></table></div>';
+                    area.innerHTML = html;
+                } catch(e) {
+                    area.innerHTML = '<div style="text-align:center;color:#888;padding:2rem;"><p>Could not parse CSV</p></div>';
+                }
+            }
+            
+            function renderGooglePreview(area, url, ext) {
+                if (ext === 'pdf') {
+                    area.innerHTML = '<iframe src="' + url + '#toolbar=0&navpanes=0" style="width:100%;height:100%;border:none;"></iframe>';
+                } else {
+                    const gUrl = 'https://docs.google.com/viewer?url=' + encodeURIComponent(url) + '&embedded=true';
+                    area.innerHTML = '<iframe src="' + gUrl + '" style="width:100%;height:100%;border:none;"></iframe>';
+                }
+            }
+            
+            // ==================== ACTIONS ====================
+            async function copyUrl() {
+                try {
+                    await navigator.clipboard.writeText(getPublicUrl(fileName));
                     showToast('Link copied!', 'success');
+                } catch(e) {
+                    showToast('Copy failed', 'error');
                 }
             }
             
             async function downloadFile() {
                 if (!supabase) return;
-                
                 try {
-                    const { data, error } = await supabase
-                        .storage
-                        .from(STORAGE_BUCKET)
-                        .download(fileName);
-                    
+                    const { data, error } = await supabase.storage.from(STORAGE_BUCKET).download(fileName);
                     if (error) throw error;
-                    
                     const url = URL.createObjectURL(data);
                     const a = document.createElement('a');
-                    a.href = url;
-                    a.download = fileName;
-                    document.body.appendChild(a);
-                    a.click();
-                    setTimeout(() => {
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                    }, 100);
-                    
-                    showToast(`Downloaded ${fileName}`, 'success');
-                } catch (err) {
-                    showToast(`Download failed: ${err.message}`, 'error');
+                    a.href = url; a.download = fileName;
+                    document.body.appendChild(a); a.click();
+                    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+                    showToast('Downloaded!', 'success');
+                } catch(e) {
+                    showToast('Download failed', 'error');
                 }
             }
             
-            function goBack() {
-                if (document.referrer && document.referrer.includes(window.location.host)) {
-                    window.history.back();
-                } else {
-                    window.location.href = 'index.html';
-                }
-            }
-            
-            // ==================== PREVIEW RENDERING ====================
-            function renderPreview() {
+            // ==================== INIT ====================
+            async function init() {
                 if (!fileName) {
-                    renderNoFile();
+                    $('previewArea').innerHTML = '<div style="text-align:center;color:#888;padding:2rem;"><i class="bx bx-error-circle" style="font-size:48px;display:block;margin-bottom:12px;"></i><p>No file specified</p></div>';
                     return;
                 }
                 
-                const ext = getFileExtension(fileName);
-                const category = getFileCategory(fileName);
-                const url = getPublicUrl(fileName);
-                const typeLabel = getFileTypeLabel(fileName);
-                const icon = getFileIcon(fileName);
-                const size = fileMetadata?.metadata?.size || 0;
-                const created = fileMetadata?.created_at ? formatDate(fileMetadata.created_at) : 'Unknown';
-                
-                const container = document.getElementById('previewContainer');
-                
-                container.innerHTML = `
-                    <!-- File Info Card -->
-                    <div class="file-info-card">
-                        <div class="file-icon-large ${category}">
-                            <i class="${icon}"></i>
-                        </div>
-                        <div class="file-info-details">
-                            <div class="file-info-name">${escapeHtml(fileName)}</div>
-                            <div class="file-info-meta">
-                                <span>${typeLabel}</span>
-                                <span>·</span>
-                                <span>${formatSize(size)}</span>
-                                <span>·</span>
-                                <span>${created}</span>
-                            </div>
-                            ${fileSubject ? `<span class="file-info-subject"><i class="bx bx-purchase-tag"></i> ${escapeHtml(fileSubject)}</span>` : ''}
-                        </div>
-                        <div class="file-actions">
-                            <button class="btn btn-outline btn-sm" onclick="window.VaultView.copyUrl()">
-                                <i class="bx bx-link"></i> <span>Copy Link</span>
-                            </button>
-                            <button class="btn btn-primary btn-sm" onclick="window.VaultView.download()">
-                                <i class="bx bx-download"></i> <span>Download</span>
-                            </button>
-                            <button class="btn btn-ghost btn-sm" onclick="window.open('${escapeHtml(url)}', '_blank')">
-                                <i class="bx bx-open-in-new"></i> <span>Open Raw</span>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Preview Card -->
-                    <div class="preview-card">
-                        <div class="preview-card-header">
-                            <span class="preview-card-title">
-                                <i class="bx bx-show"></i> Preview
-                            </span>
-                            <span style="font-size:0.75rem;color:var(--text-tertiary);">${typeLabel}</span>
-                        </div>
-                        <div class="preview-card-body" id="previewBody">
-                            ${renderPreviewContent(fileName, category, ext, url)}
-                        </div>
-                    </div>
-                    
-                    <!-- File Details -->
-                    <div class="details-card">
-                        <div class="details-card-title">
-                            <i class="bx bx-info-circle"></i> File Details
-                        </div>
-                        <div class="details-grid">
-                            <div class="detail-item">
-                                <div class="detail-label">File Name</div>
-                                <div class="detail-value">${escapeHtml(fileName)}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">File Type</div>
-                                <div class="detail-value">${typeLabel}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Extension</div>
-                                <div class="detail-value">.${ext.toUpperCase()}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Size</div>
-                                <div class="detail-value">${formatSize(size)}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Uploaded</div>
-                                <div class="detail-value">${created}</div>
-                            </div>
-                            ${fileSubject ? `
-                            <div class="detail-item">
-                                <div class="detail-label">Subject</div>
-                                <div class="detail-value">${escapeHtml(fileSubject)}</div>
-                            </div>` : ''}
-                            <div class="detail-item">
-                                <div class="detail-label">Public URL</div>
-                                <div class="detail-value" style="font-size:0.7rem;">
-                                    <a href="${escapeHtml(url)}" target="_blank" style="color:var(--primary);">${escapeHtml(url)}</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                // Initialize specific preview handlers
-                initSpecificPreviews(fileName, category, ext, url);
-            }
-            
-            function renderPreviewContent(fileName, category, ext, url) {
-                // Document types that can be previewed
-                const docPreviewTypes = ['txt', 'csv', 'md', 'rtf', 'log', 'json', 'xml', 'yml', 'yaml', 'ini', 'cfg', 'conf'];
-                const googleDocTypes = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp'];
-                const imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp', 'ico'];
-                const videoTypes = ['mp4', 'webm', 'ogg'];
-                const audioTypes = ['mp3', 'wav', 'ogg', 'aac', 'flac'];
-                
-                if (docPreviewTypes.includes(ext)) {
-                    return renderTextPreview(fileName, ext, url);
-                } else if (googleDocTypes.includes(ext)) {
-                    return renderGoogleDocPreview(url, ext);
-                } else if (imageTypes.includes(ext)) {
-                    return renderImagePreview(url, fileName);
-                } else if (videoTypes.includes(ext)) {
-                    return renderVideoPreview(url);
-                } else if (audioTypes.includes(ext)) {
-                    return renderAudioPreview(url);
-                } else {
-                    return renderUnsupportedPreview(fileName, ext);
-                }
-            }
-            
-            function renderTextPreview(fileName, ext, url) {
-                // For CSV, we'll handle specially in initSpecificPreviews
-                if (ext === 'csv') {
-                    return `<div class="doc-preview"><div class="doc-preview-content csv-preview" id="csvContent">
-                        <div class="loading-spinner"><div class="spinner"></div></div>
-                    </div></div>`;
-                }
-                
-                return `<div class="doc-preview">
-                    <div class="doc-preview-content" id="textContent">
-                        <div class="loading-spinner"><div class="spinner"></div></div>
-                    </div>
-                </div>`;
-            }
-            
-            function renderGoogleDocPreview(url, ext) {
-                if (ext === 'pdf') {
-                    return `<iframe src="${url}#toolbar=0&navpanes=0" class="pdf-viewer" id="pdfViewer"></iframe>`;
-                }
-                
-                // Use Google Docs Viewer for Office documents
-                const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
-                return `<iframe src="${googleViewerUrl}" class="office-viewer" id="officeViewer"></iframe>`;
-            }
-            
-            function renderImagePreview(url, fileName) {
-                return `<div class="image-preview-container">
-                    <img src="${url}" alt="${escapeHtml(fileName)}" class="image-preview" id="imagePreview"
-                         onerror="this.parentElement.innerHTML='<div class=\\'unsupported-preview\\'><i class=\\'bx bx-error-circle\\'></i><h3>Image Load Error</h3><p>The image could not be loaded.</p></div>'">
-                </div>`;
-            }
-            
-            function renderVideoPreview(url) {
-                return `<video controls class="video-preview" id="videoPreview">
-                    <source src="${url}" type="video/${getFileExtension(fileName)}">
-                    Your browser does not support the video tag.
-                </video>`;
-            }
-            
-            function renderAudioPreview(url) {
-                return `<audio controls class="audio-preview" id="audioPreview">
-                    <source src="${url}" type="audio/${getFileExtension(fileName)}">
-                    Your browser does not support the audio element.
-                </audio>`;
-            }
-            
-            function renderUnsupportedPreview(fileName, ext) {
-                return `<div class="unsupported-preview">
-                    <i class="bx bx-file-blank"></i>
-                    <h3>Preview Not Available</h3>
-                    <p>This file type (.${ext.toUpperCase()}) cannot be previewed in the browser.</p>
-                    <p style="font-size:0.8125rem;color:var(--text-tertiary);">You can still download or copy the link to access this file.</p>
-                </div>`;
-            }
-            
-            function renderNoFile() {
-                const container = document.getElementById('previewContainer');
-                container.innerHTML = `
-                    <div class="file-info-card" style="justify-content:center;text-align:center;padding:3rem 1rem;">
-                        <div>
-                            <i class="bx bx-error-circle" style="font-size:48px;color:var(--border);display:block;margin-bottom:1rem;"></i>
-                            <h3 style="margin-bottom:0.5rem;">No File Specified</h3>
-                            <p style="color:var(--text-secondary);margin-bottom:1rem;">Please select a file from the main page to preview it here.</p>
-                            <button class="btn btn-primary" onclick="window.location.href='index.html'">
-                                <i class="bx bx-arrow-back"></i> Go to Files
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // ==================== SPECIFIC PREVIEW INITIALIZATION ====================
-            async function initSpecificPreviews(fileName, category, ext, url) {
-                if (['txt', 'md', 'rtf', 'log', 'json', 'xml', 'yml', 'yaml', 'ini', 'cfg', 'conf'].includes(ext)) {
-                    initTextPreview(fileName, url);
-                } else if (ext === 'csv') {
-                    initCsvPreview(fileName, url);
-                }
-            }
-            
-            async function initTextPreview(fileName, url) {
-                const textContent = document.getElementById('textContent');
-                if (!textContent) return;
-                
-                try {
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error('Failed to fetch file');
-                    const text = await response.text();
-                    textContent.textContent = text;
-                    
-                    // Add syntax highlighting classes for JSON
-                    if (getFileExtension(fileName) === 'json') {
-                        try {
-                            const parsed = JSON.parse(text);
-                            textContent.textContent = JSON.stringify(parsed, null, 2);
-                        } catch(e) {
-                            // Not valid JSON, show raw text
+                // Fetch metadata
+                let metadata = null;
+                if (supabase) {
+                    try {
+                        const { data, error } = await supabase.storage.from(STORAGE_BUCKET).list('', { limit: 200 });
+                        if (!error) {
+                            const files = (data || []).filter(f => f.name === fileName);
+                            if (files.length > 0) metadata = files[0];
                         }
-                    }
-                } catch (err) {
-                    textContent.innerHTML = `<div class="unsupported-preview">
-                        <i class="bx bx-error-circle"></i>
-                        <h3>Preview Error</h3>
-                        <p>Could not load file content: ${escapeHtml(err.message)}</p>
-                    </div>`;
+                    } catch(e) {}
                 }
-            }
-            
-            async function initCsvPreview(fileName, url) {
-                const csvContent = document.getElementById('csvContent');
-                if (!csvContent) return;
                 
-                try {
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error('Failed to fetch file');
-                    const text = await response.text();
-                    
-                    const lines = text.trim().split('\n');
-                    if (lines.length === 0) throw new Error('Empty file');
-                    
-                    const headers = parseCSVLine(lines[0]);
-                    const rows = lines.slice(1).map(line => parseCSVLine(line));
-                    
-                    let tableHTML = '<div class="csv-table-wrapper"><table class="csv-table"><thead><tr>';
-                    headers.forEach(header => {
-                        tableHTML += `<th>${escapeHtml(header)}</th>`;
-                    });
-                    tableHTML += '</tr></thead><tbody>';
-                    
-                    rows.forEach(row => {
-                        tableHTML += '<tr>';
-                        headers.forEach((_, i) => {
-                            tableHTML += `<td>${escapeHtml(row[i] || '')}</td>`;
-                        });
-                        tableHTML += '</tr>';
-                    });
-                    
-                    tableHTML += '</tbody></table></div>';
-                    csvContent.innerHTML = tableHTML;
-                } catch (err) {
-                    csvContent.innerHTML = `<div class="unsupported-preview">
-                        <i class="bx bx-error-circle"></i>
-                        <h3>CSV Preview Error</h3>
-                        <p>${escapeHtml(err.message)}</p>
-                    </div>`;
-                }
-            }
-            
-            function parseCSVLine(line) {
-                const result = [];
-                let current = '';
-                let inQuotes = false;
+                updateCornerInfo(metadata);
+                renderPreview(metadata);
                 
-                for (let i = 0; i < line.length; i++) {
-                    const char = line[i];
-                    
-                    if (inQuotes) {
-                        if (char === '"') {
-                            if (i + 1 < line.length && line[i + 1] === '"') {
-                                current += '"';
-                                i++;
-                            } else {
-                                inQuotes = false;
-                            }
-                        } else {
-                            current += char;
-                        }
+                // Button handlers
+                $('btnDownload').onclick = downloadFile;
+                $('btnOpenRaw').onclick = () => window.open(getPublicUrl(fileName), '_blank');
+                $('btnCopy').onclick = copyUrl;
+                
+                // Corner close/minimize
+                let minimized = false;
+                $('cornerClose').onclick = (e) => {
+                    e.stopPropagation();
+                    if (minimized) {
+                        $('cornerInfo').style.display = 'none';
                     } else {
-                        if (char === '"') {
-                            inQuotes = true;
-                        } else if (char === ',') {
-                            result.push(current.trim());
-                            current = '';
-                        } else {
-                            current += char;
-                        }
+                        minimized = true;
+                        $('cornerInfo').classList.add('minimized');
                     }
-                }
-                result.push(current.trim());
-                return result;
-            }
-            
-            // ==================== THEME ====================
-            function setTheme(theme) {
-                document.body.classList.remove('theme-light', 'theme-dark');
-                document.body.classList.add('theme-' + theme);
-                document.getElementById('themeIcon').className = theme === 'dark' ? 'bx bx-sun' : 'bx bx-moon';
-                localStorage.setItem('vaultdrop-theme', theme);
-            }
-            
-            // ==================== GLOBAL API ====================
-            window.VaultView = {
-                copyUrl: copyFileUrl,
-                download: downloadFile,
-                goBack: goBack,
-            };
-            
-            // ==================== EVENT LISTENERS ====================
-            document.getElementById('themeToggle').addEventListener('click', () => {
-                const current = document.body.classList.contains('theme-dark') ? 'dark' : 'light';
-                setTheme(current === 'dark' ? 'light' : 'dark');
-            });
-            
-            // ==================== INITIALIZE ====================
-            async function init() {
-                const savedTheme = localStorage.getItem('vaultdrop-theme') || 'light';
-                setTheme(savedTheme);
-                
-                if (fileName) {
-                    fileMetadata = await fetchFileMetadata();
-                }
-                
-                renderPreview();
+                };
+                $('cornerInfo').onclick = () => {
+                    if (minimized) {
+                        minimized = false;
+                        $('cornerInfo').classList.remove('minimized');
+                    }
+                };
             }
             
             init();
-            
         })();
     </script>
 </body>

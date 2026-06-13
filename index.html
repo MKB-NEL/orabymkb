@@ -28,6 +28,9 @@
       --accent-hover: #166fe5;
       --accent-light: #e7f3ff;
       --accent-gradient: linear-gradient(135deg, #1877f2 0%, #00a2ff 100%);
+      --accent-purple: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+      --accent-green: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      --accent-orange: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
       --danger: #fa383e;
       --danger-hover: #e02d32;
       --danger-light: #ffebee;
@@ -67,15 +70,54 @@
       line-height: 1.5;
     }
 
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-tertiary);
+    }
+
     /* Main App Container */
-    .social-app {
+    .app-container {
       width: 100%;
-      max-width: 680px;
-      display: flex;
-      flex-direction: column;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 1fr;
       gap: 16px;
       margin-top: 8px;
       padding-bottom: 32px;
+    }
+
+    @media (min-width: 900px) {
+      .app-container {
+        grid-template-columns: 1fr 380px;
+        gap: 20px;
+      }
+      
+      .main-column {
+        grid-column: 1;
+      }
+      
+      .side-column {
+        grid-column: 2;
+        position: sticky;
+        top: 16px;
+        align-self: start;
+        max-height: calc(100vh - 32px);
+        overflow-y: auto;
+      }
     }
 
     /* Header Card */
@@ -127,6 +169,12 @@
       font-weight: 500;
     }
 
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .header-stats {
       display: flex;
       gap: 16px;
@@ -147,7 +195,76 @@
       color: var(--accent);
     }
 
-    /* Create Post / Upload Card */
+    .btn-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      transition: var(--transition);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .btn-icon:hover {
+      background: var(--bg);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .btn-icon .badge-dot {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      background: var(--danger);
+      border-radius: 50%;
+      border: 2px solid var(--surface);
+    }
+
+    .view-toggle {
+      display: flex;
+      background: var(--bg);
+      border-radius: var(--radius-full);
+      padding: 3px;
+      border: 1px solid var(--border);
+    }
+
+    .view-toggle-btn {
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: transparent;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: var(--transition);
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .view-toggle-btn.active {
+      background: var(--surface);
+      color: var(--accent);
+      box-shadow: var(--shadow-xs);
+      font-weight: 600;
+    }
+
+    .view-toggle-btn i {
+      font-size: 1rem;
+    }
+
+    /* Upload Card */
     .upload-card {
       background: var(--surface);
       border-radius: var(--radius-lg);
@@ -178,6 +295,12 @@
       border-color: var(--accent);
       border-style: solid;
       box-shadow: 0 0 0 4px rgba(24, 119, 242, 0.15);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(24, 119, 242, 0.15); }
+      50% { box-shadow: 0 0 0 8px rgba(24, 119, 242, 0.05); }
     }
 
     .upload-trigger i {
@@ -223,6 +346,7 @@
       border: 1px solid var(--accent);
       display: none;
       animation: slideDown 0.3s ease;
+      margin-top: 12px;
     }
 
     .progress-card.active {
@@ -230,14 +354,8 @@
     }
 
     @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .progress-header {
@@ -317,29 +435,52 @@
       box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.1);
     }
 
-    .btn-icon {
-      width: 38px;
-      height: 38px;
+    /* View Tabs */
+    .view-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg);
       border-radius: var(--radius-full);
+      padding: 3px;
       border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text-secondary);
+    }
+
+    .tab-btn {
+      padding: 8px 14px;
+      border-radius: var(--radius-full);
+      border: none;
+      background: transparent;
+      color: var(--text-tertiary);
       cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: var(--transition);
+      font-family: inherit;
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      transition: var(--transition);
-      flex-shrink: 0;
+      gap: 4px;
+      white-space: nowrap;
     }
 
-    .btn-icon:hover {
-      background: var(--bg);
+    .tab-btn.active {
+      background: var(--surface);
       color: var(--accent);
-      border-color: var(--accent);
+      box-shadow: var(--shadow-xs);
+      font-weight: 600;
     }
 
-    /* File Feed */
+    .tab-btn i {
+      font-size: 1rem;
+    }
+
+    /* Content Area */
+    .content-area {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* File Feed View */
     .file-feed {
       display: flex;
       flex-direction: column;
@@ -357,19 +498,12 @@
     }
 
     @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(15px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .file-post:hover {
       box-shadow: var(--shadow-md);
-      border-color: var(--border);
     }
 
     .post-header {
@@ -472,30 +606,344 @@
       font-size: 1.2rem;
     }
 
-    /* Empty State */
-    .empty-feed {
+    /* Table View */
+    .table-view {
       background: var(--surface);
       border-radius: var(--radius-lg);
-      padding: 60px 20px;
-      text-align: center;
       box-shadow: var(--shadow-sm);
       border: 1px solid var(--border);
+      overflow: hidden;
     }
 
-    .empty-feed i {
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    .file-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .file-table thead {
+      background: var(--surface-hover);
+      border-bottom: 2px solid var(--border);
+    }
+
+    .file-table th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition);
+    }
+
+    .file-table th:hover {
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .file-table th i {
+      font-size: 0.8rem;
+      margin-left: 4px;
+      opacity: 0.5;
+    }
+
+    .file-table th.sorted i {
+      opacity: 1;
+      color: var(--accent);
+    }
+
+    .file-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 0.85rem;
+    }
+
+    .file-table tbody tr {
+      transition: var(--transition);
+    }
+
+    .file-table tbody tr:hover {
+      background: var(--accent-light);
+    }
+
+    .file-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .table-file-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-xs);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .table-file-icon.image { background: #e3f2fd; color: #1976d2; }
+    .table-file-icon.document { background: #fff3e0; color: #f57c00; }
+    .table-file-icon.video { background: #fce4ec; color: #c2185b; }
+    .table-file-icon.other { background: #f5f5f5; color: #616161; }
+
+    .actions-cell {
+      display: flex;
+      gap: 4px;
+    }
+
+    .btn-sm {
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-xs);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+
+    .btn-sm:hover {
+      background: var(--accent-light);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .btn-sm.danger:hover {
+      background: var(--danger-light);
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+
+    /* Grid View */
+    .grid-view {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .grid-card {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      padding: 20px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .grid-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+      border-color: var(--accent);
+    }
+
+    .grid-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent-gradient);
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .grid-card:hover::before {
+      opacity: 1;
+    }
+
+    .grid-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+
+    .grid-icon.image { background: linear-gradient(135deg, #e3f2fd, #bbdefb); color: #1976d2; }
+    .grid-icon.document { background: linear-gradient(135deg, #fff3e0, #ffe0b2); color: #f57c00; }
+    .grid-icon.video { background: linear-gradient(135deg, #fce4ec, #f8bbd0); color: #c2185b; }
+    .grid-icon.other { background: linear-gradient(135deg, #f5f5f5, #e0e0e0); color: #616161; }
+
+    .grid-name {
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      word-break: break-word;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .grid-meta {
+      font-size: 0.7rem;
+      color: var(--text-tertiary);
+    }
+
+    .grid-actions {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    /* Sidebar Panels */
+    .side-panel {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      padding: 20px;
+    }
+
+    .side-panel + .side-panel {
+      margin-top: 16px;
+    }
+
+    .panel-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-title i {
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    /* Quick Stats */
+    .quick-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .quick-stat {
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      text-align: center;
+    }
+
+    .quick-stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .quick-stat-label {
+      font-size: 0.7rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    /* Recent Mini List */
+    .recent-mini {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .recent-mini-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .recent-mini-item:hover {
+      background: var(--bg);
+    }
+
+    .recent-mini-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-xs);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .recent-mini-icon.image { background: #e3f2fd; color: #1976d2; }
+    .recent-mini-icon.document { background: #fff3e0; color: #f57c00; }
+    .recent-mini-icon.video { background: #fce4ec; color: #c2185b; }
+    .recent-mini-icon.other { background: #f5f5f5; color: #616161; }
+
+    .recent-mini-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .recent-mini-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .recent-mini-date {
+      font-size: 0.7rem;
+      color: var(--text-tertiary);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-tertiary);
+    }
+
+    .empty-state i {
       font-size: 64px;
       color: var(--border);
       margin-bottom: 16px;
       display: block;
     }
 
-    .empty-feed h3 {
+    .empty-state h3 {
       font-size: 1.1rem;
       color: var(--text-primary);
       margin-bottom: 6px;
     }
 
-    .empty-feed p {
+    .empty-state p {
       font-size: 0.85rem;
       color: var(--text-tertiary);
     }
@@ -531,7 +979,6 @@
 
     .toast.success { border-left-color: var(--success); }
     .toast.error { border-left-color: var(--danger); }
-
     .toast i { font-size: 1.3rem; }
     .toast.success i { color: var(--success); }
     .toast.error i { color: var(--danger); }
@@ -546,82 +993,260 @@
       to { transform: translateX(120%); opacity: 0; }
     }
 
+    /* Loading Shimmer */
+    .shimmer {
+      background: linear-gradient(90deg, var(--border-light) 25%, var(--border) 50%, var(--border-light) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: var(--shadow-xl);
+    }
+
+    .modal h3 {
+      margin-bottom: 12px;
+    }
+
+    .modal p {
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: var(--radius-full);
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: inherit;
+      font-size: 0.85rem;
+      transition: var(--transition);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: var(--danger-hover);
+    }
+
     /* Responsive */
     @media (max-width: 500px) {
-      .social-app {
-        gap: 10px;
-      }
-      .post-action span {
+      .post-action span, .tab-btn span {
         display: none;
       }
       .post-action {
         padding: 12px;
       }
+      .grid-view {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .view-tabs {
+        overflow-x: auto;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="social-app">
-    <!-- Header -->
-    <div class="header-card">
-      <div class="brand">
-        <div class="brand-icon">
-          <i class="bx bx-cloud-lightning"></i>
+  <div class="app-container">
+    <!-- ==================== MAIN COLUMN ==================== -->
+    <div class="main-column">
+      <!-- Header -->
+      <div class="header-card">
+        <div class="brand">
+          <div class="brand-icon">
+            <i class="bx bx-cloud-lightning"></i>
+          </div>
+          <div class="brand-info">
+            <h2>VaultDrop</h2>
+            <span>Your files, socialized</span>
+          </div>
         </div>
-        <div class="brand-info">
-          <h2>VaultDrop</h2>
-          <span>Your files, socialized</span>
+        <div class="header-actions">
+          <div class="header-stats">
+            <div class="stat-item">
+              <i class="bx bx-file"></i>
+              <span id="fileCount">0</span>
+            </div>
+          </div>
+          <button class="btn-icon" id="refreshBtn" title="Refresh (Ctrl+R)">
+            <i class="bx bx-refresh"></i>
+          </button>
         </div>
       </div>
-      <div class="header-stats">
-        <div class="stat-item">
-          <i class="bx bx-file"></i>
-          <span id="fileCount">0</span>
+
+      <!-- Upload Card -->
+      <div class="upload-card">
+        <div class="upload-trigger" id="dropZone">
+          <i class="bx bx-cloud-upload"></i>
+          <span class="upload-trigger-text">Drop files here or click to browse...</span>
+          <button class="upload-btn-mini" id="browseBtn">
+            <i class="bx bx-plus"></i> Add
+          </button>
         </div>
-        <button class="btn-icon" id="refreshBtn" title="Refresh">
-          <i class="bx bx-refresh"></i>
+        <input type="file" id="fileInput" multiple />
+        
+        <!-- Progress -->
+        <div class="progress-card" id="progressCard">
+          <div class="progress-header">
+            <span id="progressLabel">Uploading files...</span>
+            <span id="progressPercent">0%</span>
+          </div>
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar-fill" id="progressFill"></div>
+          </div>
+          <div class="progress-detail" id="progressDetail"></div>
+        </div>
+      </div>
+
+      <!-- Search & View Toggle -->
+      <div class="search-card">
+        <div class="search-wrapper">
+          <i class="bx bx-search"></i>
+          <input type="text" id="searchInput" placeholder="Search files... (Ctrl+K)" autocomplete="off">
+        </div>
+        <div class="view-tabs" id="viewTabs">
+          <button class="tab-btn active" data-view="feed">
+            <i class="bx bx-list-ul"></i> <span>Feed</span>
+          </button>
+          <button class="tab-btn" data-view="grid">
+            <i class="bx bx-grid-alt"></i> <span>Grid</span>
+          </button>
+          <button class="tab-btn" data-view="table">
+            <i class="bx bx-table"></i> <span>Table</span>
+          </button>
+        </div>
+        <button class="btn-icon" id="sortBtn" title="Sort">
+          <i class="bx bx-sort-alt-2"></i>
         </button>
       </div>
-    </div>
 
-    <!-- Upload Card -->
-    <div class="upload-card">
-      <div class="upload-trigger" id="dropZone">
-        <i class="bx bx-cloud-upload"></i>
-        <span class="upload-trigger-text">Drop files here or click to browse...</span>
-        <button class="upload-btn-mini" id="browseBtn">
-          <i class="bx bx-plus"></i> Add
-        </button>
-      </div>
-      <input type="file" id="fileInput" multiple />
-      
-      <!-- Progress -->
-      <div class="progress-card" id="progressCard">
-        <div class="progress-header">
-          <span id="progressLabel">Uploading files...</span>
-          <span id="progressPercent">0%</span>
+      <!-- Content Area -->
+      <div class="content-area" id="contentArea">
+        <!-- Feed View (default) -->
+        <div class="file-feed" id="feedView"></div>
+        
+        <!-- Grid View -->
+        <div class="grid-view" id="gridView" style="display: none;"></div>
+        
+        <!-- Table View -->
+        <div class="table-view" id="tableView" style="display: none;">
+          <div class="table-scroll">
+            <table class="file-table">
+              <thead>
+                <tr>
+                  <th data-sort="name" class="sorted">Name <i class="bx bx-sort-up"></i></th>
+                  <th data-sort="size">Size <i class="bx bx-sort"></i></th>
+                  <th data-sort="date">Date <i class="bx bx-sort"></i></th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
         </div>
-        <div class="progress-bar-wrapper">
-          <div class="progress-bar-fill" id="progressFill"></div>
+        
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+          <i class="bx bx-folder-open"></i>
+          <h3>No files yet</h3>
+          <p>Drop files above to get started</p>
         </div>
-        <div class="progress-detail" id="progressDetail"></div>
       </div>
     </div>
 
-    <!-- Search -->
-    <div class="search-card">
-      <div class="search-wrapper">
-        <i class="bx bx-search"></i>
-        <input type="text" id="searchInput" placeholder="Search your files..." autocomplete="off">
+    <!-- ==================== SIDE COLUMN ==================== -->
+    <div class="side-column">
+      <!-- Quick Stats -->
+      <div class="side-panel">
+        <div class="panel-title">
+          <i class="bx bx-bar-chart-square"></i> Quick Stats
+        </div>
+        <div class="quick-stats">
+          <div class="quick-stat">
+            <div class="quick-stat-value" id="totalFiles">0</div>
+            <div class="quick-stat-label">Total Files</div>
+          </div>
+          <div class="quick-stat">
+            <div class="quick-stat-value" id="totalSize">0 B</div>
+            <div class="quick-stat-label">Total Size</div>
+          </div>
+          <div class="quick-stat">
+            <div class="quick-stat-value" id="imageCount">0</div>
+            <div class="quick-stat-label">Images</div>
+          </div>
+          <div class="quick-stat">
+            <div class="quick-stat-value" id="docCount">0</div>
+            <div class="quick-stat-label">Documents</div>
+          </div>
+        </div>
       </div>
-      <button class="btn-icon" id="sortBtn" title="Sort">
-        <i class="bx bx-sort-alt-2"></i>
-      </button>
-    </div>
 
-    <!-- File Feed -->
-    <div class="file-feed" id="fileFeed">
-      <!-- Dynamic posts -->
+      <!-- Recently Added -->
+      <div class="side-panel">
+        <div class="panel-title">
+          <i class="bx bx-time-five"></i> Recently Added
+        </div>
+        <div class="recent-mini" id="recentMini">
+          <!-- Dynamic recent items -->
+        </div>
+      </div>
     </div>
   </div>
 
@@ -631,28 +1256,16 @@
   <script>
     (function() {
       // ==================== CONFIGURATION ====================
-      // Configure your Supabase project and bucket here.
-      // The bucket must exist with appropriate RLS policies.
-      // For uploads to work, the bucket must allow INSERT operations.
-      
       const SUPABASE_URL = "https://kdrgdnrwibuqpvikjapx.supabase.co";
       const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkcmdkbnJ3aWJ1cXB2aWtqYXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNjE4ODMsImV4cCI6MjA5NjkzNzg4M30.9wEbcIDziq9xDWZQ_BF0X-p25g4SQkuCCQV-5fhDnbY";
-      const STORAGE_BUCKET = "exams"; // Change to your bucket name
+      const STORAGE_BUCKET = "exams";
       
       // ==================== INITIALIZATION ====================
-      // Use a try-catch wrapper to prevent SDK initialization errors from breaking the page
       let supabase;
       try {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-          auth: {
-            persistSession: false,
-            autoRefreshToken: false,
-          },
-          global: {
-            headers: {
-              'X-Client-Info': 'vaultdrop-file-manager',
-            },
-          },
+          auth: { persistSession: false, autoRefreshToken: false },
+          global: { headers: { 'X-Client-Info': 'vaultdrop' } },
         });
       } catch (initError) {
         console.error('Supabase init error:', initError);
@@ -671,15 +1284,26 @@
       const searchInput = document.getElementById('searchInput');
       const sortBtn = document.getElementById('sortBtn');
       const refreshBtn = document.getElementById('refreshBtn');
-      const fileFeed = document.getElementById('fileFeed');
+      const feedView = document.getElementById('feedView');
+      const gridView = document.getElementById('gridView');
+      const tableView = document.getElementById('tableView');
+      const tableBody = document.getElementById('tableBody');
+      const emptyState = document.getElementById('emptyState');
       const fileCountEl = document.getElementById('fileCount');
+      const totalFilesEl = document.getElementById('totalFiles');
+      const totalSizeEl = document.getElementById('totalSize');
+      const imageCountEl = document.getElementById('imageCount');
+      const docCountEl = document.getElementById('docCount');
+      const recentMini = document.getElementById('recentMini');
       const toastContainer = document.getElementById('toastContainer');
       
       // State
       let allFiles = [];
-      let sortOrder = 'newest'; // 'newest', 'oldest', 'name'
-      let uploadQueue = [];
-      let isUploading = false;
+      let filteredFiles = [];
+      let currentView = 'feed';
+      let sortOrder = 'newest';
+      let tableSort = { field: 'name', direction: 'asc' };
+      let searchTimeout;
       
       // ==================== TOAST SYSTEM ====================
       function showToast(message, type = 'success') {
@@ -691,9 +1315,7 @@
         
         setTimeout(() => {
           toast.style.animation = 'toastOut 0.3s ease forwards';
-          setTimeout(() => {
-            if (toast.parentNode) toast.remove();
-          }, 300);
+          setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300);
         }, 4000);
       }
       
@@ -712,9 +1334,9 @@
       
       function getFileCategory(filename) {
         const ext = getFileExtension(filename);
-        const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp', 'ico', 'heic'];
-        const docExts = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'md', 'rtf'];
-        const videoExts = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm', 'm4v'];
+        const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp', 'ico', 'heic', 'heif', 'tiff', 'raw'];
+        const docExts = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'md', 'rtf', 'odt', 'ods', 'odp'];
+        const videoExts = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm', 'm4v', '3gp'];
         
         if (imageExts.includes(ext)) return 'image';
         if (docExts.includes(ext)) return 'document';
@@ -733,11 +1355,7 @@
       }
       
       function sanitizeFileName(name) {
-        // Remove special characters and spaces for safer uploads
-        return name
-          .replace(/[^a-zA-Z0-9._-]/g, '_')
-          .replace(/_+/g, '_')
-          .replace(/^_|_$/g, '');
+        return name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
       }
       
       function escapeHtml(text) {
@@ -746,45 +1364,63 @@
         return div.innerHTML;
       }
       
+      function formatDate(dateString) {
+        if (!dateString) return 'Unknown';
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+        
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
+        if (diffDays < 7) return `${diffDays}d ago`;
+        
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+      
+      function formatFullDate(dateString) {
+        if (!dateString) return 'Unknown';
+        return new Date(dateString).toLocaleDateString('en-US', {
+          month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+      }
+      
       // ==================== FILE OPERATIONS ====================
       async function fetchFiles() {
-        if (!supabase) {
-          showToast('Storage client not initialized', 'error');
-          return;
-        }
+        if (!supabase) return;
         
         try {
           const { data, error } = await supabase
             .storage
             .from(STORAGE_BUCKET)
-            .list('', {
-              limit: 200,
-              offset: 0,
-              sortBy: { column: 'created_at', order: 'desc' }
-            });
+            .list('', { limit: 200, offset: 0, sortBy: { column: 'created_at', order: 'desc' } });
           
-          if (error) {
-            // Check if it's a permissions issue
-            if (error.message?.includes('policy') || error.message?.includes('permission')) {
-              throw new Error('Bucket permissions may need updating. Check RLS policies.');
-            }
-            throw error;
-          }
+          if (error) throw error;
           
           allFiles = (data || []).filter(item => item && item.name && !item.name.endsWith('/'));
-          updateFileCount();
-          applySortAndRender();
+          applyFilters();
         } catch (err) {
           console.error('Fetch error:', err);
-          showToast(`Load failed: ${err.message || 'Unknown error'}`, 'error');
+          showToast(`Load failed: ${err.message}`, 'error');
           allFiles = [];
-          renderFeed([]);
+          applyFilters();
         }
       }
       
-      function updateFileCount() {
-        const count = allFiles.length;
-        fileCountEl.textContent = count;
+      function updateStats() {
+        const totalFiles = allFiles.length;
+        const totalSize = allFiles.reduce((sum, file) => sum + (file.metadata?.size || 0), 0);
+        const imageFiles = allFiles.filter(f => getFileCategory(f.name) === 'image').length;
+        const docFiles = allFiles.filter(f => getFileCategory(f.name) === 'document').length;
+        
+        fileCountEl.textContent = totalFiles;
+        totalFilesEl.textContent = totalFiles;
+        totalSizeEl.textContent = formatSize(totalSize);
+        imageCountEl.textContent = imageFiles;
+        docCountEl.textContent = docFiles;
       }
       
       function getPublicUrl(fileName) {
@@ -796,23 +1432,17 @@
       async function copyFileUrl(fileName) {
         try {
           const url = getPublicUrl(fileName);
-          if (!url) throw new Error('Could not generate URL');
           await navigator.clipboard.writeText(url);
-          showToast('Link copied to clipboard!', 'success');
+          showToast('Link copied!', 'success');
         } catch (err) {
-          // Fallback for older browsers
-          try {
-            const url = getPublicUrl(fileName);
-            const textarea = document.createElement('textarea');
-            textarea.value = url;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            showToast('Link copied!', 'success');
-          } catch (fallbackErr) {
-            showToast('Failed to copy link', 'error');
-          }
+          const url = getPublicUrl(fileName);
+          const textarea = document.createElement('textarea');
+          textarea.value = url;
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+          showToast('Link copied!', 'success');
         }
       }
       
@@ -863,15 +1493,13 @@
         }
       }
       
-      // ==================== ENHANCED UPLOAD SYSTEM ====================
+      // ==================== UPLOAD SYSTEM ====================
       async function uploadSingleFile(file) {
         if (!supabase) throw new Error('Storage client not initialized');
         
-        // Sanitize filename for safer uploads
         const sanitizedName = sanitizeFileName(file.name);
         if (!sanitizedName) throw new Error('Invalid filename');
         
-        // Try upload with original name first, then fallback to sanitized
         const attempts = [
           { name: file.name, upsert: false },
           { name: sanitizedName, upsert: false },
@@ -883,30 +1511,16 @@
             const { data, error } = await supabase
               .storage
               .from(STORAGE_BUCKET)
-              .upload(attempt.name, file, {
-                cacheControl: '3600',
-                upsert: attempt.upsert,
-              });
+              .upload(attempt.name, file, { cacheControl: '3600', upsert: attempt.upsert });
             
             if (!error) return data;
-            
-            // If file exists, try next attempt
-            if (error.message?.includes('already exists') || error.statusCode === '409') {
-              continue;
-            }
-            
-            // If it's a permissions error, throw immediately
-            if (error.message?.includes('policy') || error.message?.includes('permission') || error.statusCode === '403') {
+            if (error.message?.includes('already exists') || error.statusCode === '409') continue;
+            if (error.message?.includes('policy') || error.message?.includes('permission')) {
               throw new Error('Upload permission denied. Check bucket RLS policies.');
             }
-            
             throw error;
           } catch (uploadErr) {
-            // If it's the last attempt, throw the error
-            if (attempt === attempts[attempts.length - 1]) {
-              throw uploadErr;
-            }
-            // Otherwise continue to next attempt
+            if (attempt === attempts[attempts.length - 1]) throw uploadErr;
           }
         }
         
@@ -931,25 +1545,20 @@
           
           try {
             progressLabel.textContent = `Uploading: ${file.name}`;
-            
             await uploadSingleFile(file);
-            
             successCount++;
-            
           } catch (err) {
             failCount++;
             console.error(`Upload error for ${file.name}:`, err);
             showToast(`${file.name}: ${err.message}`, 'error');
           }
           
-          // Update progress
           const progress = ((i + 1) / total) * 100;
           progressFill.style.width = progress + '%';
           progressPercent.textContent = Math.round(progress) + '%';
           progressDetail.textContent = `${i + 1} / ${total} files processed`;
         }
         
-        // Complete
         progressLabel.textContent = 'Upload complete!';
         progressFill.style.width = '100%';
         progressPercent.textContent = '100%';
@@ -959,13 +1568,11 @@
           showToast(`${successCount} file(s) uploaded successfully!`, 'success');
         }
         
-        // Hide progress after delay
         setTimeout(() => {
           progressCard.classList.remove('active');
           progressFill.style.width = '0%';
         }, 2500);
         
-        // Refresh file list
         await fetchFiles();
       }
       
@@ -974,60 +1581,88 @@
         processUploadQueue(files);
       }
       
-      // ==================== RENDERING ====================
-      function sortFiles(files) {
-        const sorted = [...files];
-        
-        switch(sortOrder) {
-          case 'newest':
-            return sorted.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-          case 'oldest':
-            return sorted.sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
-          case 'name':
-            return sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-          default:
-            return sorted;
-        }
-      }
-      
-      function applySortAndRender() {
+      // ==================== FILTERING & SORTING ====================
+      function applyFilters() {
         const searchTerm = (searchInput.value || '').trim().toLowerCase();
-        let filtered = allFiles;
         
         if (searchTerm) {
-          filtered = allFiles.filter(file => 
+          filteredFiles = allFiles.filter(file => 
             (file.name || '').toLowerCase().includes(searchTerm)
           );
+        } else {
+          filteredFiles = [...allFiles];
         }
         
-        const sortedFiles = sortFiles(filtered);
-        renderFeed(sortedFiles);
+        // Apply appropriate sort based on view
+        if (currentView === 'table') {
+          sortTableFiles();
+        } else {
+          sortFeedFiles();
+        }
+        
+        updateStats();
+        renderCurrentView();
+        renderRecentMini();
       }
       
-      function renderFeed(files) {
-        if (!files || files.length === 0) {
-          fileFeed.innerHTML = `
-            <div class="empty-feed">
-              <i class="bx bx-folder-open"></i>
-              <h3>No files yet</h3>
-              <p>Drop files above to get started</p>
-            </div>
-          `;
+      function sortFeedFiles() {
+        switch(sortOrder) {
+          case 'newest':
+            filteredFiles.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+            break;
+          case 'oldest':
+            filteredFiles.sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
+            break;
+          case 'name':
+            filteredFiles.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            break;
+        }
+      }
+      
+      function sortTableFiles() {
+        filteredFiles.sort((a, b) => {
+          let comparison = 0;
+          switch(tableSort.field) {
+            case 'name':
+              comparison = (a.name || '').localeCompare(b.name || '');
+              break;
+            case 'size':
+              comparison = (a.metadata?.size || 0) - (b.metadata?.size || 0);
+              break;
+            case 'date':
+              comparison = new Date(a.created_at || 0) - new Date(b.created_at || 0);
+              break;
+          }
+          return tableSort.direction === 'asc' ? comparison : -comparison;
+        });
+      }
+      
+      // ==================== RENDERING ====================
+      function renderCurrentView() {
+        const hasFiles = filteredFiles.length > 0;
+        emptyState.style.display = hasFiles ? 'none' : 'block';
+        
+        switch(currentView) {
+          case 'feed': renderFeedView(); break;
+          case 'grid': renderGridView(); break;
+          case 'table': renderTableView(); break;
+        }
+      }
+      
+      function renderFeedView() {
+        feedView.style.display = 'flex';
+        gridView.style.display = 'none';
+        tableView.style.display = 'none';
+        
+        if (filteredFiles.length === 0) {
+          feedView.innerHTML = '';
           return;
         }
         
-        fileFeed.innerHTML = files.map((file, index) => {
+        feedView.innerHTML = filteredFiles.map((file, index) => {
           const fileName = file.name || 'unknown';
           const size = file.metadata?.size || 0;
-          const created = file.created_at 
-            ? new Date(file.created_at).toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              })
-            : 'Unknown date';
+          const created = formatFullDate(file.created_at);
           const category = getFileCategory(fileName);
           const icon = getFileIcon(fileName);
           const safeName = escapeHtml(fileName);
@@ -1063,35 +1698,173 @@
         }).join('');
       }
       
-      // ==================== EVENT LISTENERS ====================
-      // Drag and Drop
-      function handleDragEvents() {
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-          dropZone.addEventListener(eventName, (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          });
+      function renderGridView() {
+        feedView.style.display = 'none';
+        gridView.style.display = 'grid';
+        tableView.style.display = 'none';
+        
+        if (filteredFiles.length === 0) {
+          gridView.innerHTML = '';
+          return;
+        }
+        
+        gridView.innerHTML = filteredFiles.map(file => {
+          const fileName = file.name || 'unknown';
+          const size = file.metadata?.size || 0;
+          const created = formatDate(file.created_at);
+          const category = getFileCategory(fileName);
+          const icon = getFileIcon(fileName);
+          const safeName = escapeHtml(fileName);
+          
+          return `
+            <div class="grid-card" ondblclick="window.VaultDrop.download('${safeName}')" title="Double-click to download">
+              <div class="grid-icon ${category}">
+                <i class="${icon}"></i>
+              </div>
+              <div class="grid-name">${safeName}</div>
+              <div class="grid-meta">${formatSize(size)} · ${created}</div>
+              <div class="grid-actions">
+                <button class="btn-sm" onclick="event.stopPropagation(); window.VaultDrop.copyUrl('${safeName}')" title="Copy link">
+                  <i class="bx bx-link"></i>
+                </button>
+                <button class="btn-sm" onclick="event.stopPropagation(); window.VaultDrop.download('${safeName}')" title="Download">
+                  <i class="bx bx-download"></i>
+                </button>
+                <button class="btn-sm danger" onclick="event.stopPropagation(); window.VaultDrop.deleteFile('${safeName}')" title="Delete">
+                  <i class="bx bx-trash"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+      
+      function renderTableView() {
+        feedView.style.display = 'none';
+        gridView.style.display = 'none';
+        tableView.style.display = 'block';
+        
+        if (filteredFiles.length === 0) {
+          tableBody.innerHTML = '';
+          return;
+        }
+        
+        // Update sort indicators
+        document.querySelectorAll('.file-table th[data-sort]').forEach(th => {
+          th.classList.remove('sorted');
+          const icon = th.querySelector('i');
+          if (icon) icon.className = 'bx bx-sort';
         });
         
-        dropZone.addEventListener('dragenter', () => dropZone.classList.add('drag-active'));
-        dropZone.addEventListener('dragover', () => dropZone.classList.add('drag-active'));
-        dropZone.addEventListener('dragleave', (e) => {
-          if (!dropZone.contains(e.relatedTarget)) {
-            dropZone.classList.remove('drag-active');
-          }
-        });
-        dropZone.addEventListener('drop', (e) => {
-          dropZone.classList.remove('drag-active');
-          const files = e.dataTransfer?.files;
-          if (files && files.length > 0) {
-            handleFiles(files);
-          }
-        });
+        const sortedHeader = document.querySelector(`.file-table th[data-sort="${tableSort.field}"]`);
+        if (sortedHeader) {
+          sortedHeader.classList.add('sorted');
+          const icon = sortedHeader.querySelector('i');
+          if (icon) icon.className = tableSort.direction === 'asc' ? 'bx bx-sort-up' : 'bx bx-sort-down';
+        }
+        
+        tableBody.innerHTML = filteredFiles.map(file => {
+          const fileName = file.name || 'unknown';
+          const size = file.metadata?.size || 0;
+          const created = formatFullDate(file.created_at);
+          const category = getFileCategory(fileName);
+          const icon = getFileIcon(fileName);
+          const safeName = escapeHtml(fileName);
+          
+          return `
+            <tr>
+              <td>
+                <div class="file-cell">
+                  <div class="table-file-icon ${category}">
+                    <i class="${icon}"></i>
+                  </div>
+                  <span title="${safeName}" style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;">
+                    ${safeName}
+                  </span>
+                </div>
+              </td>
+              <td>${formatSize(size)}</td>
+              <td>${created}</td>
+              <td>
+                <div class="actions-cell">
+                  <button class="btn-sm" onclick="window.VaultDrop.copyUrl('${safeName}')" title="Copy link">
+                    <i class="bx bx-link"></i>
+                  </button>
+                  <button class="btn-sm" onclick="window.VaultDrop.download('${safeName}')" title="Download">
+                    <i class="bx bx-download"></i>
+                  </button>
+                  <button class="btn-sm danger" onclick="window.VaultDrop.deleteFile('${safeName}')" title="Delete">
+                    <i class="bx bx-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
       }
+      
+      function renderRecentMini() {
+        const recentFiles = allFiles.slice(0, 5);
+        
+        if (recentFiles.length === 0) {
+          recentMini.innerHTML = '<p style="color: var(--text-tertiary); font-size: 0.8rem; text-align: center;">No files yet</p>';
+          return;
+        }
+        
+        recentMini.innerHTML = recentFiles.map(file => {
+          const fileName = file.name || 'unknown';
+          const created = formatDate(file.created_at);
+          const category = getFileCategory(fileName);
+          const icon = getFileIcon(fileName);
+          const safeName = escapeHtml(fileName);
+          
+          return `
+            <div class="recent-mini-item" onclick="window.VaultDrop.download('${safeName}')" title="Click to download">
+              <div class="recent-mini-icon ${category}">
+                <i class="${icon}"></i>
+              </div>
+              <div class="recent-mini-info">
+                <div class="recent-mini-name">${safeName}</div>
+                <div class="recent-mini-date">${created}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+      
+      function switchView(view) {
+        currentView = view;
+        
+        // Update tab buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.view === view);
+        });
+        
+        applyFilters();
+      }
+      
+      // ==================== EVENT LISTENERS ====================
+      // Drag and Drop
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        });
+      });
+      
+      dropZone.addEventListener('dragenter', () => dropZone.classList.add('drag-active'));
+      dropZone.addEventListener('dragover', () => dropZone.classList.add('drag-active'));
+      dropZone.addEventListener('dragleave', (e) => {
+        if (!dropZone.contains(e.relatedTarget)) dropZone.classList.remove('drag-active');
+      });
+      dropZone.addEventListener('drop', (e) => {
+        dropZone.classList.remove('drag-active');
+        const files = e.dataTransfer?.files;
+        if (files && files.length > 0) handleFiles(files);
+      });
       
       // Click triggers
       dropZone.addEventListener('click', (e) => {
-        if (e.target === progressCard || progressCard.contains(e.target)) return;
         if (e.target.closest('button')) return;
         fileInput.click();
       });
@@ -1108,18 +1881,50 @@
         }
       });
       
-      // Search
-      searchInput.addEventListener('input', () => {
-        applySortAndRender();
+      // View tabs
+      document.getElementById('viewTabs').addEventListener('click', (e) => {
+        const tabBtn = e.target.closest('.tab-btn');
+        if (!tabBtn) return;
+        switchView(tabBtn.dataset.view);
       });
       
-      // Sort toggle
+      // Search with debounce
+      searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(applyFilters, 300);
+      });
+      
+      // Sort toggle (for feed/grid views)
       sortBtn.addEventListener('click', () => {
-        const orders = ['newest', 'oldest', 'name'];
-        const currentIndex = orders.indexOf(sortOrder);
-        sortOrder = orders[(currentIndex + 1) % orders.length];
-        sortBtn.title = `Sort: ${sortOrder}`;
-        applySortAndRender();
+        if (currentView === 'table') {
+          // In table view, cycle through sort fields
+          const fields = ['name', 'size', 'date'];
+          const currentIndex = fields.indexOf(tableSort.field);
+          tableSort.field = fields[(currentIndex + 1) % fields.length];
+          tableSort.direction = 'asc';
+        } else {
+          const orders = ['newest', 'oldest', 'name'];
+          const currentIndex = orders.indexOf(sortOrder);
+          sortOrder = orders[(currentIndex + 1) % orders.length];
+        }
+        applyFilters();
+      });
+      
+      // Table header sorting
+      document.querySelector('.file-table thead').addEventListener('click', (e) => {
+        const th = e.target.closest('th[data-sort]');
+        if (!th) return;
+        
+        const sortField = th.dataset.sort;
+        
+        if (tableSort.field === sortField) {
+          tableSort.direction = tableSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+          tableSort.field = sortField;
+          tableSort.direction = 'asc';
+        }
+        
+        applyFilters();
       });
       
       // Refresh
@@ -1135,38 +1940,48 @@
       
       // ==================== KEYBOARD SHORTCUTS ====================
       document.addEventListener('keydown', (e) => {
-        // Ctrl+K or Cmd+K to focus search
+        // Ctrl/Cmd+K for search
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
           e.preventDefault();
           searchInput.focus();
+          searchInput.select();
         }
-        // Ctrl+R or Cmd+R to refresh (prevent default browser refresh)
-        if ((e.ctrlKey || e.metaKey) && e.key === 'r' && document.activeElement === document.body) {
+        
+        // Ctrl/Cmd+1/2/3 for view switching
+        if ((e.ctrlKey || e.metaKey) && e.key === '1') {
           e.preventDefault();
-          fetchFiles();
+          switchView('feed');
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === '2') {
+          e.preventDefault();
+          switchView('grid');
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === '3') {
+          e.preventDefault();
+          switchView('table');
         }
       });
       
-      // ==================== INITIALIZE ====================
-      handleDragEvents();
-      fetchFiles();
-      
-      // Handle global errors gracefully (the redirectionChain error is from a browser extension, not our code)
+      // ==================== ERROR HANDLING ====================
       window.addEventListener('error', (e) => {
-        if (e.message && e.message.includes('Cannot redefine property')) {
-          // This is from browser extensions, suppress it
+        if (e.message?.includes('Cannot redefine property')) {
           e.preventDefault();
           return false;
         }
       });
       
-      // Catch unhandled promise rejections from extensions
       window.addEventListener('unhandledrejection', (e) => {
         if (e.reason?.message?.includes('Cannot redefine property')) {
           e.preventDefault();
           return false;
         }
       });
+      
+      // ==================== INITIALIZE ====================
+      fetchFiles();
+      
+      // Auto-refresh every 30 seconds
+      setInterval(fetchFiles, 30000);
       
     })();
   </script>

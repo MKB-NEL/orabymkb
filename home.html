@@ -1,1174 +1,1384 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>VaultDrop · Social File Hub</title>
-  
-  <!-- Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
-  <!-- Boxicons -->
-  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-  
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <style>
-    :root {
-      --bg: #f0f2f5;
-      --surface: #ffffff;
-      --surface-hover: #f7f8fa;
-      --border: #e4e6eb;
-      --border-light: #f0f2f5;
-      --text-primary: #1c1e21;
-      --text-secondary: #65676b;
-      --text-tertiary: #8a8d91;
-      --accent: #1877f2;
-      --accent-hover: #166fe5;
-      --accent-light: #e7f3ff;
-      --accent-gradient: linear-gradient(135deg, #1877f2 0%, #00a2ff 100%);
-      --danger: #fa383e;
-      --danger-hover: #e02d32;
-      --danger-light: #ffebee;
-      --success: #31a24c;
-      --success-light: #e8f5e9;
-      --warning: #f7b928;
-      --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
-      --shadow-xl: 0 12px 48px rgba(0,0,0,0.15);
-      --radius-xs: 6px;
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
-      --radius-xl: 24px;
-      --radius-full: 50px;
-      --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>VaultDrop · Social File Hub</title>
+    <meta name="description" content="VaultDrop is the social platform to upload, share, and discover files with your community.">
+    <meta name="theme-color" content="#6c47ff">
+    
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Boxicons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            --radius-full: 9999px;
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+        .theme-light {
+            --bg-main: #f4f2ee;
+            --bg-surface: #ffffff;
+            --bg-hover: #f9fafb;
+            --bg-input: #eef3f8;
+            --border: #e5e7eb;
+            --border-light: #f0f0f0;
+            --text-primary: #191919;
+            --text-secondary: #595856;
+            --text-tertiary: #868482;
+            --primary: #6c47ff;
+            --primary-hover: #5835e8;
+            --primary-light: #f0ebff;
+            --secondary: #3b82f6;
+            --secondary-hover: #2563eb;
+            --secondary-light: #eff6ff;
+            --success: #057642;
+            --success-bg: #e9f7ef;
+            --warning: #b85c00;
+            --danger: #d11124;
+            --danger-bg: #fdecea;
+            --card-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+            --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
 
-    body {
-      background: var(--bg);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 16px;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      line-height: 1.5;
-    }
+        .theme-dark {
+            --bg-main: #1a1a2e;
+            --bg-surface: #16213e;
+            --bg-hover: #1a2744;
+            --bg-input: #0f3460;
+            --border: #2a3a5e;
+            --border-light: #1e2d4a;
+            --text-primary: #e8e8e8;
+            --text-secondary: #b0b0b0;
+            --text-tertiary: #8a8a8a;
+            --primary: #8b6cff;
+            --primary-hover: #7b5ce8;
+            --primary-light: #1e1a3a;
+            --secondary: #60a5fa;
+            --secondary-hover: #3b82f6;
+            --secondary-light: #1a2a4a;
+            --success: #22c55e;
+            --success-bg: #0a2a1a;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --danger-bg: #2a0a0a;
+            --card-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
+            --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
 
-    /* Main App Container */
-    .social-app {
-      width: 100%;
-      max-width: 680px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      margin-top: 8px;
-      padding-bottom: 32px;
-    }
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    /* Header Card */
-    .header-card {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      padding: 16px 20px;
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      position: sticky;
-      top: 8px;
-      z-index: 100;
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--border);
-    }
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            transition: background var(--transition-base), color var(--transition-base);
+        }
 
-    .brand-icon {
-      width: 40px;
-      height: 40px;
-      background: var(--accent-gradient);
-      border-radius: var(--radius-full);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 22px;
-      box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
-    }
+        a { color: inherit; text-decoration: none; }
+        button { cursor: pointer; font-family: inherit; border: none; background: transparent; }
+        button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+        input, textarea, select { font-family: inherit; font-size: inherit; }
 
-    .brand-info h2 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      line-height: 1.2;
-    }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
 
-    .brand-info span {
-      font-size: 0.7rem;
-      color: var(--text-tertiary);
-      font-weight: 500;
-    }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+        @keyframes modalIn { from { transform: scale(.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes toastUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-    .header-stats {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
+        .loading-spinner { display: flex; align-items: center; justify-content: center; padding: 3rem; }
+        .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
 
-    .stat-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      font-weight: 600;
-    }
+        /* Navbar */
+        .navbar {
+            position: sticky; top: 0; z-index: 100; background: var(--bg-surface);
+            border-bottom: 1px solid var(--border); height: 52px; display: flex;
+            align-items: center; padding: 0 1rem; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+        }
+        .navbar-inner {
+            max-width: 1128px; margin: 0 auto; width: 100%; display: flex;
+            align-items: center; justify-content: space-between; gap: 0.75rem;
+        }
+        .navbar-brand { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; cursor: pointer; }
+        .navbar-logo {
+            width: 34px; height: 34px; background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 18px;
+        }
+        .navbar-title { font-size: 1rem; font-weight: 700; letter-spacing: -0.3px; }
+        .navbar-search { flex: 1; max-width: 320px; }
+        .search-input-wrap {
+            display: flex; align-items: center; background: var(--bg-input); border-radius: var(--radius-full);
+            padding: 0 0.75rem; height: 34px; gap: 0.5rem; transition: all var(--transition-fast);
+            border: 1px solid transparent;
+        }
+        .search-input-wrap:focus-within {
+            background: var(--bg-surface); border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(108, 71, 255, 0.12);
+        }
+        .search-input-wrap input { flex: 1; border: none; background: transparent; outline: none; font-size: 0.875rem; color: var(--text-primary); }
+        .navbar-actions { display: flex; align-items: center; gap: 0.25rem; flex-shrink: 0; }
+        .file-count-badge {
+            background: var(--primary); color: #fff; font-size: 0.65rem; font-weight: 700;
+            min-width: 20px; height: 20px; border-radius: var(--radius-full);
+            display: flex; align-items: center; justify-content: center; padding: 0 6px;
+        }
 
-    .stat-item i {
-      font-size: 1.2rem;
-      color: var(--accent);
-    }
+        /* Buttons */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem;
+            padding: 0.5rem 1rem; border-radius: var(--radius-full); font-weight: 600;
+            font-size: 0.875rem; transition: all var(--transition-fast); white-space: nowrap;
+            font-family: var(--font-family);
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08); }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); font-weight: 600; }
+        .btn-outline:hover { background: var(--primary-light); }
+        .btn-ghost { background: transparent; color: var(--text-secondary); font-weight: 500; }
+        .btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .btn-sm { padding: 0.3rem 0.75rem; font-size: 0.8125rem; }
+        .btn-xs { padding: 0.2rem 0.5rem; font-size: 0.7rem; border-radius: var(--radius-sm); }
+        .btn-icon { width: 34px; height: 34px; padding: 0; border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-danger:hover { background: #b91c1c; }
 
-    /* Create Post / Upload Card */
-    .upload-card {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      padding: 16px 20px;
-      box-shadow: var(--shadow-sm);
-      border: 1px solid var(--border);
-    }
+        /* Main Layout */
+        .main-layout {
+            display: grid; grid-template-columns: 1fr 300px; gap: 1rem;
+            padding: 1rem; padding-bottom: 3rem; max-width: 1128px; margin: 0 auto;
+        }
+        .feed-column { min-width: 0; }
+        .sidebar-column { position: sticky; top: 68px; align-self: start; display: flex; flex-direction: column; gap: 0.75rem; }
 
-    .upload-trigger {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: var(--bg);
-      border-radius: var(--radius-full);
-      cursor: pointer;
-      transition: var(--transition);
-      border: 2px dashed var(--border);
-    }
+        /* Upload Box */
+        .upload-box {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 1rem; box-shadow: var(--card-shadow); margin-bottom: 1rem;
+        }
+        .upload-trigger {
+            display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem;
+            background: var(--bg-input); border: 2px dashed var(--border); border-radius: var(--radius-lg);
+            cursor: pointer; transition: all var(--transition-fast); margin-bottom: 0.75rem;
+        }
+        .upload-trigger:hover, .upload-trigger.drag-active {
+            background: var(--primary-light); border-color: var(--primary);
+        }
+        .upload-trigger.drag-active { animation: pulse 2s infinite; border-style: solid; }
+        .upload-trigger i { font-size: 24px; color: var(--primary); flex-shrink: 0; }
+        .upload-trigger-text { flex: 1; font-size: 0.875rem; color: var(--text-tertiary); font-weight: 500; }
+        .upload-subject-row {
+            display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;
+        }
+        .subject-input {
+            flex: 1; min-width: 150px; padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border); border-radius: var(--radius-full);
+            font-size: 0.8125rem; background: var(--bg-surface); color: var(--text-primary);
+            outline: none; transition: all var(--transition-fast);
+        }
+        .subject-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(108, 71, 255, 0.1); }
+        #fileInput { display: none; }
 
-    .upload-trigger:hover {
-      background: var(--accent-light);
-      border-color: var(--accent);
-    }
+        /* Progress Card */
+        .progress-card {
+            background: var(--bg-surface); border: 1px solid var(--primary);
+            border-radius: var(--radius-lg); padding: 1rem; box-shadow: var(--card-shadow);
+            display: none; animation: slideDown 0.3s ease; margin-top: 0.75rem;
+        }
+        .progress-card.active { display: block; }
+        .progress-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.8125rem; font-weight: 600; }
+        .progress-bar-wrapper { width: 100%; height: 6px; background: var(--bg-input); border-radius: var(--radius-full); overflow: hidden; margin-bottom: 4px; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: var(--radius-full); width: 0%; transition: width 0.4s ease; }
+        .progress-detail { font-size: 0.7rem; color: var(--text-tertiary); text-align: right; }
 
-    .upload-trigger.drag-active {
-      background: var(--accent-light);
-      border-color: var(--accent);
-      border-style: solid;
-      box-shadow: 0 0 0 4px rgba(24, 119, 242, 0.15);
-    }
+        /* View Tabs */
+        .view-tabs {
+            display: flex; gap: 1px; background: var(--border); border-radius: var(--radius-lg);
+            overflow: hidden; margin-bottom: 1rem;
+        }
+        .tab-btn {
+            flex: 1; padding: 0.5rem; background: var(--bg-surface); font-size: 0.8125rem;
+            font-weight: 600; color: var(--text-secondary); cursor: pointer;
+            transition: all var(--transition-fast); white-space: nowrap;
+            display: flex; align-items: center; justify-content: center; gap: 0.25rem;
+        }
+        .tab-btn:hover { background: var(--bg-hover); }
+        .tab-btn.active { background: var(--primary); color: #fff; }
 
-    .upload-trigger i {
-      font-size: 24px;
-      color: var(--accent);
-    }
+        /* File Card (Feed View) */
+        .file-card {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 0.75rem;
+            box-shadow: var(--card-shadow); transition: all var(--transition-fast);
+            animation: fadeIn 0.25s ease-out; cursor: pointer;
+        }
+        .file-card:hover { box-shadow: var(--card-hover-shadow); border-color: var(--primary); }
+        .card-header { display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.5rem; }
+        .card-icon {
+            width: 44px; height: 44px; border-radius: var(--radius-md); flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; font-size: 22px;
+        }
+        .card-icon.pdf { background: linear-gradient(135deg, #fce4ec, #f8bbd0); color: #c62828; }
+        .card-icon.word { background: linear-gradient(135deg, #e3f2fd, #bbdefb); color: #1565c0; }
+        .card-icon.excel { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); color: #2e7d32; }
+        .card-icon.ppt { background: linear-gradient(135deg, #fff3e0, #ffe0b2); color: #e65100; }
+        .card-icon.txt { background: linear-gradient(135deg, #f5f5f5, #e0e0e0); color: #424242; }
+        .card-icon.image { background: linear-gradient(135deg, #e8eaf6, #c5cae9); color: #283593; }
+        .card-icon.video { background: linear-gradient(135deg, #fce4ec, #f8bbd0); color: #880e4f; }
+        .card-icon.other { background: linear-gradient(135deg, #eceff1, #cfd8dc); color: #455a64; }
+        .card-meta { flex: 1; min-width: 0; }
+        .card-title {
+            font-size: 0.95rem; font-weight: 600; margin-bottom: 0.2rem;
+            line-height: 1.4; word-break: break-word;
+        }
+        .card-subtitle {
+            font-size: 0.75rem; color: var(--text-tertiary); display: flex;
+            align-items: center; gap: 0.375rem; flex-wrap: wrap;
+        }
+        .card-subject-tag {
+            display: inline-block; padding: 2px 8px; border-radius: var(--radius-full);
+            font-size: 0.65rem; font-weight: 600; background: var(--primary-light); color: var(--primary);
+            margin-top: 0.25rem;
+        }
+        .card-actions {
+            display: flex; align-items: center; gap: 0.25rem; padding-top: 0.5rem;
+            border-top: 1px solid var(--border-light); flex-wrap: wrap;
+        }
+        .card-action-btn {
+            display: flex; align-items: center; gap: 0.2rem; padding: 0.35rem 0.6rem;
+            border-radius: var(--radius-sm); font-size: 0.75rem; font-weight: 600;
+            color: var(--text-secondary); cursor: pointer; transition: all var(--transition-fast);
+        }
+        .card-action-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .card-action-btn.danger:hover { background: var(--danger-bg); color: var(--danger); }
+        .card-action-btn i { font-size: 1.1rem; }
 
-    .upload-trigger-text {
-      flex: 1;
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
+        /* Grid View */
+        .grid-view {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 0.75rem;
+        }
+        .grid-card {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 1.25rem 0.75rem;
+            box-shadow: var(--card-shadow); transition: all var(--transition-fast);
+            cursor: pointer; display: flex; flex-direction: column; align-items: center;
+            text-align: center; gap: 0.5rem; animation: fadeIn 0.25s ease-out;
+        }
+        .grid-card:hover { box-shadow: var(--card-hover-shadow); transform: translateY(-2px); border-color: var(--primary); }
+        .grid-icon {
+            width: 48px; height: 48px; border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center; font-size: 26px;
+        }
+        .grid-icon.pdf { background: linear-gradient(135deg, #fce4ec, #f8bbd0); color: #c62828; }
+        .grid-icon.word { background: linear-gradient(135deg, #e3f2fd, #bbdefb); color: #1565c0; }
+        .grid-icon.excel { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); color: #2e7d32; }
+        .grid-icon.ppt { background: linear-gradient(135deg, #fff3e0, #ffe0b2); color: #e65100; }
+        .grid-icon.txt { background: linear-gradient(135deg, #f5f5f5, #e0e0e0); color: #424242; }
+        .grid-icon.image { background: linear-gradient(135deg, #e8eaf6, #c5cae9); color: #283593; }
+        .grid-icon.video { background: linear-gradient(135deg, #fce4ec, #f8bbd0); color: #880e4f; }
+        .grid-icon.other { background: linear-gradient(135deg, #eceff1, #cfd8dc); color: #455a64; }
+        .grid-name {
+            font-weight: 600; font-size: 0.8rem; color: var(--text-primary);
+            word-break: break-word; display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden; width: 100%;
+        }
+        .grid-meta { font-size: 0.65rem; color: var(--text-tertiary); }
+        .grid-actions { display: flex; gap: 4px; margin-top: 0.25rem; }
+        .btn-sm-icon {
+            width: 28px; height: 28px; border-radius: var(--radius-sm);
+            border: 1px solid var(--border); background: var(--bg-surface);
+            color: var(--text-secondary); cursor: pointer; display: flex;
+            align-items: center; justify-content: center; font-size: 0.9rem;
+            transition: all var(--transition-fast);
+        }
+        .btn-sm-icon:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+        .btn-sm-icon.danger:hover { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
 
-    .upload-btn-mini {
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 8px 20px;
-      border-radius: var(--radius-full);
-      font-weight: 600;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: var(--transition);
-      white-space: nowrap;
-    }
+        /* Table View */
+        .table-view {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); box-shadow: var(--card-shadow);
+            overflow: hidden; animation: fadeIn 0.25s ease-out;
+        }
+        .table-scroll { overflow-x: auto; }
+        .file-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        .file-table thead { background: var(--bg-hover); border-bottom: 2px solid var(--border); }
+        .file-table th {
+            padding: 10px 12px; text-align: left; font-size: 0.7rem; font-weight: 700;
+            color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;
+            white-space: nowrap; cursor: pointer; user-select: none; transition: all var(--transition-fast);
+        }
+        .file-table th:hover { color: var(--primary); background: var(--primary-light); }
+        .file-table th i { font-size: 0.7rem; margin-left: 4px; opacity: 0.5; }
+        .file-table th.sorted i { opacity: 1; color: var(--primary); }
+        .file-table td { padding: 8px 12px; border-bottom: 1px solid var(--border-light); font-size: 0.8rem; }
+        .file-table tbody tr { transition: all var(--transition-fast); cursor: pointer; }
+        .file-table tbody tr:hover { background: var(--bg-hover); }
+        .file-cell { display: flex; align-items: center; gap: 8px; }
+        .table-file-icon {
+            width: 28px; height: 28px; border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+        }
+        .table-file-icon.pdf { background: #fce4ec; color: #c62828; }
+        .table-file-icon.word { background: #e3f2fd; color: #1565c0; }
+        .table-file-icon.excel { background: #e8f5e9; color: #2e7d32; }
+        .table-file-icon.ppt { background: #fff3e0; color: #e65100; }
+        .table-file-icon.txt { background: #f5f5f5; color: #424242; }
+        .table-file-icon.image { background: #e8eaf6; color: #283593; }
+        .table-file-icon.video { background: #fce4ec; color: #880e4f; }
+        .table-file-icon.other { background: #eceff1; color: #455a64; }
+        .actions-cell { display: flex; gap: 4px; }
 
-    .upload-btn-mini:hover {
-      background: var(--accent-hover);
-      transform: scale(1.02);
-    }
+        /* Sidebar */
+        .sidebar-card {
+            background: var(--bg-surface); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 1rem; box-shadow: var(--card-shadow);
+        }
+        .sidebar-card-title {
+            font-size: 0.85rem; font-weight: 600; margin-bottom: 0.75rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .sidebar-mini-link {
+            display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem;
+            font-size: 0.75rem; cursor: pointer; border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
+        }
+        .sidebar-mini-link:hover { background: var(--bg-hover); }
+        .sidebar-mini-link-num { font-weight: 700; color: var(--primary); min-width: 18px; font-size: 0.75rem; }
+        .sidebar-mini-link-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-secondary); }
+        .sidebar-mini-icon {
+            width: 26px; height: 26px; border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;
+        }
+        .sidebar-mini-icon.pdf { background: #fce4ec; color: #c62828; }
+        .sidebar-mini-icon.word { background: #e3f2fd; color: #1565c0; }
+        .sidebar-mini-icon.excel { background: #e8f5e9; color: #2e7d32; }
+        .sidebar-mini-icon.ppt { background: #fff3e0; color: #e65100; }
+        .sidebar-mini-icon.txt { background: #f5f5f5; color: #424242; }
+        .sidebar-mini-icon.image { background: #e8eaf6; color: #283593; }
+        .sidebar-mini-icon.video { background: #fce4ec; color: #880e4f; }
+        .sidebar-mini-icon.other { background: #eceff1; color: #455a64; }
+        .live-indicator {
+            display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+            background: #22c55e; animation: pulse 2s infinite; margin-right: 5px;
+        }
 
-    #fileInput {
-      display: none;
-    }
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 300;
+            display: flex; align-items: center; justify-content: center; padding: 1rem;
+            opacity: 0; visibility: hidden; transition: all var(--transition-base);
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal {
+            background: var(--bg-surface); border-radius: var(--radius-xl); width: 100%;
+            max-width: 420px; max-height: 80vh; overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); animation: modalIn .2s ease-out;
+        }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-light);
+            position: sticky; top: 0; background: var(--bg-surface); z-index: 5;
+        }
+        .modal-title { font-weight: 600; font-size: 1.1rem; }
+        .modal-close {
+            width: 36px; height: 36px; border-radius: var(--radius-full);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text-tertiary); font-size: 1.25rem;
+        }
+        .modal-close:hover { background: var(--bg-hover); }
+        .modal-body { padding: 1.25rem; }
 
-    /* Progress Card */
-    .progress-card {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      padding: 16px 20px;
-      box-shadow: var(--shadow-md);
-      border: 1px solid var(--accent);
-      display: none;
-      animation: slideDown 0.3s ease;
-    }
+        /* Empty State */
+        .empty-state {
+            text-align: center; padding: 2.5rem 1rem; background: var(--bg-surface);
+            border-radius: var(--radius-lg); border: 1px solid var(--border);
+        }
+        .empty-state i { font-size: 48px; color: var(--border); margin-bottom: 0.5rem; display: block; }
 
-    .progress-card.active {
-      display: block;
-    }
+        /* Toast */
+        .toast-container {
+            position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%);
+            z-index: 400; display: flex; flex-direction: column; gap: 0.5rem;
+            width: 90%; max-width: 400px;
+        }
+        .toast {
+            padding: 0.75rem 1rem; border-radius: var(--radius-md); font-size: 0.8125rem;
+            font-weight: 500; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: toastUp .3s ease-out; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .toast.success { background: var(--success-bg); color: var(--success); border: 1px solid #a7f3d0; }
+        .toast.error { background: var(--danger-bg); color: var(--danger); border: 1px solid #fecaca; }
+        .toast.info { background: var(--secondary-light); color: #1e40af; border: 1px solid #bfdbfe; }
 
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .progress-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    .progress-bar-wrapper {
-      width: 100%;
-      height: 6px;
-      background: var(--border-light);
-      border-radius: var(--radius-full);
-      overflow: hidden;
-      margin-bottom: 6px;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background: var(--accent-gradient);
-      border-radius: var(--radius-full);
-      width: 0%;
-      transition: width 0.4s ease;
-    }
-
-    .progress-detail {
-      font-size: 0.7rem;
-      color: var(--text-tertiary);
-      text-align: right;
-    }
-
-    /* Search Bar */
-    .search-card {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      padding: 12px 16px;
-      box-shadow: var(--shadow-sm);
-      border: 1px solid var(--border);
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .search-wrapper {
-      flex: 1;
-      position: relative;
-    }
-
-    .search-wrapper i {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-tertiary);
-      font-size: 1.1rem;
-      pointer-events: none;
-    }
-
-    #searchInput {
-      width: 100%;
-      padding: 10px 12px 10px 40px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-full);
-      font-size: 0.85rem;
-      font-family: inherit;
-      background: var(--bg);
-      color: var(--text-primary);
-      transition: var(--transition);
-      outline: none;
-    }
-
-    #searchInput:focus {
-      border-color: var(--accent);
-      background: var(--surface);
-      box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.1);
-    }
-
-    .btn-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: var(--radius-full);
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text-secondary);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      transition: var(--transition);
-      flex-shrink: 0;
-    }
-
-    .btn-icon:hover {
-      background: var(--bg);
-      color: var(--accent);
-      border-color: var(--accent);
-    }
-
-    /* File Feed */
-    .file-feed {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .file-post {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm);
-      border: 1px solid var(--border);
-      overflow: hidden;
-      transition: var(--transition);
-      animation: fadeInUp 0.4s ease;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(15px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .file-post:hover {
-      box-shadow: var(--shadow-md);
-      border-color: var(--border);
-    }
-
-    .post-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-    }
-
-    .post-avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: var(--radius-full);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0;
-    }
-
-    .post-avatar.image {
-      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-      color: #1976d2;
-    }
-
-    .post-avatar.document {
-      background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-      color: #f57c00;
-    }
-
-    .post-avatar.video {
-      background: linear-gradient(135deg, #fce4ec, #f8bbd0);
-      color: #c2185b;
-    }
-
-    .post-avatar.other {
-      background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
-      color: #616161;
-    }
-
-    .post-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .post-title {
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-bottom: 2px;
-    }
-
-    .post-meta {
-      font-size: 0.75rem;
-      color: var(--text-tertiary);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .post-actions-bar {
-      display: flex;
-      border-top: 1px solid var(--border-light);
-      padding: 4px 12px;
-      gap: 4px;
-    }
-
-    .post-action {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 10px 8px;
-      border: none;
-      background: transparent;
-      color: var(--text-secondary);
-      font-weight: 600;
-      font-size: 0.8rem;
-      cursor: pointer;
-      border-radius: var(--radius-xs);
-      transition: var(--transition);
-      font-family: inherit;
-    }
-
-    .post-action:hover {
-      background: var(--bg);
-      color: var(--accent);
-    }
-
-    .post-action.danger:hover {
-      background: var(--danger-light);
-      color: var(--danger);
-    }
-
-    .post-action i {
-      font-size: 1.2rem;
-    }
-
-    /* Empty State */
-    .empty-feed {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      padding: 60px 20px;
-      text-align: center;
-      box-shadow: var(--shadow-sm);
-      border: 1px solid var(--border);
-    }
-
-    .empty-feed i {
-      font-size: 64px;
-      color: var(--border);
-      margin-bottom: 16px;
-      display: block;
-    }
-
-    .empty-feed h3 {
-      font-size: 1.1rem;
-      color: var(--text-primary);
-      margin-bottom: 6px;
-    }
-
-    .empty-feed p {
-      font-size: 0.85rem;
-      color: var(--text-tertiary);
-    }
-
-    /* Toast Notifications */
-    .toast-container {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      display: flex;
-      flex-direction: column-reverse;
-      gap: 8px;
-      z-index: 9999;
-      pointer-events: none;
-    }
-
-    .toast {
-      background: var(--surface);
-      padding: 14px 18px;
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-lg);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 500;
-      font-size: 0.85rem;
-      animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      pointer-events: all;
-      border-left: 4px solid;
-      min-width: 280px;
-      max-width: 420px;
-    }
-
-    .toast.success { border-left-color: var(--success); }
-    .toast.error { border-left-color: var(--danger); }
-
-    .toast i { font-size: 1.3rem; }
-    .toast.success i { color: var(--success); }
-    .toast.error i { color: var(--danger); }
-
-    @keyframes toastIn {
-      from { transform: translateX(120%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-
-    @keyframes toastOut {
-      from { transform: translateX(0); opacity: 1; }
-      to { transform: translateX(120%); opacity: 0; }
-    }
-
-    /* Responsive */
-    @media (max-width: 500px) {
-      .social-app {
-        gap: 10px;
-      }
-      .post-action span {
-        display: none;
-      }
-      .post-action {
-        padding: 12px;
-      }
-    }
-  </style>
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main-layout { grid-template-columns: 1fr; padding: 0.75rem; }
+            .sidebar-column { display: none; }
+            .navbar-title { display: none; }
+            .navbar-search { max-width: 200px; }
+        }
+        @media (max-width: 600px) {
+            .navbar { padding: 0 0.5rem; height: 48px; }
+            .navbar-search { max-width: 150px; }
+            .navbar-logo { width: 28px; height: 28px; font-size: 14px; }
+            .upload-trigger { padding: 0.6rem 0.75rem; gap: 0.5rem; }
+            .upload-trigger i { font-size: 20px; }
+            .upload-trigger-text { font-size: 0.75rem; }
+            .upload-subject-row { flex-direction: column; }
+            .subject-input { width: 100%; }
+            .card-header { gap: 0.5rem; }
+            .card-icon { width: 36px; height: 36px; font-size: 18px; }
+            .card-title { font-size: 0.85rem; }
+            .card-action-btn span { display: none; }
+            .card-action-btn { padding: 0.4rem 0.5rem; }
+            .grid-view { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+            .tab-btn span { display: none; }
+            .tab-btn { padding: 0.5rem 0.35rem; font-size: 0.7rem; }
+            .file-table th, .file-table td { padding: 6px 8px; font-size: 0.7rem; }
+            .btn-sm-icon { width: 26px; height: 26px; font-size: 0.8rem; }
+            .modal { max-width: 95vw; margin: 0.5rem; }
+        }
+        @media (max-width: 380px) {
+            .navbar-search { max-width: 120px; }
+            .search-input-wrap input { font-size: 0.75rem; }
+            .btn { font-size: 0.75rem; padding: 0.4rem 0.75rem; }
+            .grid-view { grid-template-columns: repeat(2, 1fr); gap: 0.4rem; }
+            .grid-card { padding: 0.75rem 0.5rem; }
+            .grid-icon { width: 36px; height: 36px; font-size: 20px; }
+            .grid-name { font-size: 0.7rem; }
+        }
+    </style>
 </head>
-<body>
-  <div class="social-app">
-    <!-- Header -->
-    <div class="header-card">
-      <div class="brand">
-        <div class="brand-icon">
-          <i class="bx bx-cloud-lightning"></i>
+<body class="theme-light">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <div class="navbar-brand" onclick="resetToFeed()">
+                <div class="navbar-logo"><i class="bx bx-cloud-lightning"></i></div>
+                <span class="navbar-title">VaultDrop</span>
+            </div>
+            <div class="navbar-search">
+                <div class="search-input-wrap">
+                    <i class="bx bx-search" style="color:var(--text-tertiary);font-size:16px;"></i>
+                    <input type="text" id="searchInput" placeholder="Search files..." autocomplete="off">
+                </div>
+            </div>
+            <div class="navbar-actions">
+                <span class="file-count-badge" id="navFileCount">0</span>
+                <button class="btn btn-icon btn-ghost" id="refreshBtn" title="Refresh"><i class="bx bx-refresh" style="font-size:18px;"></i></button>
+                <button class="btn btn-icon btn-ghost" id="themeToggle" title="Toggle theme"><i class="bx bx-moon" style="font-size:18px;" id="themeIcon"></i></button>
+            </div>
         </div>
-        <div class="brand-info">
-          <h2>VaultDrop</h2>
-          <span>Your files, socialized</span>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Feed Column -->
+        <div class="feed-column">
+            <!-- Upload Box -->
+            <div class="upload-box">
+                <div class="upload-trigger" id="dropZone">
+                    <i class="bx bx-cloud-upload"></i>
+                    <span class="upload-trigger-text">Drop files here or click to browse...</span>
+                </div>
+                <div class="upload-subject-row">
+                    <input type="text" class="subject-input" id="subjectInput" placeholder="File subject/topic (optional)" maxlength="100">
+                    <button class="btn btn-primary btn-sm" id="browseBtn"><i class="bx bx-plus"></i> Add Files</button>
+                </div>
+                <input type="file" id="fileInput" multiple />
+                
+                <!-- Progress -->
+                <div class="progress-card" id="progressCard">
+                    <div class="progress-header">
+                        <span id="progressLabel">Uploading files...</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar-wrapper"><div class="progress-bar-fill" id="progressFill"></div></div>
+                    <div class="progress-detail" id="progressDetail"></div>
+                </div>
+            </div>
+
+            <!-- View Tabs -->
+            <div class="view-tabs" id="viewTabs">
+                <button class="tab-btn active" data-view="feed"><i class="bx bx-list-ul"></i> <span>Feed</span></button>
+                <button class="tab-btn" data-view="grid"><i class="bx bx-grid-alt"></i> <span>Grid</span></button>
+                <button class="tab-btn" data-view="table"><i class="bx bx-table"></i> <span>Table</span></button>
+            </div>
+
+            <!-- Content Area -->
+            <div id="contentArea">
+                <div id="feedView"></div>
+                <div class="grid-view" id="gridView" style="display:none;"></div>
+                <div class="table-view" id="tableView" style="display:none;">
+                    <div class="table-scroll">
+                        <table class="file-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="name" class="sorted">Name <i class="bx bx-sort-up"></i></th>
+                                    <th data-sort="type">Type <i class="bx bx-sort"></i></th>
+                                    <th data-sort="size">Size <i class="bx bx-sort"></i></th>
+                                    <th data-sort="date">Date <i class="bx bx-sort"></i></th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="empty-state" id="emptyState" style="display:none;">
+                    <i class="bx bx-folder-open"></i>
+                    <div style="font-weight:600;">No files found</div>
+                    <div style="color:var(--text-secondary);font-size:0.875rem;">Upload files to get started</div>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="header-stats">
-        <div class="stat-item">
-          <i class="bx bx-file"></i>
-          <span id="fileCount">0</span>
+
+        <!-- Sidebar Column -->
+        <div class="sidebar-column">
+            <div class="sidebar-card">
+                <div class="sidebar-card-title"><i class="bx bx-time-five"></i> Recently Added</div>
+                <div id="recentMini"><p style="color:var(--text-tertiary);font-size:0.75rem;text-align:center;padding:1rem;">Loading...</p></div>
+            </div>
+            <div style="text-align:center;padding:1rem;font-size:0.65rem;color:var(--text-tertiary);">
+                <span style="color:var(--primary);font-weight:600;">VaultDrop © 2026</span>
+            </div>
         </div>
-        <button class="btn-icon" id="refreshBtn" title="Refresh">
-          <i class="bx bx-refresh"></i>
-        </button>
-      </div>
     </div>
 
-    <!-- Upload Card -->
-    <div class="upload-card">
-      <div class="upload-trigger" id="dropZone">
-        <i class="bx bx-cloud-upload"></i>
-        <span class="upload-trigger-text">Drop files here or click to browse...</span>
-        <button class="upload-btn-mini" id="browseBtn">
-          <i class="bx bx-plus"></i> Add
-        </button>
-      </div>
-      <input type="file" id="fileInput" multiple />
-      
-      <!-- Progress -->
-      <div class="progress-card" id="progressCard">
-        <div class="progress-header">
-          <span id="progressLabel">Uploading files...</span>
-          <span id="progressPercent">0%</span>
+    <!-- Modal for Subject -->
+    <div class="modal-overlay" id="subjectModal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Add File Subject</span>
+                <button class="modal-close" id="subjectModalClose"><i class="bx bx-x"></i></button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.8125rem;color:var(--text-secondary);margin-bottom:0.75rem;">
+                    Add a subject/topic for <strong id="subjectFileName">file</strong>
+                </p>
+                <input type="text" id="modalSubjectInput" placeholder="e.g., Project Report, Invoice, Notes..." 
+                       style="width:100%;padding:0.6rem 0.85rem;border:1.5px solid var(--border);border-radius:var(--radius-md);font-size:0.875rem;background:var(--bg-input);color:var(--text-primary);outline:none;font-family:var(--font-family);margin-bottom:0.75rem;" maxlength="100">
+                <button class="btn btn-primary" id="confirmSubject" style="width:100%;">Save & Upload</button>
+            </div>
         </div>
-        <div class="progress-bar-wrapper">
-          <div class="progress-bar-fill" id="progressFill"></div>
-        </div>
-        <div class="progress-detail" id="progressDetail"></div>
-      </div>
     </div>
 
-    <!-- Search -->
-    <div class="search-card">
-      <div class="search-wrapper">
-        <i class="bx bx-search"></i>
-        <input type="text" id="searchInput" placeholder="Search your files..." autocomplete="off">
-      </div>
-      <button class="btn-icon" id="sortBtn" title="Sort">
-        <i class="bx bx-sort-alt-2"></i>
-      </button>
-    </div>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
 
-    <!-- File Feed -->
-    <div class="file-feed" id="fileFeed">
-      <!-- Dynamic posts -->
-    </div>
-  </div>
-
-  <!-- Toast Container -->
-  <div class="toast-container" id="toastContainer"></div>
-
-  <script>
-    (function() {
-      // ==================== CONFIGURATION ====================
-      // Configure your Supabase project and bucket here.
-      // The bucket must exist with appropriate RLS policies.
-      // For uploads to work, the bucket must allow INSERT operations.
-      
-      const SUPABASE_URL = "https://kdrgdnrwibuqpvikjapx.supabase.co";
-      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkcmdkbnJ3aWJ1cXB2aWtqYXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNjE4ODMsImV4cCI6MjA5NjkzNzg4M30.9wEbcIDziq9xDWZQ_BF0X-p25g4SQkuCCQV-5fhDnbY";
-      const STORAGE_BUCKET = "exams"; // Change to your bucket name
-      
-      // ==================== INITIALIZATION ====================
-      // Use a try-catch wrapper to prevent SDK initialization errors from breaking the page
-      let supabase;
-      try {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-          auth: {
-            persistSession: false,
-            autoRefreshToken: false,
-          },
-          global: {
-            headers: {
-              'X-Client-Info': 'vaultdrop-file-manager',
-            },
-          },
-        });
-      } catch (initError) {
-        console.error('Supabase init error:', initError);
-        showToast('Failed to initialize storage client', 'error');
-      }
-      
-      // DOM Elements
-      const dropZone = document.getElementById('dropZone');
-      const fileInput = document.getElementById('fileInput');
-      const browseBtn = document.getElementById('browseBtn');
-      const progressCard = document.getElementById('progressCard');
-      const progressFill = document.getElementById('progressFill');
-      const progressLabel = document.getElementById('progressLabel');
-      const progressPercent = document.getElementById('progressPercent');
-      const progressDetail = document.getElementById('progressDetail');
-      const searchInput = document.getElementById('searchInput');
-      const sortBtn = document.getElementById('sortBtn');
-      const refreshBtn = document.getElementById('refreshBtn');
-      const fileFeed = document.getElementById('fileFeed');
-      const fileCountEl = document.getElementById('fileCount');
-      const toastContainer = document.getElementById('toastContainer');
-      
-      // State
-      let allFiles = [];
-      let sortOrder = 'newest'; // 'newest', 'oldest', 'name'
-      let uploadQueue = [];
-      let isUploading = false;
-      
-      // ==================== TOAST SYSTEM ====================
-      function showToast(message, type = 'success') {
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        const icon = type === 'success' ? 'bx-check-circle' : 'bx-error-circle';
-        toast.innerHTML = `<i class="bx ${icon}"></i> <span>${message}</span>`;
-        toastContainer.appendChild(toast);
-        
-        setTimeout(() => {
-          toast.style.animation = 'toastOut 0.3s ease forwards';
-          setTimeout(() => {
-            if (toast.parentNode) toast.remove();
-          }, 300);
-        }, 4000);
-      }
-      
-      // ==================== UTILITY FUNCTIONS ====================
-      function formatSize(bytes) {
-        if (!bytes || bytes === 0) return '0 B';
-        const k = 1024;
-        const sizes = ['B', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-      }
-      
-      function getFileExtension(filename) {
-        return (filename || '').split('.').pop().toLowerCase();
-      }
-      
-      function getFileCategory(filename) {
-        const ext = getFileExtension(filename);
-        const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp', 'ico', 'heic'];
-        const docExts = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'md', 'rtf'];
-        const videoExts = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm', 'm4v'];
-        
-        if (imageExts.includes(ext)) return 'image';
-        if (docExts.includes(ext)) return 'document';
-        if (videoExts.includes(ext)) return 'video';
-        return 'other';
-      }
-      
-      function getFileIcon(filename) {
-        const category = getFileCategory(filename);
-        switch(category) {
-          case 'image': return 'bx bx-image-alt';
-          case 'document': return 'bx bx-file';
-          case 'video': return 'bx bx-video';
-          default: return 'bx bx-file-blank';
-        }
-      }
-      
-      function sanitizeFileName(name) {
-        // Remove special characters and spaces for safer uploads
-        return name
-          .replace(/[^a-zA-Z0-9._-]/g, '_')
-          .replace(/_+/g, '_')
-          .replace(/^_|_$/g, '');
-      }
-      
-      function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text || '';
-        return div.innerHTML;
-      }
-      
-      // ==================== FILE OPERATIONS ====================
-      async function fetchFiles() {
-        if (!supabase) {
-          showToast('Storage client not initialized', 'error');
-          return;
-        }
-        
-        try {
-          const { data, error } = await supabase
-            .storage
-            .from(STORAGE_BUCKET)
-            .list('', {
-              limit: 200,
-              offset: 0,
-              sortBy: { column: 'created_at', order: 'desc' }
+    <script>
+        (function() {
+            // ==================== CONFIGURATION ====================
+            const SUPABASE_URL = "https://kdrgdnrwibuqpvikjapx.supabase.co";
+            const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkcmdkbnJ3aWJ1cXB2aWtqYXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNjE4ODMsImV4cCI6MjA5NjkzNzg4M30.9wEbcIDziq9xDWZQ_BF0X-p25g4SQkuCCQV-5fhDnbY";
+            const STORAGE_BUCKET = "exams";
+            
+            // ==================== INITIALIZATION ====================
+            let supabase;
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                    auth: { persistSession: false, autoRefreshToken: false },
+                    global: { headers: { 'X-Client-Info': 'vaultdrop' } },
+                });
+            } catch (initError) {
+                console.error('Supabase init error:', initError);
+                showToast('Failed to initialize storage client', 'error');
+            }
+            
+            // DOM Elements
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const browseBtn = document.getElementById('browseBtn');
+            const subjectInput = document.getElementById('subjectInput');
+            const progressCard = document.getElementById('progressCard');
+            const progressFill = document.getElementById('progressFill');
+            const progressLabel = document.getElementById('progressLabel');
+            const progressPercent = document.getElementById('progressPercent');
+            const progressDetail = document.getElementById('progressDetail');
+            const searchInput = document.getElementById('searchInput');
+            const refreshBtn = document.getElementById('refreshBtn');
+            const feedView = document.getElementById('feedView');
+            const gridView = document.getElementById('gridView');
+            const tableView = document.getElementById('tableView');
+            const tableBody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+            const navFileCount = document.getElementById('navFileCount');
+            const recentMini = document.getElementById('recentMini');
+            const toastContainer = document.getElementById('toastContainer');
+            const subjectModal = document.getElementById('subjectModal');
+            const subjectFileName = document.getElementById('subjectFileName');
+            const modalSubjectInput = document.getElementById('modalSubjectInput');
+            const confirmSubjectBtn = document.getElementById('confirmSubject');
+            const subjectModalClose = document.getElementById('subjectModalClose');
+            
+            // State
+            let allFiles = [];
+            let fileSubjects = {}; // { filename: subject }
+            let filteredFiles = [];
+            let currentView = 'feed';
+            let tableSort = { field: 'name', direction: 'asc' };
+            let searchTimeout;
+            let pendingFiles = null; // Files waiting for subject input
+            
+            // Load subjects from localStorage
+            try {
+                fileSubjects = JSON.parse(localStorage.getItem('vaultdrop_subjects') || '{}');
+            } catch(e) {
+                fileSubjects = {};
+            }
+            
+            function saveSubjects() {
+                localStorage.setItem('vaultdrop_subjects', JSON.stringify(fileSubjects));
+            }
+            
+            // ==================== TOAST SYSTEM ====================
+            function showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `<span>${message}</span>`;
+                toastContainer.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateY(10px)';
+                    toast.style.transition = 'all 0.25s';
+                    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 250);
+                }, 3000);
+            }
+            
+            // ==================== UTILITY FUNCTIONS ====================
+            function formatSize(bytes) {
+                if (!bytes || bytes === 0) return '0 B';
+                const k = 1024;
+                const sizes = ['B', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+            }
+            
+            function getFileExtension(filename) {
+                return (filename || '').split('.').pop().toLowerCase();
+            }
+            
+            function getFileTypeLabel(filename) {
+                const ext = getFileExtension(filename);
+                const docTypes = {
+                    'pdf': 'PDF Document',
+                    'doc': 'Word Document', 'docx': 'Word Document',
+                    'xls': 'Excel Spreadsheet', 'xlsx': 'Excel Spreadsheet',
+                    'ppt': 'PowerPoint', 'pptx': 'PowerPoint',
+                    'txt': 'Text File', 'csv': 'CSV File', 'md': 'Markdown',
+                    'rtf': 'Rich Text', 'odt': 'OpenDocument Text',
+                    'ods': 'OpenDocument Spreadsheet', 'odp': 'OpenDocument Presentation',
+                };
+                if (docTypes[ext]) return docTypes[ext];
+                
+                const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp', 'ico', 'heic', 'heif', 'tiff', 'raw'];
+                if (imageExts.includes(ext)) return 'Image (' + ext.toUpperCase() + ')';
+                
+                const videoExts = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm', 'm4v', '3gp'];
+                if (videoExts.includes(ext)) return 'Video (' + ext.toUpperCase() + ')';
+                
+                return ext.toUpperCase() + ' File';
+            }
+            
+            function getFileCategory(filename) {
+                const ext = getFileExtension(filename);
+                const docExts = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'md', 'rtf', 'odt', 'ods', 'odp'];
+                const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp', 'ico', 'heic', 'heif', 'tiff', 'raw'];
+                const videoExts = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm', 'm4v', '3gp'];
+                
+                if (docExts.includes(ext)) return ext; // Return specific doc type
+                if (imageExts.includes(ext)) return 'image';
+                if (videoExts.includes(ext)) return 'video';
+                return 'other';
+            }
+            
+            function getFileIcon(filename) {
+                const category = getFileCategory(filename);
+                const iconMap = {
+                    'pdf': 'bx bxs-file-pdf',
+                    'doc': 'bx bxs-file-doc', 'docx': 'bx bxs-file-doc',
+                    'xls': 'bx bx-spreadsheet', 'xlsx': 'bx bx-spreadsheet',
+                    'ppt': 'bx bxs-slideshow', 'pptx': 'bx bxs-slideshow',
+                    'txt': 'bx bx-text', 'csv': 'bx bx-spreadsheet',
+                    'md': 'bx bx-text', 'rtf': 'bx bx-text',
+                    'image': 'bx bx-image-alt',
+                    'video': 'bx bx-video',
+                };
+                return iconMap[category] || 'bx bx-file-blank';
+            }
+            
+            function sanitizeFileName(name) {
+                return name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+            }
+            
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text || '';
+                return div.innerHTML;
+            }
+            
+            function formatDate(dateString) {
+                if (!dateString) return 'Unknown';
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffMins = Math.floor((now - date) / 60000);
+                
+                if (diffMins < 1) return 'Just now';
+                if (diffMins < 60) return `${diffMins}m ago`;
+                const diffHours = Math.floor(diffMins / 60);
+                if (diffHours < 24) return `${diffHours}h ago`;
+                const diffDays = Math.floor(diffHours / 24);
+                if (diffDays < 7) return `${diffDays}d ago`;
+                
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+            
+            function formatFullDate(dateString) {
+                if (!dateString) return 'Unknown';
+                return new Date(dateString).toLocaleDateString('en-US', {
+                    month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                });
+            }
+            
+            // ==================== FILE OPERATIONS ====================
+            async function fetchFiles() {
+                if (!supabase) return;
+                
+                try {
+                    const { data, error } = await supabase
+                        .storage
+                        .from(STORAGE_BUCKET)
+                        .list('', { limit: 200, offset: 0, sortBy: { column: 'created_at', order: 'desc' } });
+                    
+                    if (error) throw error;
+                    
+                    allFiles = (data || []).filter(item => item && item.name && !item.name.endsWith('/'));
+                    applyFilters();
+                } catch (err) {
+                    console.error('Fetch error:', err);
+                    showToast(`Load failed: ${err.message}`, 'error');
+                    allFiles = [];
+                    applyFilters();
+                }
+            }
+            
+            function updateStats() {
+                navFileCount.textContent = allFiles.length;
+            }
+            
+            function getPublicUrl(fileName) {
+                if (!supabase) return '';
+                const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
+                return data?.publicUrl || '';
+            }
+            
+            async function copyFileUrl(fileName) {
+                try {
+                    const url = getPublicUrl(fileName);
+                    await navigator.clipboard.writeText(url);
+                    showToast('Link copied!', 'success');
+                } catch (err) {
+                    const url = getPublicUrl(fileName);
+                    const textarea = document.createElement('textarea');
+                    textarea.value = url;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    showToast('Link copied!', 'success');
+                }
+            }
+            
+            function openFilePreview(fileName) {
+                // Open view.html with the file name as a parameter
+                const url = getPublicUrl(fileName);
+                const subject = fileSubjects[fileName] || '';
+                const params = new URLSearchParams({
+                    file: fileName,
+                    url: url,
+                    subject: subject
+                });
+                window.open('view.html?' + params.toString(), '_blank');
+            }
+            
+            async function downloadFile(fileName) {
+                if (!supabase) return;
+                
+                try {
+                    const { data, error } = await supabase
+                        .storage
+                        .from(STORAGE_BUCKET)
+                        .download(fileName);
+                    
+                    if (error) throw error;
+                    
+                    const url = URL.createObjectURL(data);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    }, 100);
+                    
+                    showToast(`Downloaded ${fileName}`, 'success');
+                } catch (err) {
+                    showToast(`Download failed: ${err.message}`, 'error');
+                }
+            }
+            
+            async function deleteFile(fileName) {
+                if (!supabase) return;
+                if (!confirm(`Delete "${fileName}"? This action cannot be undone.`)) return;
+                
+                try {
+                    const { error } = await supabase
+                        .storage
+                        .from(STORAGE_BUCKET)
+                        .remove([fileName]);
+                    
+                    if (error) throw error;
+                    
+                    // Clean up subject
+                    delete fileSubjects[fileName];
+                    saveSubjects();
+                    
+                    showToast(`Deleted ${fileName}`, 'success');
+                    await fetchFiles();
+                } catch (err) {
+                    showToast(`Delete failed: ${err.message}`, 'error');
+                }
+            }
+            
+            // ==================== SUBJECT MODAL ====================
+            function openSubjectModal(files) {
+                pendingFiles = files;
+                const firstFileName = files.length === 1 ? files[0].name : `${files.length} files`;
+                subjectFileName.textContent = firstFileName;
+                modalSubjectInput.value = subjectInput.value || '';
+                modalSubjectInput.focus();
+                subjectModal.classList.add('active');
+            }
+            
+            function closeSubjectModal() {
+                subjectModal.classList.remove('active');
+                pendingFiles = null;
+            }
+            
+            function confirmSubject() {
+                const subject = modalSubjectInput.value.trim();
+                subjectInput.value = subject; // Keep in main input for next time
+                
+                if (pendingFiles) {
+                    // Store subject for each file
+                    for (const file of pendingFiles) {
+                        if (subject) {
+                            fileSubjects[file.name] = subject;
+                        }
+                    }
+                    saveSubjects();
+                    processUploadQueue(pendingFiles);
+                }
+                
+                closeSubjectModal();
+            }
+            
+            // ==================== UPLOAD SYSTEM ====================
+            async function uploadSingleFile(file) {
+                if (!supabase) throw new Error('Storage client not initialized');
+                
+                const sanitizedName = sanitizeFileName(file.name);
+                if (!sanitizedName) throw new Error('Invalid filename');
+                
+                const attempts = [
+                    { name: file.name, upsert: false },
+                    { name: sanitizedName, upsert: false },
+                    { name: `${Date.now()}_${sanitizedName}`, upsert: false },
+                ];
+                
+                for (const attempt of attempts) {
+                    try {
+                        const { data, error } = await supabase
+                            .storage
+                            .from(STORAGE_BUCKET)
+                            .upload(attempt.name, file, { cacheControl: '3600', upsert: attempt.upsert });
+                        
+                        if (!error) return data;
+                        if (error.message?.includes('already exists') || error.statusCode === '409') continue;
+                        if (error.message?.includes('policy') || error.message?.includes('permission')) {
+                            throw new Error('Upload permission denied. Check bucket RLS policies.');
+                        }
+                        throw error;
+                    } catch (uploadErr) {
+                        if (attempt === attempts[attempts.length - 1]) throw uploadErr;
+                    }
+                }
+                
+                throw new Error('All upload attempts failed');
+            }
+            
+            async function processUploadQueue(files) {
+                if (!files || files.length === 0) return;
+                
+                progressCard.classList.add('active');
+                progressFill.style.width = '0%';
+                progressPercent.textContent = '0%';
+                progressLabel.textContent = 'Starting upload...';
+                progressDetail.textContent = `0 / ${files.length} files`;
+                
+                let successCount = 0;
+                let failCount = 0;
+                const total = files.length;
+                
+                for (let i = 0; i < total; i++) {
+                    const file = files[i];
+                    
+                    try {
+                        progressLabel.textContent = `Uploading: ${file.name}`;
+                        await uploadSingleFile(file);
+                        successCount++;
+                    } catch (err) {
+                        failCount++;
+                        console.error(`Upload error for ${file.name}:`, err);
+                        showToast(`${file.name}: ${err.message}`, 'error');
+                    }
+                    
+                    const progress = ((i + 1) / total) * 100;
+                    progressFill.style.width = progress + '%';
+                    progressPercent.textContent = Math.round(progress) + '%';
+                    progressDetail.textContent = `${i + 1} / ${total} files processed`;
+                }
+                
+                progressLabel.textContent = 'Upload complete!';
+                progressFill.style.width = '100%';
+                progressPercent.textContent = '100%';
+                progressDetail.textContent = `${successCount} successful, ${failCount} failed`;
+                
+                if (successCount > 0) {
+                    showToast(`${successCount} file(s) uploaded successfully!`, 'success');
+                }
+                
+                setTimeout(() => {
+                    progressCard.classList.remove('active');
+                    progressFill.style.width = '0%';
+                }, 2500);
+                
+                await fetchFiles();
+            }
+            
+            function handleFiles(files) {
+                if (!files || files.length === 0) return;
+                
+                // Check if subject input has content or if we should ask
+                const subject = subjectInput.value.trim();
+                const filesArray = Array.from(files);
+                
+                // Always show subject modal for better UX
+                openSubjectModal(filesArray);
+            }
+            
+            // ==================== FILTERING & SORTING ====================
+            function applyFilters() {
+                const searchTerm = (searchInput.value || '').trim().toLowerCase();
+                
+                if (searchTerm) {
+                    filteredFiles = allFiles.filter(file => {
+                        const nameMatch = (file.name || '').toLowerCase().includes(searchTerm);
+                        const subject = fileSubjects[file.name] || '';
+                        const subjectMatch = subject.toLowerCase().includes(searchTerm);
+                        const typeMatch = getFileTypeLabel(file.name).toLowerCase().includes(searchTerm);
+                        return nameMatch || subjectMatch || typeMatch;
+                    });
+                } else {
+                    filteredFiles = [...allFiles];
+                }
+                
+                // Sort by newest first (default)
+                filteredFiles.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+                
+                // Apply table sort if in table view
+                if (currentView === 'table') {
+                    sortTableFiles();
+                }
+                
+                updateStats();
+                renderCurrentView();
+                renderRecentMini();
+            }
+            
+            function sortTableFiles() {
+                filteredFiles.sort((a, b) => {
+                    let comparison = 0;
+                    switch(tableSort.field) {
+                        case 'name':
+                            comparison = (a.name || '').localeCompare(b.name || '');
+                            break;
+                        case 'type':
+                            comparison = getFileTypeLabel(a.name).localeCompare(getFileTypeLabel(b.name));
+                            break;
+                        case 'size':
+                            comparison = (a.metadata?.size || 0) - (b.metadata?.size || 0);
+                            break;
+                        case 'date':
+                            comparison = new Date(a.created_at || 0) - new Date(b.created_at || 0);
+                            break;
+                    }
+                    return tableSort.direction === 'asc' ? comparison : -comparison;
+                });
+            }
+            
+            // ==================== RENDERING ====================
+            function renderCurrentView() {
+                const hasFiles = filteredFiles.length > 0;
+                emptyState.style.display = hasFiles ? 'none' : 'block';
+                
+                switch(currentView) {
+                    case 'feed': renderFeedView(); break;
+                    case 'grid': renderGridView(); break;
+                    case 'table': renderTableView(); break;
+                }
+            }
+            
+            function renderFeedView() {
+                feedView.style.display = 'block';
+                gridView.style.display = 'none';
+                tableView.style.display = 'none';
+                
+                if (filteredFiles.length === 0) { feedView.innerHTML = ''; return; }
+                
+                feedView.innerHTML = filteredFiles.map((file, index) => {
+                    const fileName = file.name || 'unknown';
+                    const size = file.metadata?.size || 0;
+                    const created = formatFullDate(file.created_at);
+                    const category = getFileCategory(fileName);
+                    const icon = getFileIcon(fileName);
+                    const safeName = escapeHtml(fileName);
+                    const subject = fileSubjects[fileName] || '';
+                    const typeLabel = getFileTypeLabel(fileName);
+                    
+                    return `
+                        <div class="file-card" style="animation-delay: ${Math.min(index * 0.03, 0.5)}s" onclick="window.VaultDrop.openPreview('${safeName}')">
+                            <div class="card-header">
+                                <div class="card-icon ${category}"><i class="${icon}"></i></div>
+                                <div class="card-meta">
+                                    <div class="card-title">${safeName}</div>
+                                    <div class="card-subtitle">
+                                        <span>${typeLabel}</span>
+                                        <span>·</span>
+                                        <span>${formatSize(size)}</span>
+                                        <span>·</span>
+                                        <span>${created}</span>
+                                    </div>
+                                    ${subject ? `<span class="card-subject-tag">${escapeHtml(subject)}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="card-actions" onclick="event.stopPropagation();">
+                                <button class="card-action-btn" onclick="window.VaultDrop.copyUrl('${safeName}')"><i class="bx bx-link"></i> <span>Copy</span></button>
+                                <button class="card-action-btn" onclick="window.VaultDrop.download('${safeName}')"><i class="bx bx-download"></i> <span>Download</span></button>
+                                <button class="card-action-btn" onclick="window.VaultDrop.openPreview('${safeName}')"><i class="bx bx-show"></i> <span>View</span></button>
+                                <button class="card-action-btn danger" onclick="window.VaultDrop.deleteFile('${safeName}')"><i class="bx bx-trash"></i> <span>Delete</span></button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            function renderGridView() {
+                feedView.style.display = 'none';
+                gridView.style.display = 'grid';
+                tableView.style.display = 'none';
+                
+                if (filteredFiles.length === 0) { gridView.innerHTML = ''; return; }
+                
+                gridView.innerHTML = filteredFiles.map(file => {
+                    const fileName = file.name || 'unknown';
+                    const size = file.metadata?.size || 0;
+                    const created = formatDate(file.created_at);
+                    const category = getFileCategory(fileName);
+                    const icon = getFileIcon(fileName);
+                    const safeName = escapeHtml(fileName);
+                    const subject = fileSubjects[fileName] || '';
+                    
+                    return `
+                        <div class="grid-card" ondblclick="window.VaultDrop.openPreview('${safeName}')" title="Double-click to preview">
+                            <div class="grid-icon ${category}"><i class="${icon}"></i></div>
+                            <div class="grid-name">${safeName}</div>
+                            ${subject ? `<span class="card-subject-tag">${escapeHtml(subject)}</span>` : ''}
+                            <div class="grid-meta">${formatSize(size)} · ${created}</div>
+                            <div class="grid-actions">
+                                <button class="btn-sm-icon" onclick="event.stopPropagation(); window.VaultDrop.copyUrl('${safeName}')"><i class="bx bx-link"></i></button>
+                                <button class="btn-sm-icon" onclick="event.stopPropagation(); window.VaultDrop.download('${safeName}')"><i class="bx bx-download"></i></button>
+                                <button class="btn-sm-icon" onclick="event.stopPropagation(); window.VaultDrop.openPreview('${safeName}')"><i class="bx bx-show"></i></button>
+                                <button class="btn-sm-icon danger" onclick="event.stopPropagation(); window.VaultDrop.deleteFile('${safeName}')"><i class="bx bx-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            function renderTableView() {
+                feedView.style.display = 'none';
+                gridView.style.display = 'none';
+                tableView.style.display = 'block';
+                
+                if (filteredFiles.length === 0) { tableBody.innerHTML = ''; return; }
+                
+                // Update sort indicators
+                document.querySelectorAll('.file-table th[data-sort]').forEach(th => {
+                    th.classList.remove('sorted');
+                    const icon = th.querySelector('i');
+                    if (icon) icon.className = 'bx bx-sort';
+                });
+                
+                const sortedHeader = document.querySelector(`.file-table th[data-sort="${tableSort.field}"]`);
+                if (sortedHeader) {
+                    sortedHeader.classList.add('sorted');
+                    const icon = sortedHeader.querySelector('i');
+                    if (icon) icon.className = tableSort.direction === 'asc' ? 'bx bx-sort-up' : 'bx bx-sort-down';
+                }
+                
+                tableBody.innerHTML = filteredFiles.map(file => {
+                    const fileName = file.name || 'unknown';
+                    const size = file.metadata?.size || 0;
+                    const created = formatFullDate(file.created_at);
+                    const category = getFileCategory(fileName);
+                    const icon = getFileIcon(fileName);
+                    const safeName = escapeHtml(fileName);
+                    const typeLabel = getFileTypeLabel(fileName);
+                    const subject = fileSubjects[fileName] || '';
+                    
+                    return `
+                        <tr onclick="window.VaultDrop.openPreview('${safeName}')">
+                            <td>
+                                <div class="file-cell">
+                                    <div class="table-file-icon ${category}"><i class="${icon}"></i></div>
+                                    <span title="${safeName}" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;">
+                                        ${safeName}
+                                    </span>
+                                </div>
+                            </td>
+                            <td>${typeLabel}</td>
+                            <td>${formatSize(size)}</td>
+                            <td>${created}</td>
+                            <td>
+                                <div class="actions-cell" onclick="event.stopPropagation();">
+                                    <button class="btn-sm-icon" onclick="window.VaultDrop.copyUrl('${safeName}')"><i class="bx bx-link"></i></button>
+                                    <button class="btn-sm-icon" onclick="window.VaultDrop.download('${safeName}')"><i class="bx bx-download"></i></button>
+                                    <button class="btn-sm-icon" onclick="window.VaultDrop.openPreview('${safeName}')"><i class="bx bx-show"></i></button>
+                                    <button class="btn-sm-icon danger" onclick="window.VaultDrop.deleteFile('${safeName}')"><i class="bx bx-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+            
+            function renderRecentMini() {
+                const recentFiles = allFiles.slice(0, 5);
+                
+                if (recentFiles.length === 0) {
+                    recentMini.innerHTML = '<p style="color:var(--text-tertiary);font-size:0.75rem;text-align:center;padding:1rem;">No files yet</p>';
+                    return;
+                }
+                
+                recentMini.innerHTML = recentFiles.map((file, i) => {
+                    const fileName = file.name || 'unknown';
+                    const created = formatDate(file.created_at);
+                    const category = getFileCategory(fileName);
+                    const icon = getFileIcon(fileName);
+                    const safeName = escapeHtml(fileName);
+                    
+                    return `
+                        <div class="sidebar-mini-link" onclick="window.VaultDrop.openPreview('${safeName}')" title="Click to preview">
+                            <span class="sidebar-mini-link-num">#${i + 1}</span>
+                            <div class="sidebar-mini-icon ${category}"><i class="${icon}"></i></div>
+                            <span class="sidebar-mini-link-text">${safeName}</span>
+                            <span style="font-size:0.6rem;color:var(--text-tertiary);">${created}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            function switchView(view) {
+                currentView = view;
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.view === view);
+                });
+                applyFilters();
+            }
+            
+            function resetToFeed() {
+                currentView = 'feed';
+                searchInput.value = '';
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.view === 'feed');
+                });
+                applyFilters();
+            }
+            
+            // ==================== THEME ====================
+            function setTheme(theme) {
+                document.body.classList.remove('theme-light', 'theme-dark');
+                document.body.classList.add('theme-' + theme);
+                document.getElementById('themeIcon').className = theme === 'dark' ? 'bx bx-sun' : 'bx bx-moon';
+                localStorage.setItem('vaultdrop-theme', theme);
+            }
+            
+            // ==================== EVENT LISTENERS ====================
+            // Drag and Drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
             });
-          
-          if (error) {
-            // Check if it's a permissions issue
-            if (error.message?.includes('policy') || error.message?.includes('permission')) {
-              throw new Error('Bucket permissions may need updating. Check RLS policies.');
-            }
-            throw error;
-          }
-          
-          allFiles = (data || []).filter(item => item && item.name && !item.name.endsWith('/'));
-          updateFileCount();
-          applySortAndRender();
-        } catch (err) {
-          console.error('Fetch error:', err);
-          showToast(`Load failed: ${err.message || 'Unknown error'}`, 'error');
-          allFiles = [];
-          renderFeed([]);
-        }
-      }
-      
-      function updateFileCount() {
-        const count = allFiles.length;
-        fileCountEl.textContent = count;
-      }
-      
-      function getPublicUrl(fileName) {
-        if (!supabase) return '';
-        const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
-        return data?.publicUrl || '';
-      }
-      
-      async function copyFileUrl(fileName) {
-        try {
-          const url = getPublicUrl(fileName);
-          if (!url) throw new Error('Could not generate URL');
-          await navigator.clipboard.writeText(url);
-          showToast('Link copied to clipboard!', 'success');
-        } catch (err) {
-          // Fallback for older browsers
-          try {
-            const url = getPublicUrl(fileName);
-            const textarea = document.createElement('textarea');
-            textarea.value = url;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            showToast('Link copied!', 'success');
-          } catch (fallbackErr) {
-            showToast('Failed to copy link', 'error');
-          }
-        }
-      }
-      
-      async function downloadFile(fileName) {
-        if (!supabase) return;
-        
-        try {
-          const { data, error } = await supabase
-            .storage
-            .from(STORAGE_BUCKET)
-            .download(fileName);
-          
-          if (error) throw error;
-          
-          const url = URL.createObjectURL(data);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = fileName;
-          document.body.appendChild(a);
-          a.click();
-          setTimeout(() => {
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-          }, 100);
-          
-          showToast(`Downloaded ${fileName}`, 'success');
-        } catch (err) {
-          showToast(`Download failed: ${err.message}`, 'error');
-        }
-      }
-      
-      async function deleteFile(fileName) {
-        if (!supabase) return;
-        if (!confirm(`Delete "${fileName}"? This action cannot be undone.`)) return;
-        
-        try {
-          const { error } = await supabase
-            .storage
-            .from(STORAGE_BUCKET)
-            .remove([fileName]);
-          
-          if (error) throw error;
-          
-          showToast(`Deleted ${fileName}`, 'success');
-          await fetchFiles();
-        } catch (err) {
-          showToast(`Delete failed: ${err.message}`, 'error');
-        }
-      }
-      
-      // ==================== ENHANCED UPLOAD SYSTEM ====================
-      async function uploadSingleFile(file) {
-        if (!supabase) throw new Error('Storage client not initialized');
-        
-        // Sanitize filename for safer uploads
-        const sanitizedName = sanitizeFileName(file.name);
-        if (!sanitizedName) throw new Error('Invalid filename');
-        
-        // Try upload with original name first, then fallback to sanitized
-        const attempts = [
-          { name: file.name, upsert: false },
-          { name: sanitizedName, upsert: false },
-          { name: `${Date.now()}_${sanitizedName}`, upsert: false },
-        ];
-        
-        for (const attempt of attempts) {
-          try {
-            const { data, error } = await supabase
-              .storage
-              .from(STORAGE_BUCKET)
-              .upload(attempt.name, file, {
-                cacheControl: '3600',
-                upsert: attempt.upsert,
-              });
             
-            if (!error) return data;
+            dropZone.addEventListener('dragenter', () => dropZone.classList.add('drag-active'));
+            dropZone.addEventListener('dragover', () => dropZone.classList.add('drag-active'));
+            dropZone.addEventListener('dragleave', (e) => {
+                if (!dropZone.contains(e.relatedTarget)) dropZone.classList.remove('drag-active');
+            });
+            dropZone.addEventListener('drop', (e) => {
+                dropZone.classList.remove('drag-active');
+                const files = e.dataTransfer?.files;
+                if (files && files.length > 0) handleFiles(files);
+            });
             
-            // If file exists, try next attempt
-            if (error.message?.includes('already exists') || error.statusCode === '409') {
-              continue;
-            }
+            // Click triggers
+            dropZone.addEventListener('click', () => fileInput.click());
+            browseBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fileInput.click();
+            });
             
-            // If it's a permissions error, throw immediately
-            if (error.message?.includes('policy') || error.message?.includes('permission') || error.statusCode === '403') {
-              throw new Error('Upload permission denied. Check bucket RLS policies.');
-            }
+            fileInput.addEventListener('change', (e) => {
+                if (fileInput.files && fileInput.files.length > 0) {
+                    handleFiles(fileInput.files);
+                    fileInput.value = '';
+                }
+            });
             
-            throw error;
-          } catch (uploadErr) {
-            // If it's the last attempt, throw the error
-            if (attempt === attempts[attempts.length - 1]) {
-              throw uploadErr;
-            }
-            // Otherwise continue to next attempt
-          }
-        }
-        
-        throw new Error('All upload attempts failed');
-      }
-      
-      async function processUploadQueue(files) {
-        if (!files || files.length === 0) return;
-        
-        progressCard.classList.add('active');
-        progressFill.style.width = '0%';
-        progressPercent.textContent = '0%';
-        progressLabel.textContent = 'Starting upload...';
-        progressDetail.textContent = `0 / ${files.length} files`;
-        
-        let successCount = 0;
-        let failCount = 0;
-        const total = files.length;
-        
-        for (let i = 0; i < total; i++) {
-          const file = files[i];
-          
-          try {
-            progressLabel.textContent = `Uploading: ${file.name}`;
+            // View tabs
+            document.getElementById('viewTabs').addEventListener('click', (e) => {
+                const tabBtn = e.target.closest('.tab-btn');
+                if (!tabBtn) return;
+                switchView(tabBtn.dataset.view);
+            });
             
-            await uploadSingleFile(file);
+            // Search with debounce
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(applyFilters, 300);
+            });
             
-            successCount++;
+            // Refresh
+            refreshBtn.addEventListener('click', fetchFiles);
             
-          } catch (err) {
-            failCount++;
-            console.error(`Upload error for ${file.name}:`, err);
-            showToast(`${file.name}: ${err.message}`, 'error');
-          }
-          
-          // Update progress
-          const progress = ((i + 1) / total) * 100;
-          progressFill.style.width = progress + '%';
-          progressPercent.textContent = Math.round(progress) + '%';
-          progressDetail.textContent = `${i + 1} / ${total} files processed`;
-        }
-        
-        // Complete
-        progressLabel.textContent = 'Upload complete!';
-        progressFill.style.width = '100%';
-        progressPercent.textContent = '100%';
-        progressDetail.textContent = `${successCount} successful, ${failCount} failed`;
-        
-        if (successCount > 0) {
-          showToast(`${successCount} file(s) uploaded successfully!`, 'success');
-        }
-        
-        // Hide progress after delay
-        setTimeout(() => {
-          progressCard.classList.remove('active');
-          progressFill.style.width = '0%';
-        }, 2500);
-        
-        // Refresh file list
-        await fetchFiles();
-      }
-      
-      function handleFiles(files) {
-        if (!files || files.length === 0) return;
-        processUploadQueue(files);
-      }
-      
-      // ==================== RENDERING ====================
-      function sortFiles(files) {
-        const sorted = [...files];
-        
-        switch(sortOrder) {
-          case 'newest':
-            return sorted.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-          case 'oldest':
-            return sorted.sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
-          case 'name':
-            return sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-          default:
-            return sorted;
-        }
-      }
-      
-      function applySortAndRender() {
-        const searchTerm = (searchInput.value || '').trim().toLowerCase();
-        let filtered = allFiles;
-        
-        if (searchTerm) {
-          filtered = allFiles.filter(file => 
-            (file.name || '').toLowerCase().includes(searchTerm)
-          );
-        }
-        
-        const sortedFiles = sortFiles(filtered);
-        renderFeed(sortedFiles);
-      }
-      
-      function renderFeed(files) {
-        if (!files || files.length === 0) {
-          fileFeed.innerHTML = `
-            <div class="empty-feed">
-              <i class="bx bx-folder-open"></i>
-              <h3>No files yet</h3>
-              <p>Drop files above to get started</p>
-            </div>
-          `;
-          return;
-        }
-        
-        fileFeed.innerHTML = files.map((file, index) => {
-          const fileName = file.name || 'unknown';
-          const size = file.metadata?.size || 0;
-          const created = file.created_at 
-            ? new Date(file.created_at).toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              })
-            : 'Unknown date';
-          const category = getFileCategory(fileName);
-          const icon = getFileIcon(fileName);
-          const safeName = escapeHtml(fileName);
-          
-          return `
-            <div class="file-post" style="animation-delay: ${Math.min(index * 0.03, 0.5)}s" data-filename="${safeName}">
-              <div class="post-header">
-                <div class="post-avatar ${category}">
-                  <i class="${icon}"></i>
-                </div>
-                <div class="post-info">
-                  <div class="post-title" title="${safeName}">${safeName}</div>
-                  <div class="post-meta">
-                    <span>${formatSize(size)}</span>
-                    <span>·</span>
-                    <span>${created}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="post-actions-bar">
-                <button class="post-action" onclick="window.VaultDrop.copyUrl('${safeName}')" title="Copy link">
-                  <i class="bx bx-link"></i> <span>Copy</span>
-                </button>
-                <button class="post-action" onclick="window.VaultDrop.download('${safeName}')" title="Download">
-                  <i class="bx bx-download"></i> <span>Download</span>
-                </button>
-                <button class="post-action danger" onclick="window.VaultDrop.deleteFile('${safeName}')" title="Delete">
-                  <i class="bx bx-trash"></i> <span>Delete</span>
-                </button>
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-      
-      // ==================== EVENT LISTENERS ====================
-      // Drag and Drop
-      function handleDragEvents() {
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-          dropZone.addEventListener(eventName, (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          });
-        });
-        
-        dropZone.addEventListener('dragenter', () => dropZone.classList.add('drag-active'));
-        dropZone.addEventListener('dragover', () => dropZone.classList.add('drag-active'));
-        dropZone.addEventListener('dragleave', (e) => {
-          if (!dropZone.contains(e.relatedTarget)) {
-            dropZone.classList.remove('drag-active');
-          }
-        });
-        dropZone.addEventListener('drop', (e) => {
-          dropZone.classList.remove('drag-active');
-          const files = e.dataTransfer?.files;
-          if (files && files.length > 0) {
-            handleFiles(files);
-          }
-        });
-      }
-      
-      // Click triggers
-      dropZone.addEventListener('click', (e) => {
-        if (e.target === progressCard || progressCard.contains(e.target)) return;
-        if (e.target.closest('button')) return;
-        fileInput.click();
-      });
-      
-      browseBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        fileInput.click();
-      });
-      
-      fileInput.addEventListener('change', (e) => {
-        if (fileInput.files && fileInput.files.length > 0) {
-          handleFiles(fileInput.files);
-          fileInput.value = '';
-        }
-      });
-      
-      // Search
-      searchInput.addEventListener('input', () => {
-        applySortAndRender();
-      });
-      
-      // Sort toggle
-      sortBtn.addEventListener('click', () => {
-        const orders = ['newest', 'oldest', 'name'];
-        const currentIndex = orders.indexOf(sortOrder);
-        sortOrder = orders[(currentIndex + 1) % orders.length];
-        sortBtn.title = `Sort: ${sortOrder}`;
-        applySortAndRender();
-      });
-      
-      // Refresh
-      refreshBtn.addEventListener('click', fetchFiles);
-      
-      // ==================== GLOBAL API ====================
-      window.VaultDrop = {
-        copyUrl: copyFileUrl,
-        download: downloadFile,
-        deleteFile: deleteFile,
-        refresh: fetchFiles,
-      };
-      
-      // ==================== KEYBOARD SHORTCUTS ====================
-      document.addEventListener('keydown', (e) => {
-        // Ctrl+K or Cmd+K to focus search
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-          e.preventDefault();
-          searchInput.focus();
-        }
-        // Ctrl+R or Cmd+R to refresh (prevent default browser refresh)
-        if ((e.ctrlKey || e.metaKey) && e.key === 'r' && document.activeElement === document.body) {
-          e.preventDefault();
-          fetchFiles();
-        }
-      });
-      
-      // ==================== INITIALIZE ====================
-      handleDragEvents();
-      fetchFiles();
-      
-      // Handle global errors gracefully (the redirectionChain error is from a browser extension, not our code)
-      window.addEventListener('error', (e) => {
-        if (e.message && e.message.includes('Cannot redefine property')) {
-          // This is from browser extensions, suppress it
-          e.preventDefault();
-          return false;
-        }
-      });
-      
-      // Catch unhandled promise rejections from extensions
-      window.addEventListener('unhandledrejection', (e) => {
-        if (e.reason?.message?.includes('Cannot redefine property')) {
-          e.preventDefault();
-          return false;
-        }
-      });
-      
-    })();
-  </script>
+            // Theme toggle
+            document.getElementById('themeToggle').addEventListener('click', () => {
+                const current = document.body.classList.contains('theme-dark') ? 'dark' : 'light';
+                setTheme(current === 'dark' ? 'light' : 'dark');
+            });
+            
+            // Table header sorting
+            document.querySelector('.file-table thead').addEventListener('click', (e) => {
+                const th = e.target.closest('th[data-sort]');
+                if (!th) return;
+                
+                const sortField = th.dataset.sort;
+                if (tableSort.field === sortField) {
+                    tableSort.direction = tableSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    tableSort.field = sortField;
+                    tableSort.direction = 'asc';
+                }
+                applyFilters();
+            });
+            
+            // Subject modal
+            subjectModalClose.addEventListener('click', closeSubjectModal);
+            subjectModal.addEventListener('click', (e) => {
+                if (e.target === subjectModal) closeSubjectModal();
+            });
+            confirmSubjectBtn.addEventListener('click', confirmSubject);
+            modalSubjectInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') confirmSubject();
+            });
+            
+            // ==================== GLOBAL API ====================
+            window.VaultDrop = {
+                copyUrl: copyFileUrl,
+                download: downloadFile,
+                deleteFile: deleteFile,
+                openPreview: openFilePreview,
+                refresh: fetchFiles,
+            };
+            
+            // ==================== KEYBOARD SHORTCUTS ====================
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    searchInput.focus();
+                    searchInput.select();
+                }
+                if ((e.ctrlKey || e.metaKey) && e.key === '1') { e.preventDefault(); switchView('feed'); }
+                if ((e.ctrlKey || e.metaKey) && e.key === '2') { e.preventDefault(); switchView('grid'); }
+                if ((e.ctrlKey || e.metaKey) && e.key === '3') { e.preventDefault(); switchView('table'); }
+            });
+            
+            // ==================== ERROR HANDLING ====================
+            window.addEventListener('error', (e) => {
+                if (e.message?.includes('Cannot redefine property')) { e.preventDefault(); return false; }
+            });
+            window.addEventListener('unhandledrejection', (e) => {
+                if (e.reason?.message?.includes('Cannot redefine property')) { e.preventDefault(); return false; }
+            });
+            
+            // ==================== INITIALIZE ====================
+            const savedTheme = localStorage.getItem('vaultdrop-theme') || 'light';
+            setTheme(savedTheme);
+            fetchFiles();
+            setInterval(fetchFiles, 30000);
+            
+        })();
+    </script>
 </body>
 </html>

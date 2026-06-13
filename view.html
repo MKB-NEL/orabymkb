@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>VaultDrop · Preview</title>
-    <meta name="theme-color" content="#6c47ff">
+    <meta name="theme-color" content="#0d0d0d">
     
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -19,6 +19,7 @@
         :root {
             --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
             --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -26,84 +27,168 @@
         html, body {
             width: 100%; height: 100%; overflow: hidden;
             font-family: var(--font-family);
-            background: #1a1a1a;
-            color: #fff;
+            background: #0d0d0d;
+            color: #e0e0e0;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         /* Full-page preview area */
         .preview-fullscreen {
             width: 100%; height: 100vh;
             display: flex; align-items: center; justify-content: center;
-            background: #1a1a1a;
+            background: #0d0d0d;
+            position: relative;
         }
 
-        .preview-fullscreen iframe,
-        .preview-fullscreen img,
-        .preview-fullscreen video,
-        .preview-fullscreen .text-content {
-            width: 100%; height: 100%;
-            border: none; object-fit: contain;
+        .preview-fullscreen iframe {
+            width: 100%; height: 100%; border: none;
+        }
+
+        .preview-fullscreen img {
+            max-width: 100%; max-height: 100vh;
+            object-fit: contain; cursor: zoom-in;
+            transition: transform var(--transition-smooth);
+            user-select: none; -webkit-user-select: none;
+        }
+        .preview-fullscreen img.zoomed {
+            cursor: zoom-out; transform: scale(2);
+            position: relative; z-index: 10;
+        }
+
+        .preview-fullscreen video {
+            max-width: 100%; max-height: 100vh;
+            object-fit: contain; outline: none;
         }
 
         .preview-fullscreen .text-content {
-            padding: 2rem; overflow-y: auto;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.875rem; line-height: 1.6;
-            white-space: pre-wrap; color: #e0e0e0;
-            text-align: left;
+            width: 100%; height: 100%; padding: 2rem;
+            overflow-y: auto; font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+            font-size: 0.875rem; line-height: 1.7;
+            white-space: pre-wrap; color: #d4d4d4;
+            text-align: left; background: #0d0d0d;
         }
+        .text-content.json-pretty { color: #d4d4d4; }
+        .text-content.markdown-body { font-family: var(--font-family); white-space: normal; line-height: 1.8; }
+        .text-content.markdown-body h1, .text-content.markdown-body h2, .text-content.markdown-body h3 { color: #fff; margin: 1rem 0 0.5rem; }
+        .text-content.markdown-body h1 { font-size: 1.5rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
+        .text-content.markdown-body h2 { font-size: 1.25rem; }
+        .text-content.markdown-body h3 { font-size: 1.1rem; }
+        .text-content.markdown-body code { background: #1e1e1e; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
+        .text-content.markdown-body pre { background: #1e1e1e; padding: 1rem; border-radius: 8px; overflow-x: auto; margin: 0.75rem 0; }
+        .text-content.markdown-body pre code { background: none; padding: 0; }
+        .text-content.markdown-body blockquote { border-left: 3px solid #6c47ff; padding-left: 1rem; color: #aaa; margin: 0.75rem 0; }
+        .text-content.markdown-body ul, .text-content.markdown-body ol { padding-left: 1.5rem; }
+        .text-content.markdown-body a { color: #8b6cff; text-decoration: underline; }
+        .text-content.markdown-body table { border-collapse: collapse; width: 100%; margin: 0.75rem 0; }
+        .text-content.markdown-body th, .text-content.markdown-body td { border: 1px solid #333; padding: 8px 12px; text-align: left; }
+        .text-content.markdown-body th { background: #1e1e1e; }
 
         .csv-table-wrap {
-            width: 100%; height: 100%; overflow: auto;
-            padding: 1rem;
+            width: 100%; height: 100%; overflow: auto; padding: 1rem;
         }
         .csv-table {
             width: 100%; border-collapse: collapse;
-            font-size: 0.8125rem; color: #e0e0e0;
+            font-size: 0.8125rem; color: #d4d4d4;
         }
+        .csv-table thead { position: sticky; top: 0; z-index: 2; }
         .csv-table th {
-            background: #333; padding: 10px 14px;
-            text-align: left; font-weight: 600;
-            position: sticky; top: 0; z-index: 1;
-            border-bottom: 2px solid #555;
+            background: #1a1a1a; padding: 10px 14px;
+            text-align: left; font-weight: 600; font-size: 0.7rem;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            border-bottom: 2px solid #444; color: #aaa;
+            cursor: pointer; user-select: none; transition: background var(--transition-fast);
         }
+        .csv-table th:hover { background: #252525; color: #fff; }
+        .csv-table th .sort-arrow { margin-left: 4px; font-size: 0.6rem; opacity: 0.4; }
+        .csv-table th.sorted .sort-arrow { opacity: 1; color: #6c47ff; }
         .csv-table td {
-            padding: 8px 14px; border-bottom: 1px solid #333;
+            padding: 8px 14px; border-bottom: 1px solid #1a1a1a;
+            max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
-        .csv-table tr:hover td { background: #2a2a2a; }
+        .csv-table tr:hover td { background: #1a1a1a; }
+        .csv-table tr:nth-child(even) td { background: #111; }
+        .csv-table tr:nth-child(even):hover td { background: #1a1a1a; }
+        .csv-search {
+            position: sticky; top: 0; z-index: 3; padding: 8px 14px;
+            background: #0d0d0d; border-bottom: 1px solid #222;
+            display: flex; gap: 8px; align-items: center;
+        }
+        .csv-search input {
+            flex: 1; padding: 6px 12px; border: 1px solid #333;
+            border-radius: 6px; background: #1a1a1a; color: #e0e0e0;
+            font-size: 0.75rem; font-family: var(--font-family); outline: none;
+        }
+        .csv-search input:focus { border-color: #6c47ff; }
+        .csv-search .csv-count { font-size: 0.7rem; color: #888; white-space: nowrap; }
 
         .audio-wrap {
             display: flex; align-items: center; justify-content: center;
             width: 100%; height: 100%;
         }
-        .audio-wrap audio { width: 80%; max-width: 500px; }
+        .audio-wrap audio {
+            width: 80%; max-width: 500px;
+            border-radius: 12px; outline: none;
+        }
 
-        /* Corner info box */
-        .corner-info {
-            position: fixed; bottom: 16px; left: 16px;
-            background: rgba(30, 30, 30, 0.92);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 12px; padding: 12px 16px;
-            display: flex; align-items: center; gap: 12px;
-            z-index: 100; max-width: calc(100vw - 32px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+        .unsupported-wrap {
+            text-align: center; padding: 2rem; color: #888;
+        }
+        .unsupported-wrap i { font-size: 64px; display: block; margin-bottom: 16px; opacity: 0.5; }
+        .unsupported-wrap h3 { font-size: 1rem; margin-bottom: 8px; color: #ccc; }
+        .unsupported-wrap p { font-size: 0.8rem; }
+
+        /* Image controls */
+        .image-controls {
+            position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 6px; z-index: 50; opacity: 0;
+            transition: opacity var(--transition-fast);
+            background: rgba(20, 20, 20, 0.9); padding: 6px;
+            border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .preview-fullscreen:hover .image-controls,
+        .image-controls.visible { opacity: 1; }
+        .img-ctrl-btn {
+            width: 34px; height: 34px; border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05); color: #ccc;
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: center; font-size: 16px;
             transition: all var(--transition-fast);
+        }
+        .img-ctrl-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+        /* Corner info box - TOP LEFT */
+        .corner-info {
+            position: fixed; top: 16px; left: 16px;
+            background: rgba(20, 20, 20, 0.94);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px; padding: 10px 14px;
+            display: flex; align-items: center; gap: 10px;
+            z-index: 100; max-width: calc(100vw - 32px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            transition: all var(--transition-fast);
+            animation: slideInDown 0.4s ease;
+        }
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .corner-icon {
-            width: 40px; height: 40px; border-radius: 10px;
+            width: 38px; height: 38px; border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 22px; flex-shrink: 0;
+            font-size: 20px; flex-shrink: 0;
         }
         .corner-icon.pdf { background: #fce4ec; color: #c62828; }
         .corner-icon.word { background: #e3f2fd; color: #1565c0; }
         .corner-icon.excel { background: #e8f5e9; color: #2e7d32; }
         .corner-icon.ppt { background: #fff3e0; color: #e65100; }
         .corner-icon.txt, .corner-icon.csv, .corner-icon.md, .corner-icon.rtf,
-        .corner-icon.json, .corner-icon.xml, .corner-icon.log { background: #f5f5f5; color: #424242; }
+        .corner-icon.json, .corner-icon.xml, .corner-icon.log,
+        .corner-icon.yml, .corner-icon.yaml, .corner-icon.ini { background: #f5f5f5; color: #424242; }
         .corner-icon.image { background: #e8eaf6; color: #283593; }
         .corner-icon.video { background: #fce4ec; color: #880e4f; }
         .corner-icon.audio { background: #e8f5e9; color: #1b5e20; }
@@ -113,101 +198,126 @@
         .corner-name {
             font-size: 0.8rem; font-weight: 600; color: #fff;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            max-width: 200px; margin-bottom: 2px;
+            max-width: 180px; margin-bottom: 2px; line-height: 1.2;
         }
         .corner-meta {
-            font-size: 0.65rem; color: #aaa; display: flex;
+            font-size: 0.65rem; color: #999; display: flex;
             align-items: center; gap: 6px;
         }
         .corner-subject {
             display: inline-block; padding: 1px 8px; border-radius: 10px;
-            font-size: 0.6rem; font-weight: 600; background: rgba(108, 71, 255, 0.25);
-            color: #b4a5ff; margin-top: 3px; max-width: 180px;
+            font-size: 0.6rem; font-weight: 600; background: rgba(108, 71, 255, 0.2);
+            color: #b4a5ff; margin-top: 3px; max-width: 160px;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
-        .corner-actions {
-            display: flex; gap: 6px; flex-shrink: 0;
-        }
+        .corner-actions { display: flex; gap: 6px; flex-shrink: 0; }
         .corner-btn {
             width: 32px; height: 32px; border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.06);
-            color: #ccc; cursor: pointer; display: flex;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.04);
+            color: #bbb; cursor: pointer; display: flex;
             align-items: center; justify-content: center;
-            font-size: 16px; transition: all var(--transition-fast);
+            font-size: 15px; transition: all var(--transition-fast);
+            position: relative;
         }
         .corner-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: #fff; border-color: rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff; border-color: rgba(255, 255, 255, 0.3);
         }
+        .corner-btn:active { transform: scale(0.93); }
         .corner-btn.primary {
             background: #6c47ff; border-color: #6c47ff; color: #fff;
         }
-        .corner-btn.primary:hover { background: #7b5ce8; }
-
-        .corner-close {
-            position: absolute; top: -8px; right: -8px;
-            width: 22px; height: 22px; border-radius: 50%;
-            background: #444; border: none; color: #ccc;
-            cursor: pointer; display: flex; align-items: center;
-            justify-content: center; font-size: 14px;
-            opacity: 0; transition: all var(--transition-fast);
+        .corner-btn.primary:hover { background: #7b5ce8; border-color: #7b5ce8; }
+        .corner-btn .tooltip {
+            position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%);
+            font-size: 0.6rem; background: #333; color: #fff; padding: 3px 8px;
+            border-radius: 4px; white-space: nowrap; opacity: 0; pointer-events: none;
+            transition: opacity var(--transition-fast);
         }
-        .corner-info:hover .corner-close { opacity: 1; }
-        .corner-close:hover { background: #e53935; color: #fff; }
+        .corner-btn:hover .tooltip { opacity: 1; }
 
-        .corner-info.minimized .corner-details,
-        .corner-info.minimized .corner-actions { display: none; }
-        .corner-info.minimized { padding: 8px; border-radius: 50%; cursor: pointer; }
-        .corner-info.minimized .corner-close { opacity: 1; top: -4px; right: -4px; }
+        .corner-dismiss {
+            position: absolute; top: -6px; right: -6px;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: #3a3a3a; border: none; color: #999;
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: center; font-size: 12px;
+            opacity: 0; transition: all var(--transition-fast);
+            line-height: 1;
+        }
+        .corner-info:hover .corner-dismiss { opacity: 1; }
+        .corner-dismiss:hover { background: #e53935; color: #fff; }
 
         /* Toast */
         .toast-container {
-            position: fixed; bottom: 90px; left: 16px;
+            position: fixed; top: 80px; left: 16px;
             z-index: 200; display: flex; flex-direction: column; gap: 6px;
-            max-width: 320px;
+            max-width: 300px; pointer-events: none;
         }
         .toast {
             padding: 10px 14px; border-radius: 8px; font-size: 0.75rem;
             font-weight: 500; animation: toastIn 0.3s ease;
-            background: #333; color: #fff; border: 1px solid #555;
+            background: #1a1a1a; color: #e0e0e0; border: 1px solid #333;
+            pointer-events: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
-        .toast.success { background: #0d3b1e; border-color: #22c55e; color: #86efac; }
-        .toast.error { background: #3b0d0d; border-color: #ef4444; color: #fca5a5; }
+        .toast.success { background: #0a2a10; border-color: #22c55e; color: #86efac; }
+        .toast.error { background: #2a0a0a; border-color: #ef4444; color: #fca5a5; }
 
         @keyframes toastIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
         }
+
+        /* Loading */
+        .loading-indicator {
+            text-align: center; color: #666;
+        }
+        .loading-spinner {
+            width: 36px; height: 36px; border: 3px solid #2a2a2a;
+            border-top-color: #6c47ff; border-radius: 50%;
+            animation: spin 0.7s linear infinite; margin: 0 auto 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* Responsive */
         @media (max-width: 600px) {
             .corner-info {
-                bottom: 10px; left: 8px; right: 8px;
-                padding: 10px 12px; gap: 8px;
-                border-radius: 10px;
+                top: 8px; left: 8px; right: 8px;
+                padding: 8px 10px; gap: 8px; border-radius: 12px;
             }
-            .corner-icon { width: 32px; height: 32px; font-size: 18px; border-radius: 8px; }
-            .corner-name { font-size: 0.72rem; max-width: 120px; }
-            .corner-meta { font-size: 0.6rem; }
-            .corner-btn { width: 28px; height: 28px; font-size: 14px; border-radius: 6px; }
+            .corner-icon { width: 30px; height: 30px; font-size: 16px; border-radius: 8px; }
+            .corner-name { font-size: 0.7rem; max-width: 100px; }
+            .corner-meta { font-size: 0.58rem; }
+            .corner-btn { width: 28px; height: 28px; font-size: 13px; border-radius: 6px; }
             .corner-actions { gap: 4px; }
+            .corner-btn .tooltip { display: none; }
+            .text-content { padding: 1rem; font-size: 0.75rem; }
+            .image-controls { bottom: 8px; }
         }
     </style>
 </head>
 <body>
     <!-- Full-screen preview -->
     <div class="preview-fullscreen" id="previewArea">
-        <div style="text-align:center;color:#888;">
-            <div style="width:32px;height:32px;border:3px solid #444;border-top-color:#6c47ff;border-radius:50%;animation:spin 0.6s linear infinite;margin:0 auto 12px;"></div>
-            Loading preview...
+        <div class="loading-indicator">
+            <div class="loading-spinner"></div>
+            <span>Loading preview...</span>
         </div>
     </div>
 
-    <!-- Corner info box -->
+    <!-- Image controls (hidden by default) -->
+    <div class="image-controls" id="imageControls" style="display:none;">
+        <button class="img-ctrl-btn" id="btnZoomIn" title="Zoom in"><i class="bx bx-zoom-in"></i></button>
+        <button class="img-ctrl-btn" id="btnZoomOut" title="Zoom out"><i class="bx bx-zoom-out"></i></button>
+        <button class="img-ctrl-btn" id="btnRotate" title="Rotate"><i class="bx bx-rotate-right"></i></button>
+        <button class="img-ctrl-btn" id="btnResetImg" title="Reset"><i class="bx bx-refresh"></i></button>
+    </div>
+
+    <!-- Corner info box - TOP LEFT -->
     <div class="corner-info" id="cornerInfo" style="display:none;">
-        <button class="corner-close" id="cornerClose" title="Close panel">×</button>
+        <button class="corner-dismiss" id="cornerDismiss" title="Close">×</button>
         <div class="corner-icon" id="cornerIcon"><i class="bx bx-file"></i></div>
         <div class="corner-details">
             <div class="corner-name" id="cornerName">file.txt</div>
@@ -219,9 +329,18 @@
             <div class="corner-subject" id="cornerSubject" style="display:none;"></div>
         </div>
         <div class="corner-actions">
-            <button class="corner-btn primary" id="btnDownload" title="Download"><i class="bx bx-download"></i></button>
-            <button class="corner-btn" id="btnOpenRaw" title="Open Raw"><i class="bx bx-open-in-new"></i></button>
-            <button class="corner-btn" id="btnCopy" title="Copy Link"><i class="bx bx-link"></i></button>
+            <button class="corner-btn primary" id="btnDownload" title="Download">
+                <i class="bx bx-download"></i>
+                <span class="tooltip">Download</span>
+            </button>
+            <button class="corner-btn" id="btnOpenRaw" title="Open Raw">
+                <i class="bx bx-open-in-new"></i>
+                <span class="tooltip">Open Raw</span>
+            </button>
+            <button class="corner-btn" id="btnCopy" title="Copy Link">
+                <i class="bx bx-link"></i>
+                <span class="tooltip">Copy Link</span>
+            </button>
         </div>
     </div>
 
@@ -230,6 +349,38 @@
 
     <script>
         (function() {
+            // ==================== SUPPRESS EXTENSION ERRORS ====================
+            // Catch and suppress the "Cannot redefine property: location" error from browser extensions
+            const originalDefineProperty = Object.defineProperty;
+            Object.defineProperty = function(obj, prop, descriptor) {
+                try {
+                    return originalDefineProperty.call(Object, obj, prop, descriptor);
+                } catch (e) {
+                    if (e instanceof TypeError && e.message.includes('Cannot redefine property')) {
+                        // Silently ignore extension interference
+                        return obj;
+                    }
+                    throw e;
+                }
+            };
+
+            // Also catch unhandled errors
+            window.addEventListener('error', function(e) {
+                if (e.message && e.message.includes('Cannot redefine property')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            });
+
+            window.addEventListener('unhandledrejection', function(e) {
+                if (e.reason && e.reason.message && e.reason.message.includes('Cannot redefine property')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            });
+
             // ==================== CONFIGURATION ====================
             const SUPABASE_URL = "https://kdrgdnrwibuqpvikjapx.supabase.co";
             const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkcmdkbnJ3aWJ1cXB2aWtqYXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNjE4ODMsImV4cCI6MjA5NjkzNzg4M30.9wEbcIDziq9xDWZQ_BF0X-p25g4SQkuCCQV-5fhDnbY";
@@ -247,9 +398,10 @@
             const fileUrl = urlParams.get('url') || '';
             const fileSubject = urlParams.get('subject') || '';
             
-            // ==================== HELPERS ====================
-            function $(id) { return document.getElementById(id); }
+            // ==================== DOM HELPERS ====================
+            const $ = (id) => document.getElementById(id);
             
+            // ==================== UTILITY FUNCTIONS ====================
             function formatSize(bytes) {
                 if (!bytes || bytes === 0) return '0 B';
                 const k = 1024, sizes = ['B', 'KB', 'MB', 'GB'];
@@ -262,7 +414,7 @@
             function getCategory(fn) {
                 const ext = getExt(fn);
                 const docs = ['pdf','doc','docx','xls','xlsx','ppt','pptx','txt','csv','md','rtf','odt','ods','odp','json','xml','yml','yaml','log','ini','cfg','conf'];
-                const images = ['jpg','jpeg','png','gif','svg','webp','bmp','ico','heic','heif','tiff'];
+                const images = ['jpg','jpeg','png','gif','svg','webp','bmp','ico','heic','heif','tiff','raw'];
                 const videos = ['mp4','avi','mov','wmv','flv','mkv','webm','m4v','3gp'];
                 const audios = ['mp3','wav','ogg','aac','flac','m4a'];
                 if (docs.includes(ext)) return ext;
@@ -280,6 +432,7 @@
                     'ppt':'bx bxs-slideshow','pptx':'bx bxs-slideshow',
                     'txt':'bx bx-text','csv':'bx bx-spreadsheet','md':'bx bx-text',
                     'rtf':'bx bx-text','json':'bx bx-code','xml':'bx bx-code',
+                    'yml':'bx bx-code','yaml':'bx bx-code',
                     'image':'bx bx-image-alt','video':'bx bx-video','audio':'bx bx-music'
                 };
                 return map[c] || 'bx bx-file-blank';
@@ -288,14 +441,22 @@
             function typeLabel(fn) {
                 const ext = getExt(fn);
                 const labels = {
-                    'pdf':'PDF','doc':'Word','docx':'Word','xls':'Excel','xlsx':'Excel',
-                    'ppt':'PowerPoint','pptx':'PowerPoint','txt':'Text','csv':'CSV',
-                    'md':'Markdown','rtf':'Rich Text','json':'JSON','xml':'XML',
-                    'jpg':'JPEG','jpeg':'JPEG','png':'PNG','gif':'GIF','svg':'SVG',
-                    'webp':'WebP','mp4':'MP4','mkv':'MKV','webm':'WebM',
-                    'mp3':'MP3','wav':'WAV','ogg':'OGG','zip':'ZIP','rar':'RAR'
+                    'pdf':'PDF Document','doc':'Word Document','docx':'Word Document',
+                    'xls':'Excel Spreadsheet','xlsx':'Excel Spreadsheet',
+                    'ppt':'PowerPoint','pptx':'PowerPoint',
+                    'txt':'Plain Text','csv':'CSV Spreadsheet','md':'Markdown',
+                    'rtf':'Rich Text','json':'JSON','xml':'XML','yml':'YAML','yaml':'YAML',
+                    'log':'Log File','ini':'Config File','cfg':'Config File','conf':'Config File',
+                    'odt':'OpenDocument Text','ods':'OpenDocument Spreadsheet','odp':'OpenDocument Presentation',
+                    'jpg':'JPEG Image','jpeg':'JPEG Image','png':'PNG Image',
+                    'gif':'GIF Image','svg':'SVG Image','webp':'WebP Image','bmp':'Bitmap',
+                    'ico':'Icon','heic':'HEIC Image','tiff':'TIFF Image',
+                    'mp4':'MP4 Video','mkv':'MKV Video','webm':'WebM Video',
+                    'mov':'MOV Video','avi':'AVI Video','mp3':'MP3 Audio',
+                    'wav':'WAV Audio','ogg':'OGG Audio','flac':'FLAC Audio',
+                    'zip':'ZIP Archive','rar':'RAR Archive','7z':'7Z Archive'
                 };
-                return labels[ext] || ext.toUpperCase();
+                return labels[ext] || ext.toUpperCase() + ' File';
             }
             
             function esc(s) {
@@ -309,7 +470,11 @@
                 t.className = 'toast ' + (type || 'success');
                 t.textContent = msg;
                 $('toastContainer').appendChild(t);
-                setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(() => t.remove(), 300); }, 2500);
+                setTimeout(() => { 
+                    t.style.opacity = '0'; 
+                    t.style.transition = 'opacity 0.3s'; 
+                    setTimeout(() => t.remove(), 300); 
+                }, 2500);
             }
             
             function getPublicUrl(fn) {
@@ -325,7 +490,10 @@
                 const size = metadata?.metadata?.size || 0;
                 const type = typeLabel(fileName);
                 
-                $('cornerIcon').className = 'corner-icon ' + (['pdf','doc','docx','xls','xlsx','ppt','pptx','txt','csv','md','rtf','json','xml'].includes(cat) ? cat : cat);
+                // Determine CSS class for icon
+                const iconClass = ['pdf','doc','docx','xls','xlsx','ppt','pptx','txt','csv','md','rtf','json','xml','yml','yaml','log','ini'].includes(cat) ? cat : cat;
+                
+                $('cornerIcon').className = 'corner-icon ' + iconClass;
                 $('cornerIcon').innerHTML = '<i class="' + icon + '"></i>';
                 $('cornerName').textContent = fileName;
                 $('cornerName').title = fileName;
@@ -340,49 +508,133 @@
                 $('cornerInfo').style.display = 'flex';
             }
             
-            // ==================== PREVIEW ====================
+            // ==================== ENHANCED PREVIEWS ====================
             function renderPreview(metadata) {
                 const ext = getExt(fileName);
                 const cat = getCategory(fileName);
                 const url = getPublicUrl(fileName);
                 const area = $('previewArea');
                 
-                const textTypes = ['txt','md','rtf','log','json','xml','yml','yaml','ini','cfg','conf'];
+                const textTypes = ['txt','log','ini','cfg','conf'];
+                const codeTypes = ['json','xml','yml','yaml'];
+                const csvTypes = ['csv'];
+                const mdTypes = ['md','rtf'];
                 const googleTypes = ['pdf','doc','docx','xls','xlsx','ppt','pptx','odt','ods','odp'];
-                const imageTypes = ['jpg','jpeg','png','gif','svg','webp','bmp','ico'];
-                const videoTypes = ['mp4','webm','ogg','mov'];
-                const audioTypes = ['mp3','wav','ogg','aac','flac'];
+                const imageTypes = ['jpg','jpeg','png','gif','svg','webp','bmp','ico','heic','heif','tiff','raw'];
+                const videoTypes = ['mp4','webm','ogg','mov','mkv','avi'];
+                const audioTypes = ['mp3','wav','ogg','aac','flac','m4a'];
+                
+                // Hide image controls by default
+                $('imageControls').style.display = 'none';
                 
                 if (textTypes.includes(ext)) {
-                    renderTextPreview(area, url, ext);
-                } else if (ext === 'csv') {
+                    renderTextPreview(area, url, 'text');
+                } else if (codeTypes.includes(ext)) {
+                    renderCodePreview(area, url, ext);
+                } else if (csvTypes.includes(ext)) {
                     renderCsvPreview(area, url);
+                } else if (mdTypes.includes(ext)) {
+                    renderMarkdownPreview(area, url);
                 } else if (googleTypes.includes(ext)) {
                     renderGooglePreview(area, url, ext);
                 } else if (imageTypes.includes(ext)) {
-                    area.innerHTML = '<img src="' + url + '" alt="' + esc(fileName) + '" style="width:100%;height:100%;object-fit:contain;" onerror="this.parentElement.innerHTML=\'<div style=text-align:center;color:#888;padding:2rem;><i class=bx bx-error-circle style=font-size:48px;display:block;margin-bottom:12px;></i><p>Image could not be loaded</p></div>\'">';
+                    renderImagePreview(area, url);
                 } else if (videoTypes.includes(ext)) {
-                    area.innerHTML = '<video controls style="width:100%;height:100%;object-fit:contain;"><source src="' + url + '" type="video/' + ext + '"></video>';
+                    renderVideoPreview(area, url, ext);
                 } else if (audioTypes.includes(ext)) {
-                    area.innerHTML = '<div class="audio-wrap"><audio controls><source src="' + url + '" type="audio/' + ext + '"></audio></div>';
+                    renderAudioPreview(area, url, ext);
                 } else {
-                    area.innerHTML = '<div style="text-align:center;color:#888;padding:2rem;"><i class="bx bx-file-blank" style="font-size:64px;display:block;margin-bottom:16px;"></i><p style="font-size:1rem;margin-bottom:8px;">Preview not available</p><p style="font-size:0.8rem;">Use the buttons below to download or open this file.</p></div>';
+                    renderUnsupported(area, ext);
                 }
             }
             
-            async function renderTextPreview(area, url, ext) {
+            async function renderTextPreview(area, url, mode) {
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error('Failed to load');
+                    const text = await res.text();
+                    area.innerHTML = '<div class="text-content">' + esc(text) + '</div>';
+                } catch(e) {
+                    area.innerHTML = '<div class="unsupported-wrap"><i class="bx bx-error-circle"></i><h3>Load Error</h3><p>' + esc(e.message) + '</p></div>';
+                }
+            }
+            
+            async function renderCodePreview(area, url, ext) {
                 try {
                     const res = await fetch(url);
                     if (!res.ok) throw new Error('Failed to load');
                     let text = await res.text();
                     
+                    // Pretty print JSON
                     if (ext === 'json') {
-                        try { text = JSON.stringify(JSON.parse(text), null, 2); } catch(e) {}
+                        try {
+                            text = JSON.stringify(JSON.parse(text), null, 2);
+                        } catch(e) {}
                     }
                     
-                    area.innerHTML = '<div class="text-content">' + esc(text) + '</div>';
+                    // Basic syntax highlighting
+                    let highlighted = esc(text);
+                    if (ext === 'json') {
+                        highlighted = highlighted
+                            .replace(/"([^"]+)":/g, '<span style="color:#9cdcfe;">"$1"</span>:')
+                            .replace(/: "([^"]+)"/g, ': <span style="color:#ce9178;">"$1"</span>')
+                            .replace(/: (\d+\.?\d*)/g, ': <span style="color:#b5cea8;">$1</span>')
+                            .replace(/: (true|false|null)/g, ': <span style="color:#569cd6;">$1</span>');
+                    }
+                    if (ext === 'xml') {
+                        highlighted = highlighted
+                            .replace(/(&lt;\/?)([\w-]+)/g, '$1<span style="color:#569cd6;">$2</span>')
+                            .replace(/([\w-]+)=(&quot;.*?&quot;)/g, '<span style="color:#9cdcfe;">$1</span>=$2');
+                    }
+                    
+                    area.innerHTML = '<div class="text-content json-pretty">' + highlighted + '</div>';
                 } catch(e) {
-                    area.innerHTML = '<div style="text-align:center;color:#888;padding:2rem;"><i class="bx bx-error-circle" style="font-size:48px;display:block;margin-bottom:12px;"></i><p>Could not load file</p></div>';
+                    area.innerHTML = '<div class="unsupported-wrap"><i class="bx bx-error-circle"></i><h3>Load Error</h3><p>' + esc(e.message) + '</p></div>';
+                }
+            }
+            
+            async function renderMarkdownPreview(area, url) {
+                try {
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error('Failed to load');
+                    const text = await res.text();
+                    
+                    // Simple markdown to HTML conversion
+                    let html = text
+                        // Headers
+                        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+                        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+                        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+                        // Bold/Italic
+                        .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+                        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                        // Inline code
+                        .replace(/`([^`]+)`/g, '<code>$1</code>')
+                        // Code blocks
+                        .replace(/```[\s\S]*?```/g, (match) => '<pre><code>' + esc(match.replace(/```/g, '').trim()) + '</code></pre>')
+                        // Links
+                        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+                        // Blockquotes
+                        .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+                        // Unordered lists
+                        .replace(/^- (.+)$/gm, '<li>$1</li>')
+                        .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+                        // Horizontal rules
+                        .replace(/^---$/gm, '<hr>')
+                        // Line breaks
+                        .replace(/\n\n/g, '</p><p>')
+                        .replace(/\n/g, '<br>');
+                    
+                    html = '<p>' + html + '</p>';
+                    html = html.replace(/<li>.*?<\/li>/gs, (match) => {
+                        if (!match.includes('<ul>')) return '<ul>' + match + '</ul>';
+                        return match;
+                    });
+                    
+                    area.innerHTML = '<div class="text-content markdown-body">' + html + '</div>';
+                } catch(e) {
+                    area.innerHTML = '<div class="unsupported-wrap"><i class="bx bx-error-circle"></i><h3>Load Error</h3><p>' + esc(e.message) + '</p></div>';
                 }
             }
             
@@ -392,7 +644,7 @@
                     if (!res.ok) throw new Error('Failed to load');
                     const text = await res.text();
                     const lines = text.trim().split('\n');
-                    if (lines.length === 0) throw new Error('Empty');
+                    if (lines.length === 0) throw new Error('Empty file');
                     
                     const parseLine = (line) => {
                         const r = []; let c = '', q = false;
@@ -405,30 +657,171 @@
                     };
                     
                     const headers = parseLine(lines[0]);
-                    const rows = lines.slice(1).map(parseLine);
+                    const allRows = lines.slice(1).map(parseLine);
                     
-                    let html = '<div class="csv-table-wrap"><table class="csv-table"><thead><tr>';
-                    headers.forEach(h => html += '<th>' + esc(h) + '</th>');
-                    html += '</tr></thead><tbody>';
-                    rows.forEach(row => {
+                    let html = '<div class="csv-search"><input type="text" id="csvSearchInput" placeholder="Filter rows..." oninput="window.VaultView.filterCsv()"><span class="csv-count" id="csvCount">' + allRows.length + ' rows</span></div>';
+                    html += '<div class="csv-table-wrap"><table class="csv-table" id="csvTable"><thead><tr>';
+                    headers.forEach((h, i) => {
+                        html += '<th data-col="' + i + '" onclick="window.VaultView.sortCsv(' + i + ')">' + esc(h) + ' <span class="sort-arrow">↕</span></th>';
+                    });
+                    html += '</tr></thead><tbody id="csvBody">';
+                    
+                    allRows.forEach(row => {
                         html += '<tr>';
-                        headers.forEach((_, i) => html += '<td>' + esc(row[i] || '') + '</td>');
+                        headers.forEach((_, i) => html += '<td title="' + esc(row[i] || '') + '">' + esc(row[i] || '') + '</td>');
                         html += '</tr>';
                     });
+                    
                     html += '</tbody></table></div>';
                     area.innerHTML = html;
+                    
+                    // Store CSV data for sorting/filtering
+                    window._csvData = { headers, rows: allRows };
                 } catch(e) {
-                    area.innerHTML = '<div style="text-align:center;color:#888;padding:2rem;"><p>Could not parse CSV</p></div>';
+                    area.innerHTML = '<div class="unsupported-wrap"><i class="bx bx-error-circle"></i><h3>CSV Error</h3><p>' + esc(e.message) + '</p></div>';
                 }
+            }
+            
+            function filterCsv() {
+                const input = document.getElementById('csvSearchInput');
+                const body = document.getElementById('csvBody');
+                const count = document.getElementById('csvCount');
+                if (!input || !body || !window._csvData) return;
+                
+                const term = input.value.toLowerCase();
+                const { headers, rows } = window._csvData;
+                let filtered = rows;
+                
+                if (term) {
+                    filtered = rows.filter(row => 
+                        row.some(cell => (cell || '').toLowerCase().includes(term))
+                    );
+                }
+                
+                let html = '';
+                filtered.forEach(row => {
+                    html += '<tr>';
+                    headers.forEach((_, i) => html += '<td title="' + esc(row[i] || '') + '">' + esc(row[i] || '') + '</td>');
+                    html += '</tr>';
+                });
+                body.innerHTML = html;
+                count.textContent = filtered.length + ' / ' + rows.length + ' rows';
+            }
+            
+            function sortCsv(colIndex) {
+                if (!window._csvData) return;
+                
+                const { headers, rows } = window._csvData;
+                const th = document.querySelector('#csvTable th[data-col="' + colIndex + '"]');
+                const currentDir = th?.classList.contains('sorted-asc') ? 'asc' : 'desc';
+                
+                // Remove all sort indicators
+                document.querySelectorAll('#csvTable th').forEach(h => {
+                    h.classList.remove('sorted-asc', 'sorted-desc', 'sorted');
+                    h.querySelector('.sort-arrow').textContent = '↕';
+                });
+                
+                // Sort rows
+                const sorted = [...rows].sort((a, b) => {
+                    const va = (a[colIndex] || '').toLowerCase();
+                    const vb = (b[colIndex] || '').toLowerCase();
+                    // Try numeric sort
+                    const na = parseFloat(a[colIndex]);
+                    const nb = parseFloat(b[colIndex]);
+                    if (!isNaN(na) && !isNaN(nb)) return currentDir === 'asc' ? nb - na : na - nb;
+                    return currentDir === 'asc' ? vb.localeCompare(va) : va.localeCompare(vb);
+                });
+                
+                // Update data
+                window._csvData.rows = sorted;
+                
+                // Update UI
+                th.classList.add('sorted', 'sorted-' + (currentDir === 'asc' ? 'desc' : 'asc'));
+                th.querySelector('.sort-arrow').textContent = currentDir === 'asc' ? '↓' : '↑';
+                
+                // Re-render with current filter
+                filterCsv();
+                
+                // Update stored rows for filter
+                window._csvData.rows = sorted;
+                document.getElementById('csvCount').textContent = sorted.length + ' rows';
             }
             
             function renderGooglePreview(area, url, ext) {
                 if (ext === 'pdf') {
-                    area.innerHTML = '<iframe src="' + url + '#toolbar=0&navpanes=0" style="width:100%;height:100%;border:none;"></iframe>';
+                    area.innerHTML = '<iframe src="' + url + '#toolbar=0&navpanes=0&scrollbar=0" style="width:100%;height:100%;border:none;"></iframe>';
                 } else {
                     const gUrl = 'https://docs.google.com/viewer?url=' + encodeURIComponent(url) + '&embedded=true';
                     area.innerHTML = '<iframe src="' + gUrl + '" style="width:100%;height:100%;border:none;"></iframe>';
                 }
+            }
+            
+            function renderImagePreview(area, url) {
+                $('imageControls').style.display = 'flex';
+                area.innerHTML = '<img src="' + url + '" alt="' + esc(fileName) + '" id="previewImage" style="max-width:100%;max-height:100vh;object-fit:contain;cursor:zoom-in;transition:transform 0.3s ease;" onerror="this.parentElement.innerHTML=\'<div class=unsupported-wrap><i class=bx bx-error-circle></i><h3>Image Error</h3><p>Could not load image</p></div>\'">';
+                
+                // Image zoom/rotate state
+                let scale = 1, rotation = 0;
+                const img = $('previewImage');
+                
+                if (img) {
+                    $('btnZoomIn').onclick = () => {
+                        scale = Math.min(scale + 0.5, 5);
+                        applyImageTransform(img, scale, rotation);
+                    };
+                    $('btnZoomOut').onclick = () => {
+                        scale = Math.max(scale - 0.5, 0.5);
+                        applyImageTransform(img, scale, rotation);
+                    };
+                    $('btnRotate').onclick = () => {
+                        rotation = (rotation + 90) % 360;
+                        applyImageTransform(img, scale, rotation);
+                    };
+                    $('btnResetImg').onclick = () => {
+                        scale = 1; rotation = 0;
+                        applyImageTransform(img, scale, rotation);
+                    };
+                    
+                    // Click to toggle zoom
+                    img.onclick = () => {
+                        if (scale === 1) {
+                            scale = 2.5;
+                            img.style.cursor = 'zoom-out';
+                        } else {
+                            scale = 1;
+                            img.style.cursor = 'zoom-in';
+                        }
+                        applyImageTransform(img, scale, rotation);
+                    };
+                    
+                    // Mouse wheel zoom
+                    img.addEventListener('wheel', (e) => {
+                        e.preventDefault();
+                        const delta = e.deltaY > 0 ? -0.3 : 0.3;
+                        scale = Math.max(0.5, Math.min(5, scale + delta));
+                        if (scale === 1) img.style.cursor = 'zoom-in';
+                        else img.style.cursor = 'zoom-out';
+                        applyImageTransform(img, scale, rotation);
+                    }, { passive: false });
+                }
+            }
+            
+            function applyImageTransform(img, scale, rotation) {
+                img.style.transform = 'scale(' + scale + ') rotate(' + rotation + 'deg)';
+            }
+            
+            function renderVideoPreview(area, url, ext) {
+                const mimeMap = { mp4: 'video/mp4', webm: 'video/webm', ogg: 'video/ogg', mov: 'video/quicktime', mkv: 'video/x-matroska', avi: 'video/x-msvideo' };
+                area.innerHTML = '<video controls style="max-width:100%;max-height:100vh;object-fit:contain;outline:none;" id="previewVideo"><source src="' + url + '" type="' + (mimeMap[ext] || 'video/' + ext) + '">Your browser does not support video playback.</video>';
+            }
+            
+            function renderAudioPreview(area, url, ext) {
+                const mimeMap = { mp3: 'audio/mpeg', wav: 'audio/wav', ogg: 'audio/ogg', aac: 'audio/aac', flac: 'audio/flac', m4a: 'audio/mp4' };
+                area.innerHTML = '<div class="audio-wrap"><audio controls style="outline:none;"><source src="' + url + '" type="' + (mimeMap[ext] || 'audio/' + ext) + '">Your browser does not support audio playback.</audio></div>';
+            }
+            
+            function renderUnsupported(area, ext) {
+                area.innerHTML = '<div class="unsupported-wrap"><i class="bx bx-file-blank"></i><h3>Preview Not Available</h3><p>.' + ext.toUpperCase() + ' files cannot be previewed in the browser.</p><p style="font-size:0.75rem;margin-top:8px;">Use Download or Open Raw to access this file.</p></div>';
             }
             
             // ==================== ACTIONS ====================
@@ -437,12 +830,22 @@
                     await navigator.clipboard.writeText(getPublicUrl(fileName));
                     showToast('Link copied!', 'success');
                 } catch(e) {
-                    showToast('Copy failed', 'error');
+                    const textarea = document.createElement('textarea');
+                    textarea.value = getPublicUrl(fileName);
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    showToast('Link copied!', 'success');
                 }
             }
             
             async function downloadFile() {
-                if (!supabase) return;
+                if (!supabase) {
+                    // Fallback: open raw URL
+                    window.open(getPublicUrl(fileName), '_blank');
+                    return;
+                }
                 try {
                     const { data, error } = await supabase.storage.from(STORAGE_BUCKET).download(fileName);
                     if (error) throw error;
@@ -453,14 +856,16 @@
                     setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
                     showToast('Downloaded!', 'success');
                 } catch(e) {
-                    showToast('Download failed', 'error');
+                    // Fallback
+                    window.open(getPublicUrl(fileName), '_blank');
+                    showToast('Opening file...', 'success');
                 }
             }
             
             // ==================== INIT ====================
             async function init() {
                 if (!fileName) {
-                    $('previewArea').innerHTML = '<div style="text-align:center;color:#888;padding:2rem;"><i class="bx bx-error-circle" style="font-size:48px;display:block;margin-bottom:12px;"></i><p>No file specified</p></div>';
+                    $('previewArea').innerHTML = '<div class="unsupported-wrap"><i class="bx bx-error-circle"></i><h3>No File Specified</h3><p>Select a file from the main page to preview.</p></div>';
                     return;
                 }
                 
@@ -484,24 +889,45 @@
                 $('btnOpenRaw').onclick = () => window.open(getPublicUrl(fileName), '_blank');
                 $('btnCopy').onclick = copyUrl;
                 
-                // Corner close/minimize
-                let minimized = false;
-                $('cornerClose').onclick = (e) => {
+                // Dismiss corner info
+                $('cornerDismiss').onclick = (e) => {
                     e.stopPropagation();
-                    if (minimized) {
-                        $('cornerInfo').style.display = 'none';
-                    } else {
-                        minimized = true;
-                        $('cornerInfo').classList.add('minimized');
-                    }
+                    $('cornerInfo').style.opacity = '0';
+                    $('cornerInfo').style.transition = 'opacity 0.3s ease';
+                    setTimeout(() => { $('cornerInfo').style.display = 'none'; }, 300);
                 };
-                $('cornerInfo').onclick = () => {
-                    if (minimized) {
-                        minimized = false;
-                        $('cornerInfo').classList.remove('minimized');
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        if (document.referrer && document.referrer.includes(window.location.host)) {
+                            window.history.back();
+                        } else {
+                            window.location.href = 'index.html';
+                        }
                     }
-                };
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                        e.preventDefault();
+                        downloadFile();
+                    }
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+                        e.preventDefault();
+                        copyUrl();
+                    }
+                });
             }
+            
+            // ==================== GLOBAL API ====================
+            window.VaultView = {
+                copyUrl, downloadFile, filterCsv, sortCsv,
+                goBack: () => {
+                    if (document.referrer && document.referrer.includes(window.location.host)) {
+                        window.history.back();
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }
+            };
             
             init();
         })();

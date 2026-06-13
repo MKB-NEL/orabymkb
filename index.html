@@ -1,1365 +1,700 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ORA Terminal Shell</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            background-color: #0a0a0a;
-            color: #f0f0f0;
-            font-family: 'Courier New', 'Cascadia Code', monospace;
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        /* Matrix Canvas Background */
-        #matrix-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            opacity: 0.08;
-        }
-        
-        /* Terminal Container */
-        .terminal-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 900px;
-            height: 600px;
-            background-color: rgba(0, 0, 0, 0.95);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-            border: 1px solid #333;
-            z-index: 10;
-            min-width: 500px;
-            min-height: 400px;
-            resize: both;
-            overflow: hidden;
-        }
-        
-        /* Terminal Header */
-        .terminal-header {
-            background: linear-gradient(to bottom, #1a1a1a, #000);
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid #333;
-            user-select: none;
-        }
-        
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .terminal-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .terminal-button {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .terminal-button:hover {
-            transform: scale(1.1);
-        }
-        
-        .close { background-color: #ff5f56; }
-        .minimize { background-color: #ffbd2e; }
-        .maximize { background-color: #27ca3f; }
-        
-        .terminal-title {
-            color: #888;
-            font-size: 14px;
-            flex-grow: 1;
-            text-align: center;
-            margin: 0 20px;
-        }
-        
-        /* Terminal Body */
-        .terminal-body {
-            height: calc(100% - 45px);
-            padding: 20px;
-            overflow-y: auto;
-            background: rgba(0, 0, 0, 0.9);
-            position: relative;
-        }
-        
-        .output {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            margin-bottom: 8px;
-            line-height: 1.4;
-            font-size: 14px;
-        }
-        
-        .prompt {
-            color: #4af626;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        
-        .input-line {
-            display: flex;
-            align-items: center;
-            margin-top: 5px;
-        }
-        
-        .command-input {
-            background: transparent;
-            border: none;
-            color: #f0f0f0;
-            font-family: inherit;
-            font-size: 14px;
-            width: 100%;
-            outline: none;
-            caret-color: #4af626;
-            flex: 1;
-        }
-        
-        /* Text Colors */
-        .command { color: #4af626; }
-        .error { color: #ff5555; }
-        .success { color: #50fa7b; }
-        .info { color: #8be9fd; }
-        .system { color: #bd93f9; }
-        .warning { color: #ffb86c; }
-        .matrix { color: #00ff9d; }
-        .hacker { color: #00ff00; }
-        .scan { color: #ff00ff; }
-        .crypto { color: #ffff00; }
-        
-        /* Cursor */
-        .cursor {
-            display: inline-block;
-            width: 8px;
-            height: 16px;
-            background-color: #4af626;
-            margin-left: 2px;
-            animation: blink 1s infinite;
-            vertical-align: middle;
-        }
-        
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-        
-        /* Resize Handle */
-        .resize-handle {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 20px;
-            height: 20px;
-            cursor: nwse-resize;
-            z-index: 20;
-        }
-        
-        .resize-handle::after {
-            content: '';
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            width: 10px;
-            height: 10px;
-            border-right: 2px solid #444;
-            border-bottom: 2px solid #444;
-        }
-        
-        /* Footer */
-        .terminal-footer {
-            position: absolute;
-            bottom: 10px;
-            right: 20px;
-            color: #666;
-            font-size: 12px;
-            z-index: 5;
-        }
-        
-        /* Loading Animation */
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #444;
-            border-top-color: #00ff00;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            vertical-align: middle;
-            margin-right: 10px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Terminal Startup Animation */
-        @keyframes terminalStart {
-            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-        
-        .terminal-start-animation {
-            animation: terminalStart 0.5s ease-out;
-        }
-        
-        /* Fade out animation for boot messages */
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; max-height: 0; overflow: hidden; }
-        }
-        
-        .fade-out {
-            animation: fadeOut 1.5s ease-out forwards;
-        }
-    </style>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Supabase File Manager · Light Modern UI</title>
+  <!-- Supabase SDK (official) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+  </script>
+  <!-- Font Awesome 6 for icons (light, clean) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f8fafc;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1.5rem;
+      transition: background 0.2s ease;
+    }
+
+    /* modern light card */
+    .file-manager {
+      max-width: 1100px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 2.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+      padding: 2rem 2rem 2.2rem;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(2px);
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 1.9rem;
+      letter-spacing: -0.5px;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.2rem;
+    }
+    h1 i {
+      color: #3b82f6;
+      font-size: 2rem;
+    }
+
+    /* bucket config note (hidden but accessible) */
+    .bucket-config-note {
+      background: #f1f5f9;
+      border-radius: 1rem;
+      padding: 0.8rem 1.2rem;
+      font-size: 0.9rem;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 0.2rem;
+    }
+    .bucket-config-note i {
+      color: #3b82f6;
+    }
+    code {
+      background: #e2e8f0;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.4rem;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+    }
+
+    /* upload area (drag & drop) */
+    .upload-zone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 1.8rem;
+      background: #f9fafb;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.7rem;
+      color: #475569;
+    }
+    .upload-zone.drag-active {
+      border-color: #3b82f6;
+      background: #eff6ff;
+      transform: scale(1.01);
+      box-shadow: 0 10px 20px -10px rgba(59,130,246,0.2);
+    }
+    .upload-zone i {
+      font-size: 2.8rem;
+      color: #3b82f6;
+      opacity: 0.9;
+    }
+    .upload-zone .browse-text {
+      font-weight: 500;
+      color: #0f172a;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    #fileInput {
+      display: none;
+    }
+
+    /* progress bar */
+    .progress-container {
+      margin-top: 0.8rem;
+      width: 100%;
+      background: #e2e8f0;
+      height: 8px;
+      border-radius: 20px;
+      overflow: hidden;
+      display: none;
+    }
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #2563eb, #38bdf8);
+      border-radius: 20px;
+      transition: width 0.2s ease;
+    }
+
+    /* search & toolbar */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .search-wrapper {
+      flex: 2;
+      min-width: 220px;
+      position: relative;
+    }
+    .search-wrapper i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+    }
+    #searchInput {
+      width: 100%;
+      padding: 0.85rem 1rem 0.85rem 2.8rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 2rem;
+      background: #ffffff;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      outline: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    #searchInput:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    }
+    .refresh-btn {
+      background: white;
+      border: 1px solid #e2e8f0;
+      padding: 0.8rem 1.3rem;
+      border-radius: 2rem;
+      font-weight: 500;
+      color: #1e293b;
+      background: #ffffff;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .refresh-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    /* file list grid */
+    .file-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.2rem;
+      margin: 1.2rem 0 0.8rem;
+    }
+    .file-card {
+      background: #ffffff;
+      border: 1px solid #edf2f7;
+      border-radius: 1.4rem;
+      padding: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+      word-break: break-word;
+    }
+    .file-card:hover {
+      border-color: #b9d0f0;
+      box-shadow: 0 12px 22px -12px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+    .file-icon {
+      font-size: 2rem;
+      color: #3b82f6;
+      width: 2.5rem;
+      text-align: center;
+    }
+    .file-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+    .file-name {
+      font-weight: 600;
+      color: #0f172a;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
+    }
+    .file-meta {
+      font-size: 0.75rem;
+      color: #64748b;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      color: #475569;
+    }
+    .actions i {
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 0.4rem;
+      border-radius: 0.6rem;
+      transition: all 0.15s;
+      background: #f8fafc;
+    }
+    .actions i:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #64748b;
+      padding: 3rem;
+      font-size: 1rem;
+      background: #f9fafb;
+      border-radius: 2rem;
+    }
+
+    /* notifications toast */
+    .toast-container {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      z-index: 9999;
+    }
+    .toast {
+      background: white;
+      padding: 1rem 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-weight: 500;
+      animation: slideIn 0.3s ease;
+      border-left: 5px solid;
+      min-width: 250px;
+    }
+    .toast.success { border-left-color: #10b981; }
+    .toast.error { border-left-color: #ef4444; }
+    @keyframes slideIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @media (max-width: 550px) {
+      .file-manager {
+        padding: 1.5rem;
+      }
+      .actions i {
+        padding: 0.3rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Matrix Canvas Background -->
-    <canvas id="matrix-canvas"></canvas>
-    
-    <!-- Terminal Window -->
-    <div class="terminal-container terminal-start-animation" id="terminal-window">
-        <div class="terminal-header" id="terminal-header">
-            <div class="header-left">
-                <div class="terminal-buttons">
-                    <div class="terminal-button close" id="close-btn"></div>
-                    <div class="terminal-button minimize" id="minimize-btn"></div>
-                    <div class="terminal-button maximize" id="maximize-btn"></div>
-                </div>
-                <div class="terminal-title" id="terminal-title">ora@terminal:~</div>
-            </div>
-        </div>
-        
-        <div class="terminal-body" id="terminal-output">
-            <!-- Content will be loaded here -->
-        </div>
-        
-        <div class="terminal-footer">ora terminal by MKB - 2025</div>
-        <div class="resize-handle"></div>
-    </div>
+<div class="file-manager">
+  <h1>
+    <i class="fas fa-cloud-sun"></i> My Files
+  </h1>
 
-    <script>
-        // ==============================
-        // MAIN APPLICATION
-        // ==============================
-        (function() {
-            'use strict';
-            
-            // Global variables
-            var matrixColor = '#00ff9d';
-            var commandHistory = [];
-            var historyIndex = 0;
-            var isDragging = false;
-            var dragOffset = { x: 0, y: 0 };
-            
-            // DOM Elements
-            var canvas = document.getElementById('matrix-canvas');
-            var ctx = canvas.getContext('2d');
-            var terminalOutput = document.getElementById('terminal-output');
-            var terminalContainer = document.getElementById('terminal-window');
-            var terminalHeader = document.getElementById('terminal-header');
-            
-            // Color definitions
-            var matrixColors = [
-                '#00ff9d', '#4af626', '#00ffff', '#ff00ff',
-                '#ffaa00', '#ff5555', '#ffffff', '#9d00ff',
-                '#00aaff', '#ffff00', '#ff6b8b', '#00ff00'
-            ];
-            
-            // Matrix animation variables
-            var chars = "01アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン";
-            var charArray = chars.split("");
-            var fontSize = 14;
-            var columns = 0;
-            var drops = [];
-            
-            // ==============================
-            // MATRIX ANIMATION
-            // ==============================
-            function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            
-            function initMatrix() {
-                resizeCanvas();
-                columns = Math.floor(canvas.width / fontSize);
-                drops = [];
-                for(var i = 0; i < columns; i++) {
-                    drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
-                }
-            }
-            
-            function drawMatrix() {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                ctx.font = fontSize + 'px "Courier New", monospace';
-                
-                for(var i = 0; i < drops.length; i++) {
-                    var char = charArray[Math.floor(Math.random() * charArray.length)];
-                    var opacity = Math.random() * 0.5 + 0.5;
-                    ctx.fillStyle = matrixColor.replace(')', ', ' + opacity + ')').replace('rgb', 'rgba');
-                    ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-                    drops[i]++;
-                    
-                    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                        drops[i] = 0;
-                    }
-                }
-            }
-            
-            // ==============================
-            // BOOT SEQUENCE
-            // ==============================
-            async function runBootSequence() {
-                terminalOutput.innerHTML = '';
-                
-                var bootMessages = [
-                    {text: "[SYSTEM] Initializing ORA Secure Terminal v2.0", delay: 100},
-                    {text: "[BIOS] Scanning hardware components...", delay: 80},
-                    {text: "[OK] CPU: Intel Xeon E5-2699 v4 @ 2.20GHz (44 cores)", delay: 60},
-                    {text: "[OK] RAM: 128GB DDR4 @ 2400MHz", delay: 60},
-                    {text: "[OK] Storage: 4TB NVMe SSD", delay: 60},
-                    {text: "[OK] GPU: NVIDIA RTX 4090 (24GB VRAM)", delay: 60},
-                    {text: "[NET] Establishing secure connection...", delay: 100},
-                    {text: "[NET] Interface eth0: 192.168.1.100/24", delay: 80},
-                    {text: "[NET] Gateway: 192.168.1.1", delay: 80},
-                    {text: "[NET] DNS: 8.8.8.8, 8.8.4.4", delay: 80},
-                    {text: "[SECURE] Loading encryption modules...", delay: 120},
-                    {text: "[OK] AES-256 encryption initialized", delay: 60},
-                    {text: "[OK] RSA-4096 key pair generated", delay: 60},
-                    {text: "[OK] SHA-512 hash algorithm ready", delay: 60},
-                    {text: "[SYSTEM] Mounting file systems...", delay: 100},
-                    {text: "[OK] /dev/sda1 mounted on /", delay: 60},
-                    {text: "[OK] /dev/sda2 mounted on /home", delay: 60},
-                    {text: "[OK] /dev/sdb1 mounted on /ora", delay: 60},
-                    {text: "[KERNEL] Loading security modules...", delay: 120},
-                    {text: "[OK] SELinux: Enforcing mode", delay: 60},
-                    {text: "[OK] AppArmor: Active", delay: 60},
-                    {text: "[OK] Firewall: iptables loaded", delay: 60},
-                    {text: "[NETWORK] Starting services...", delay: 100},
-                    {text: "[OK] SSH: Secure shell daemon", delay: 60},
-                    {text: "[OK] VPN: OpenVPN established", delay: 60},
-                    {text: "[OK] Tor: Onion routing enabled", delay: 60},
-                    {text: "[CRYPTO] Generating secure certificates...", delay: 150},
-                    {text: "[OK] SSL/TLS certificates verified", delay: 80},
-                    {text: "[OK] Let's Encrypt integration complete", delay: 80},
-                    {text: "[SYSTEM] Starting user sessions...", delay: 120},
-                    {text: "[OK] X11 display server started", delay: 80},
-                    {text: "[OK] Window manager: i3-gaps", delay: 80},
-                    {text: "[OK] Terminal: ORA Terminal v2.0", delay: 80},
-                    {text: "[SECURITY] Running penetration tests...", delay: 150},
-                    {text: "[SCAN] Port scanning local network...", delay: 100},
-                    {text: "[SCAN] Vulnerability assessment...", delay: 100},
-                    {text: "[SCAN] Intrusion detection system check...", delay: 100},
-                    {text: "[OK] Security status: OPTIMAL", delay: 80},
-                    {text: "[NETWORK] Testing external connections...", delay: 120},
-                    {text: "[PING] google.com: 12ms", delay: 60},
-                    {text: "[PING] github.com: 28ms", delay: 60},
-                    {text: "[PING] 1.1.1.1: 8ms", delay: 60},
-                    {text: "[SYSTEM] Finalizing startup...", delay: 150},
-                    {text: "[OK] All systems operational", delay: 80},
-                    {text: "[OK] Security level: MAXIMUM", delay: 80},
-                    {text: "[OK] Connection: ENCRYPTED", delay: 80},
-                    {text: "[OK] Ready for commands", delay: 100}
-                ];
-                
-                // Main boot sequence
-                for (var i = 0; i < bootMessages.length; i++) {
-                    var msg = bootMessages[i];
-                    
-                    var line = document.createElement('div');
-                    line.className = 'output hacker';
-                    
-                    // Add random color effects
-                    if (Math.random() > 0.8) {
-                        line.style.color = matrixColors[Math.floor(Math.random() * matrixColors.length)];
-                    }
-                    
-                    line.textContent = msg.text;
-                    terminalOutput.appendChild(line);
-                    
-                    await new Promise(function(resolve) {
-                        setTimeout(resolve, msg.delay);
-                    });
-                    
-                    terminalOutput.scrollTop = terminalOutput.scrollHeight;
-                }
-                
-                // Final message
-                await new Promise(function(resolve) {
-                    setTimeout(resolve, 500);
-                });
-                
-                var welcomeDiv = document.createElement('div');
-                welcomeDiv.className = 'output';
-                welcomeDiv.innerHTML = '<br>' +
-                    '<span class="hacker">╔══════════════════════════════════════════════════════════╗</span><br>' +
-                    '<span class="hacker">║                    ORA TERMINAL v2.0                     ║</span><br>' +
-                    '<span class="hacker">║                 SECURE ACCESS VERIFIED                   ║</span><br>' +
-                    '<span class="hacker">║                 USER: ora                                ║</span><br>' +
-                    '<span class="hacker">║                 SECURITY LEVEL: MAXIMUM                  ║</span><br>' +
-                    '<span class="hacker">║                 CONNECTION: ENCRYPTED                    ║</span><br>' +
-                    '<span class="hacker">╚══════════════════════════════════════════════════════════╝</span><br><br>' +
-                    '<span class="info">Type \'help\' for available commands</span><br>' +
-                    '<span class="info">Type \'orastart\' to launch ORA Tool (opens in new window)</span><br>' +
-                    '<span class="info">Type \'clear\' to clear terminal screen</span><br><br>' +
-                    '<span class="warning">⚠️ All activities are logged and monitored</span><br>';
-                terminalOutput.appendChild(welcomeDiv);
-                
-                // Schedule removal of boot messages after 15 seconds
-                setTimeout(function() {
-                    var bootMessages = terminalOutput.querySelectorAll('.output.hacker');
-                    bootMessages.forEach(function(msg) {
-                        msg.classList.add('fade-out');
-                    });
-                    setTimeout(function() {
-                        bootMessages.forEach(function(msg) {
-                            if (msg.parentNode) {
-                                msg.parentNode.removeChild(msg);
-                            }
-                        });
-                    }, 1500);
-                }, 15000); // 15 seconds
-                
-                // Create first input line
-                createInputLine();
-            }
-            
-            // ==============================
-            // COMMAND SYSTEM
-            // ==============================
-            var commands = {
-                help: {
-                    description: 'Show all available commands',
-                    execute: function(args) {
-                        var helpText = '<span class="hacker">Available commands:</span><br><br>';
-                        helpText += '<span class="command">orastart</span>      - Launch ORA Tool (opens new window)<br>';
-                        helpText += '<span class="command">clear</span>         - Clear the terminal screen<br>';
-                        helpText += '<span class="command">date</span>          - Show current date and time<br>';
-                        helpText += '<span class="command">echo [text]</span>   - Display a line of text<br>';
-                        helpText += '<span class="command">whoami</span>        - Print effective userid<br>';
-                        helpText += '<span class="command">pwd</span>           - Print working directory<br>';
-                        helpText += '<span class="command">ls</span>            - List directory contents<br>';
-                        helpText += '<span class="command">cd [dir]</span>      - Change directory<br>';
-                        helpText += '<span class="command">cat [file]</span>    - Display file contents<br>';
-                        helpText += '<span class="command">touch [file]</span>  - Create empty file<br>';
-                        helpText += '<span class="command">mkdir [dir]</span>   - Create directory<br>';
-                        helpText += '<span class="command">rm [file]</span>     - Remove file<br>';
-                        helpText += '<span class="command">grep [pattern]</span>- Search for pattern<br>';
-                        helpText += '<span class="command">ps</span>            - Display running processes<br>';
-                        helpText += '<span class="command">kill [pid]</span>    - Kill process by PID<br>';
-                        helpText += '<span class="command">df</span>            - Show disk space usage<br>';
-                        helpText += '<span class="command">du</span>            - Show directory space usage<br>';
-                        helpText += '<span class="command">ifconfig</span>      - Display network interfaces<br>';
-                        helpText += '<span class="command">ping [host]</span>   - Ping network host<br>';
-                        helpText += '<span class="command">netstat</span>       - Network statistics<br>';
-                        helpText += '<span class="command">ssh [user@host]</span>- SSH to remote host<br>';
-                        helpText += '<span class="command">scp</span>           - Secure file copy<br>';
-                        helpText += '<span class="command">wget [url]</span>    - Download file from URL<br>';
-                        helpText += '<span class="command">curl [url]</span>    - Transfer data from URL<br>';
-                        helpText += '<span class="command">find [pattern]</span>- Find files<br>';
-                        helpText += '<span class="command">tar</span>           - Archive files<br>';
-                        helpText += '<span class="command">zip</span>           - Compress files<br>';
-                        helpText += '<span class="command">unzip [file]</span>  - Extract zip file<br>';
-                        helpText += '<span class="command">history</span>       - Show command history<br>';
-                        helpText += '<span class="command">alias</span>         - Create command alias<br>';
-                        helpText += '<span class="command">env</span>           - Show environment variables<br>';
-                        helpText += '<span class="command">export</span>        - Set environment variable<br>';
-                        helpText += '<span class="command">source [file]</span> - Execute commands from file<br>';
-                        helpText += '<span class="command">cron</span>          - Schedule tasks<br>';
-                        helpText += '<span class="command">top</span>           - Display system processes<br>';
-                        helpText += '<span class="command">htop</span>          - Interactive process viewer<br>';
-                        helpText += '<span class="command">nano [file]</span>   - Text editor<br>';
-                        helpText += '<span class="command">vim [file]</span>    - Advanced text editor<br>';
-                        helpText += '<span class="command">diff [file1] [file2]</span> - Compare files<br>';
-                        helpText += '<span class="command">wc [file]</span>     - Word count<br>';
-                        helpText += '<span class="command">sort [file]</span>   - Sort lines<br>';
-                        helpText += '<span class="command">uniq [file]</span>   - Remove duplicates<br>';
-                        helpText += '<span class="command">cut</span>           - Remove sections from lines<br>';
-                        helpText += '<span class="command">sed</span>           - Stream editor<br>';
-                        helpText += '<span class="command">awk</span>           - Pattern scanning and processing<br>';
-                        helpText += '<span class="command">tr</span>            - Translate characters<br>';
-                        helpText += '<span class="command">tee</span>           - Read from stdin and write to stdout/files<br>';
-                        helpText += '<span class="command">xargs</span>         - Build and execute command lines<br>';
-                        helpText += '<span class="command">time [command]</span>- Time command execution<br>';
-                        helpText += '<span class="command">which [command]</span>- Locate a command<br>';
-                        helpText += '<span class="command">whereis [command]</span>- Locate binary, source, and manual pages<br>';
-                        helpText += '<span class="command">locate [pattern]</span>- Find files by name<br>';
-                        helpText += '<span class="command">updatedb</span>      - Update database for locate<br>';
-                        helpText += '<span class="command">chmod [mode] [file]</span>- Change file permissions<br>';
-                        helpText += '<span class="command">chown [owner] [file]</span>- Change file owner<br>';
-                        helpText += '<span class="command">chgrp [group] [file]</span>- Change file group<br>';
-                        helpText += '<span class="command">ln [source] [target]</span>- Create link<br>';
-                        helpText += '<span class="command">stat [file]</span>   - Display file status<br>';
-                        helpText += '<span class="command">file [file]</span>   - Determine file type<br>';
-                        helpText += '<span class="command">md5sum [file]</span> - Calculate MD5 checksum<br>';
-                        helpText += '<span class="command">sha256sum [file]</span>- Calculate SHA256 checksum<br>';
-                        helpText += '<span class="command">base64 [file]</span> - Base64 encode/decode<br>';
-                        helpText += '<span class="command">yes [text]</span>    - Output text repeatedly<br>';
-                        helpText += '<span class="command">factor [number]</span>- Print prime factors<br>';
-                        helpText += '<span class="command">seq [start] [end]</span>- Print sequence of numbers<br>';
-                        helpText += '<span class="command">shuf [file]</span>   - Shuffle lines<br>';
-                        helpText += '<span class="command">split [file]</span>  - Split file into pieces<br>';
-                        helpText += '<span class="command">tac [file]</span>    - Concatenate and print files in reverse<br>';
-                        helpText += '<span class="command">rev [file]</span>    - Reverse lines<br>';
-                        helpText += '<span class="command">head [file]</span>   - Output first part of files<br>';
-                        helpText += '<span class="command">tail [file]</span>   - Output last part of files<br>';
-                        helpText += '<span class="command">less [file]</span>   - View file contents<br>';
-                        helpText += '<span class="command">more [file]</span>   - View file contents page by page<br>';
-                        helpText += '<span class="command">man [command]</span> - Display manual page<br>';
-                        helpText += '<span class="command">info [command]</span>- Display info page<br>';
-                        helpText += '<span class="command">whatis [command]</span>- Display one-line manual description<br>';
-                        helpText += '<span class="command">apropos [keyword]</span>- Search manual pages<br>';
-                        helpText += '<span class="command">neofetch</span>      - Display system information<br>';
-                        helpText += '<span class="command">uname</span>         - Print system information<br>';
-                        helpText += '<span class="command">uptime</span>        - Tell how long system has been running<br>';
-                        helpText += '<span class="command">cal</span>           - Display a calendar<br>';
-                        helpText += '<span class="command">bc</span>            - Arbitrary precision calculator<br>';
-                        helpText += '<span class="command">dc</span>            - Desk calculator<br>';
-                        helpText += '<span class="command">factor</span>        - Factor numbers<br>';
-                        helpText += '<span class="command">color [1-12]</span>  - Change matrix color<br>';
-                        helpText += '<span class="command">matrix</span>        - Toggle matrix background<br>';
-                        helpText += '<span class="command">reboot</span>        - Restart terminal<br>';
-                        helpText += '<span class="command">shutdown</span>      - Shutdown terminal<br>';
-                        helpText += '<span class="command">about</span>         - About this terminal<br>';
-                        helpText += '<br><span class="info">Use TAB for auto-completion and ↑↓ for command history</span>';
-                        return helpText;
-                    }
-                },
-                
-                orastart: {
-                    description: 'Launch ORA Tool',
-                    execute: function(args) {
-                        setTimeout(function() {
-                            window.open('oratool.html', '_blank', 'width=1200,height=800');
-                        }, 500);
-                        return '<span class="success">Launching ORA Tool in new window...</span>';
-                    }
-                },
-                
-                clear: {
-                    description: 'Clear the terminal screen',
-                    execute: function(args) {
-                        setTimeout(function() {
-                            terminalOutput.innerHTML = '';
-                            createInputLine();
-                        }, 10);
-                        return '';
-                    }
-                },
-                
-                date: {
-                    description: 'Show current date and time',
-                    execute: function(args) {
-                        var now = new Date();
-                        return now.toLocaleString();
-                    }
-                },
-                
-                echo: {
-                    description: 'Echo back the input text',
-                    execute: function(args) {
-                        return args.join(' ');
-                    }
-                },
-                
-                whoami: {
-                    description: 'Print effective userid',
-                    execute: function(args) {
-                        return 'ora';
-                    }
-                },
-                
-                pwd: {
-                    description: 'Print working directory',
-                    execute: function(args) {
-                        return '/home/ora';
-                    }
-                },
-                
-                ls: {
-                    description: 'List directory contents',
-                    execute: function(args) {
-                        if (args[0] === '-la') {
-                            return 'total 128<br>' +
-                                   'drwxr-xr-x 18 ora ora  4096 Dec 12 10:30 .<br>' +
-                                   'drwxr-xr-x  3 root root 4096 Dec 12 09:15 ..<br>' +
-                                   '-rw-r--r--  1 ora ora   220 Dec 12 09:15 .bash_logout<br>' +
-                                   '-rw-r--r--  1 ora ora  3771 Dec 12 09:15 .bashrc<br>' +
-                                   'drwx------ 15 ora ora  4096 Dec 12 10:25 .cache<br>' +
-                                   'drwx------ 12 ora ora  4096 Dec 12 10:20 .config<br>' +
-                                   'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Desktop<br>' +
-                                   'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Documents<br>' +
-                                   'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Downloads<br>' +
-                                   '-rw-r--r--  1 ora ora   807 Dec 12 09:15 .profile<br>' +
-                                   'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Public<br>' +
-                                   '-rw-r--r--  1 ora ora     0 Dec 12 09:15 .sudo_as_admin_successful<br>' +
-                                   'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Templates<br>' +
-                                   'drwxr-xr-x  2 ora ora  4096 Dec 12 09:15 Videos<br>' +
-                                   '-rw-r--r--  1 ora ora    46 Dec 12 09:15 .wget-hsts';
-                        }
-                        return 'Desktop    Downloads  Music     Public     oratool.html<br>' +
-                               'Documents  Pictures   Videos    data.json';
-                    }
-                },
-                
-                cd: {
-                    description: 'Change directory',
-                    execute: function(args) {
-                        if (args.length === 0) {
-                            return '<span class="info">Changed to home directory</span>';
-                        }
-                        if (args[0] === '..') {
-                            return '<span class="info">Changed to parent directory</span>';
-                        }
-                        if (args[0] === '/') {
-                            return '<span class="info">Changed to root directory</span>';
-                        }
-                        return '<span class="info">Changed to ' + args[0] + '</span>';
-                    }
-                },
-                
-                cat: {
-                    description: 'Display file contents',
-                    execute: function(args) {
-                        var files = {
-                            'README.md': '# ORA Terminal\n\nWelcome to ORA Terminal v2.0\n\nThis is a secure terminal interface with Kali Linux-like commands.\n\n## Features\n- Matrix background animation\n- ORA Tool integration\n- Secure encrypted connection\n- Command history\n- Auto-completion\n\n## Security\nAll connections are encrypted with AES-256.\n',
-                            'config.json': '{\n  "version": "2.0",\n  "author": "MKB",\n  "security": "maximum",\n  "encryption": "AES-256",\n  "autoUpdate": true\n}',
-                            'log.txt': '[2025-01-15 10:30:15] System boot completed\n[2025-01-15 10:31:22] User ora logged in\n[2025-01-15 10:35:47] Secure connection established\n[2025-01-15 10:40:12] Security scan completed - no threats found\n'
-                        };
-                        
-                        if (args.length === 0) {
-                            return '<span class="error">Usage: cat [filename]</span>';
-                        }
-                        
-                        var filename = args[0];
-                        if (files[filename]) {
-                            return files[filename];
-                        } else {
-                            return '<span class="error">cat: ' + filename + ': No such file or directory</span>';
-                        }
-                    }
-                },
-                
-                mkdir: {
-                    description: 'Create directory',
-                    execute: function(args) {
-                        if (args.length === 0) {
-                            return '<span class="error">mkdir: missing operand</span>';
-                        }
-                        return '<span class="success">Created directory \'' + args[0] + '\'</span>';
-                    }
-                },
-                
-                touch: {
-                    description: 'Create empty file',
-                    execute: function(args) {
-                        if (args.length === 0) {
-                            return '<span class="error">touch: missing file operand</span>';
-                        }
-                        return '<span class="success">Created file \'' + args[0] + '\'</span>';
-                    }
-                },
-                
-                rm: {
-                    description: 'Remove file',
-                    execute: function(args) {
-                        if (args.length === 0) {
-                            return '<span class="error">rm: missing operand</span>';
-                        }
-                        if (args[0] === '-rf' && args[1]) {
-                            return '<span class="warning">Removed directory \'' + args[1] + '\' recursively</span>';
-                        }
-                        return '<span class="warning">Removed \'' + args[0] + '\'</span>';
-                    }
-                },
-                
-                grep: {
-                    description: 'Search for pattern',
-                    execute: function(args) {
-                        if (args.length === 0) {
-                            return '<span class="error">grep: missing pattern</span>';
-                        }
-                        var sampleText = 'Searching for pattern: ' + args[0] + '\n' +
-                                       'file1.txt:3:Found pattern here\n' +
-                                       'file2.txt:7:Another occurrence\n' +
-                                       'file3.txt:12:Pattern matched';
-                        return sampleText;
-                    }
-                },
-                
-                ps: {
-                    description: 'Display running processes',
-                    execute: function(args) {
-                        return '  PID TTY          TIME CMD<br>' +
-                               '    1 ?        00:00:01 systemd<br>' +
-                               '  456 ?        00:00:00 sshd<br>' +
-                               '  789 ?        00:00:02 ora-terminal<br>' +
-                               ' 1234 pts/0    00:00:00 bash<br>' +
-                               ' 5678 ?        00:00:01 matrix-anim';
-                    }
-                },
-                
-                kill: {
-                    description: 'Kill process by PID',
-                    execute: function(args) {
-                        if (args.length === 0) {
-                            return '<span class="error">kill: usage: kill [-s sigspec] pid</span>';
-                        }
-                        return '<span class="warning">Terminated process ' + args[0] + '</span>';
-                    }
-                },
-                
-                df: {
-                    description: 'Show disk space usage',
-                    execute: function(args) {
-                        return 'Filesystem     1K-blocks    Used Available Use% Mounted on<br>' +
-                               '/dev/sda1       4194304  1048576   3145728  25% /<br>' +
-                               '/dev/sda2      16777216  4194304  12582912  25% /home<br>' +
-                               '/dev/sdb1      41943040 12582912  29360128  30% /ora';
-                    }
-                },
-                
-                du: {
-                    description: 'Show directory space usage',
-                    execute: function(args) {
-                        return '4.0K    ./Desktop<br>' +
-                               '8.0K    ./Documents<br>' +
-                               '12K     ./Downloads<br>' +
-                               '4.0K    ./Public<br>' +
-                               '28K     .';
-                    }
-                },
-                
-                ifconfig: {
-                    description: 'Display network interfaces',
-                    execute: function(args) {
-                        return 'eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500<br>' +
-                               '        inet 192.168.1.100  netmask 255.255.255.0  broadcast 192.168.1.255<br>' +
-                               '        ether 00:11:22:33:44:55  txqueuelen 1000  (Ethernet)<br>' +
-                               '        RX packets 123456  bytes 987654321 (987.6 MB)<br>' +
-                               '        TX packets 654321  bytes 123456789 (123.4 MB)<br><br>' +
-                               'lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536<br>' +
-                               '        inet 127.0.0.1  netmask 255.0.0.0<br>' +
-                               '        loop  txqueuelen 1000  (Local Loopback)';
-                    }
-                },
-                
-                ping: {
-                    description: 'Ping network host',
-                    execute: function(args) {
-                        if (args.length === 0) {
-                            return '<span class="error">ping: missing host operand</span>';
-                        }
-                        var host = args[0];
-                        return 'PING ' + host + ' (' + host + ') 56(84) bytes of data.<br>' +
-                               '64 bytes from ' + host + ': icmp_seq=1 ttl=64 time=1.23 ms<br>' +
-                               '64 bytes from ' + host + ': icmp_seq=2 ttl=64 time=1.15 ms<br>' +
-                               '64 bytes from ' + host + ': icmp_seq=3 ttl=64 time=1.30 ms<br><br>' +
-                               '--- ' + host + ' ping statistics ---<br>' +
-                               '3 packets transmitted, 3 received, 0% packet loss, time 2002ms<br>' +
-                               'rtt min/avg/max/mdev = 1.150/1.227/1.300/0.062 ms';
-                    }
-                },
-                
-                netstat: {
-                    description: 'Network statistics',
-                    execute: function(args) {
-                        return 'Active Internet connections (w/o servers)<br>' +
-                               'Proto Recv-Q Send-Q Local Address           Foreign Address         State<br>' +
-                               'tcp        0      0 192.168.1.100:22        192.168.1.50:54321      ESTABLISHED<br>' +
-                               'tcp        0      0 192.168.1.100:443       203.0.113.10:12345      TIME_WAIT<br><br>' +
-                               'Active UNIX domain sockets (w/o servers)<br>' +
-                               'Proto RefCnt Flags       Type       State         I-Node   Path<br>' +
-                               'unix  2      [ ]         DGRAM                    12345    /run/systemd/notify<br>' +
-                               'unix  3      [ ]         STREAM     CONNECTED     23456    /var/run/dbus/system_bus_socket';
-                    }
-                },
-                
-                ssh: {
-                    description: 'SSH to remote host',
-                    execute: function(args) {
-                        if (args.length === 0) {
-                            return '<span class="error">ssh: missing hostname</span>';
-                        }
-                        var host = args[0];
-                        return 'Connecting to ' + host + '...<br>' +
-                               'Authenticating with public key...<br>' +
-                               'Welcome to ' + host + '<br>' +
-                               'Last login: Mon Jan 15 10:30:45 2025 from 192.168.1.100<br>' +
-                               host + ' $ ';
-                    }
-                },
-                
-                wget: {
-                    description: 'Download file from URL',
-                    execute: function(args) {
-                        if (args.length === 0) {
-                            return '<span class="error">wget: missing URL</span>';
-                        }
-                        var url = args[0];
-                        return '--2025-01-15 10:45:23--  ' + url + '<br>' +
-                               'Resolving ' + url + '... 203.0.113.1<br>' +
-                               'Connecting to ' + url + '|203.0.113.1|:443... connected.<br>' +
-                               'HTTP request sent, awaiting response... 200 OK<br>' +
-                               'Length: 1234567 (1.2M) [application/octet-stream]<br>' +
-                               'Saving to: \'downloaded_file\'<br><br>' +
-                               '100%[======================================>] 1,234,567   1.23MB/s   in 1.0s<br><br>' +
-                               '2025-01-15 10:45:24 (1.23 MB/s) - \'downloaded_file\' saved [1234567/1234567]';
-                    }
-                },
-                
-                curl: {
-                    description: 'Transfer data from URL',
-                    execute: function(args) {
-                        if (args.length === 0) {
-                            return '<span class="error">curl: try \'curl --help\' for more information</span>';
-                        }
-                        var url = args[0];
-                        return '{\n  "status": "success",\n  "data": {\n    "url": "' + url + '",\n    "size": 12345,\n    "type": "application/json"\n  }\n}';
-                    }
-                },
-                
-                find: {
-                    description: 'Find files',
-                    execute: function(args) {
-                        if (args.length === 0) {
-                            args = ['.'];
-                        }
-                        return './Desktop<br>' +
-                               './Desktop/file1.txt<br>' +
-                               './Documents<br>' +
-                               './Documents/report.pdf<br>' +
-                               './Downloads<br>' +
-                               './Downloads/archive.zip<br>' +
-                               './Public<br>' +
-                               './Public/index.html';
-                    }
-                },
-                
-                history: {
-                    description: 'Show command history',
-                    execute: function(args) {
-                        var historyText = '';
-                        var start = Math.max(0, commandHistory.length - 20);
-                        for (var i = start; i < commandHistory.length; i++) {
-                            historyText += '  ' + (i + 1) + '  ' + commandHistory[i] + '<br>';
-                        }
-                        return historyText || '<span class="info">No command history yet</span>';
-                    }
-                },
-                
-                env: {
-                    description: 'Show environment variables',
-                    execute: function(args) {
-                        return 'USER=ora<br>' +
-                               'HOME=/home/ora<br>' +
-                               'SHELL=/bin/bash<br>' +
-                               'TERM=ora-terminal<br>' +
-                               'PATH=/usr/local/bin:/usr/bin:/bin<br>' +
-                               'PWD=/home/ora<br>' +
-                               'LANG=en_US.UTF-8<br>' +
-                               'SECURITY_LEVEL=maximum';
-                    }
-                },
-                
-                top: {
-                    description: 'Display system processes',
-                    execute: function(args) {
-                        return 'top - 10:45:23 up 15 min,  1 user,  load average: 0.15, 0.08, 0.03<br>' +
-                               'Tasks: 123 total,   1 running, 122 sleeping,   0 stopped,   0 zombie<br>' +
-                               '%Cpu(s):  2.3 us,  0.7 sy,  0.0 ni, 97.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st<br>' +
-                               'MiB Mem : 128000.0 total, 115200.0 free,   6400.0 used,   6400.0 buff/cache<br>' +
-                               'MiB Swap:   4096.0 total,   4096.0 free,      0.0 used. 120000.0 avail Mem<br><br>' +
-                               '  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND<br>' +
-                               '  789 ora       20   0  123456   7890   1234 S   2.3   0.0   0:02.34 ora-terminal<br>' +
-                               ' 1234 ora       20   0   56789   2345   1234 S   0.3   0.0   0:00.12 bash<br>' +
-                               '    1 root      20   0  169256  12345   7890 S   0.0   0.0   0:01.23 systemd';
-                    }
-                },
-                
-                nano: {
-                    description: 'Text editor',
-                    execute: function(args) {
-                        if (args.length === 0) {
-                            return '<span class="info">GNU nano 7.2 - New Buffer</span><br><br>' +
-                                   '[ File: New Buffer ]<br><br>' +
-                                   'Welcome to nano. Type your text here.<br><br>' +
-                                   '^G Get Help  ^O Write Out ^W Where Is  ^K Cut Text  ^J Justify   ^C Cur Pos<br>' +
-                                   '^X Exit      ^R Read File ^\ Replace   ^U Paste Text^T To Spell  ^_ Go To Line';
-                        }
-                        return '<span class="info">Editing file: ' + args[0] + '</span><br>' +
-                               '<span class="info">Press Ctrl+X to exit</span>';
-                    }
-                },
-                
-                vim: {
-                    description: 'Advanced text editor',
-                    execute: function(args) {
-                        return '<span class="info">VIM - Vi IMproved 9.0</span><br><br>' +
-                               '~<br>'.repeat(20) + '<br><br>' +
-                               '"' + (args[0] || 'New File') + '" [New File]<br>' +
-                               'Press i for insert mode, :q to quit, :wq to save and quit';
-                    }
-                },
-                
-                diff: {
-                    description: 'Compare files',
-                    execute: function(args) {
-                        if (args.length < 2) {
-                            return '<span class="error">diff: missing operand after \'' + (args[0] || 'diff') + '\'</span>';
-                        }
-                        return '1c1<br>' +
-                               '< Hello World<br>' +
-                               '---<br>' +
-                               '> Hello ORA<br>' +
-                               '3d2<br>' +
-                               '< This line is only in file1';
-                    }
-                },
-                
-                wc: {
-                    description: 'Word count',
-                    execute: function(args) {
-                        if (args.length === 0) {
-                            return '<span class="error">wc: missing file operand</span>';
-                        }
-                        return '  123   456  7890 ' + args[0];
-                    }
-                },
-                
-                sort: {
-                    description: 'Sort lines',
-                    execute: function(args) {
-                        return 'apple<br>' +
-                               'banana<br>' +
-                               'cherry<br>' +
-                               'date<br>' +
-                               'elderberry';
-                    }
-                },
-                
-                uniq: {
-                    description: 'Remove duplicates',
-                    execute: function(args) {
-                        return 'line1<br>' +
-                               'line2<br>' +
-                               'line3<br>' +
-                               'line4';
-                    }
-                },
-                
-                man: {
-                    description: 'Display manual page',
-                    execute: function(args) {
-                        if (args.length === 0) {
-                            return '<span class="error">What manual page do you want?</span>';
-                        }
-                        var cmd = args[0];
-                        if (commands[cmd]) {
-                            return '<span class="hacker">NAME</span><br>' +
-                                   '       ' + cmd + ' - ' + commands[cmd].description + '<br><br>' +
-                                   '<span class="hacker">SYNOPSIS</span><br>' +
-                                   '       ' + cmd + ' [options] [arguments]<br><br>' +
-                                   '<span class="hacker">DESCRIPTION</span><br>' +
-                                   '       ' + commands[cmd].description + '<br><br>' +
-                                   '<span class="hacker">SEE ALSO</span><br>' +
-                                   '       help(1)';
-                        } else {
-                            return 'No manual entry for ' + cmd;
-                        }
-                    }
-                },
-                
-                neofetch: {
-                    description: 'Display system information',
-                    execute: function(args) {
-                        return '' +
-                        '<span class="hacker">        .-/+oossssoo+/-.               <span class="info">ora@terminal</span></span><br>' +
-                        '<span class="hacker">    `:+ssssssssssssssssss+:`           -------------</span><br>' +
-                        '<span class="hacker">  -+ssssssssssssssssssyyssss+-         <span class="info">OS: ORA Terminal Kali v2.0</span></span><br>' +
-                        '<span class="hacker"> .ossssssssssssssssssdMMMNysssso.       <span class="info">Host: ORA Secure Server</span></span><br>' +
-                        '<span class="hacker"> /ssssssssssshdmmNNmmyNMMMMhssssss/      <span class="info">Kernel: 6.1.0-kali5-amd64</span></span><br>' +
-                        '<span class="hacker"> +ssssssssshmydMMMMMMMNddddysssssss+     <span class="info">Uptime: 15 mins</span></span><br>' +
-                        '<span class="hacker"> /sssssssshNMMMyhhyyyyhmNMMMNhssssss/    <span class="info">Shell: ora-terminal v2.0</span></span><br>' +
-                        '<span class="hacker"> .ossssssssdMMMNhsssssssssshNMMMdssssso.  <span class="info">Terminal: ORA Terminal</span></span><br>' +
-                        '<span class="hacker">  -+sssssssshyyysssssssssssssyyyyssss+-  <span class="info">CPU: Xeon E5-2699 v4 (44) @ 2.20GHz</span></span><br>' +
-                        '<span class="hacker">    `:+ssssssssssssssssssssssssssss+:`   <span class="info">Memory: 128GiB</span></span><br>' +
-                        '<span class="hacker">        .-/+oossssoo+/-.</span>';
-                    }
-                },
-                
-                uname: {
-                    description: 'Print system information',
-                    execute: function(args) {
-                        if (args[0] === '-a') {
-                            return 'Linux terminal 6.1.0-kali5-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.12-1kali2 (2023-02-23) x86_64 GNU/Linux';
-                        }
-                        return 'Linux';
-                    }
-                },
-                
-                uptime: {
-                    description: 'Tell how long system has been running',
-                    execute: function(args) {
-                        return ' 10:45:23 up 15 min,  1 user,  load average: 0.15, 0.08, 0.03';
-                    }
-                },
-                
-                cal: {
-                    description: 'Display a calendar',
-                    execute: function(args) {
-                        var now = new Date();
-                        var month = now.getMonth();
-                        var year = now.getFullYear();
-                        
-                        var monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                                        'July', 'August', 'September', 'October', 'November', 'December'];
-                        
-                        return '' +
-                        '<span class="info">     ' + monthNames[month] + ' ' + year + '</span><br>' +
-                        '<span class="info">Su Mo Tu We Th Fr Sa</span><br>' +
-                        '<span class="info"> 1  2  3  4  5  6  7</span><br>' +
-                        '<span class="info"> 8  9 10 11 12 13 14</span><br>' +
-                        '<span class="info">15 16 17 18 19 20 21</span><br>' +
-                        '<span class="info">22 23 24 25 26 27 28</span><br>' +
-                        '<span class="info">29 30 31</span>';
-                    }
-                },
-                
-                bc: {
-                    description: 'Arbitrary precision calculator',
-                    execute: function(args) {
-                        if (args.length === 0) {
-                            return '<span class="info">bc 1.07.1 - Arbitrary precision calculator</span><br>' +
-                                   '<span class="info">Type \'quit\' to exit</span>';
-                        }
-                        var expr = args.join(' ');
-                        try {
-                            var result = eval(expr);
-                            return expr + ' = ' + result;
-                        } catch (e) {
-                            return '<span class="error">bc: syntax error</span>';
-                        }
-                    }
-                },
-                
-                color: {
-                    description: 'Change matrix animation color (1-12)',
-                    execute: function(args) {
-                        if (args.length === 0) {
-                            var colors = '<span class="info">Available colors (1-12):</span><br>';
-                            for (var i = 0; i < matrixColors.length; i++) {
-                                colors += '<span class="command">' + (i + 1) + '</span> - <span style="color:' + matrixColors[i] + '">■</span> ' + matrixColors[i] + '<br>';
-                            }
-                            return colors;
-                        }
-                        
-                        var colorNum = parseInt(args[0]);
-                        if (colorNum >= 1 && colorNum <= 12) {
-                            matrixColor = matrixColors[colorNum - 1];
-                            return '<span class="success">Matrix color changed to #' + colorNum + '</span>';
-                        } else {
-                            return '<span class="error">Color must be between 1 and 12</span>';
-                        }
-                    }
-                },
-                
-                matrix: {
-                    description: 'Toggle matrix background',
-                    execute: function(args) {
-                        if (canvas.style.display === 'none') {
-                            canvas.style.display = 'block';
-                            return '<span class="success">Matrix background enabled</span>';
-                        } else {
-                            canvas.style.display = 'none';
-                            return '<span class="success">Matrix background disabled</span>';
-                        }
-                    }
-                },
-                
-                reboot: {
-                    description: 'Restart terminal',
-                    execute: function(args) {
-                        setTimeout(function() {
-                            location.reload();
-                        }, 1000);
-                        return '<span class="warning">Rebooting terminal...</span>';
-                    }
-                },
-                
-                shutdown: {
-                    description: 'Shutdown terminal',
-                    execute: function(args) {
-                        setTimeout(function() {
-                            terminalOutput.innerHTML = '';
-                            var shutdownMsg = document.createElement('div');
-                            shutdownMsg.className = 'output system';
-                            shutdownMsg.textContent = '[SYSTEM] Shutting down ORA Terminal...';
-                            terminalOutput.appendChild(shutdownMsg);
-                            setTimeout(function() {
-                                document.body.innerHTML = '<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:#4af626;font-family:monospace;text-align:center;">ORA Terminal - SHUTDOWN<br><br>Refresh page to restart</div>';
-                            }, 2000);
-                        }, 1000);
-                        return '<span class="warning">Shutting down terminal...</span>';
-                    }
-                },
-                
-                about: {
-                    description: 'About this terminal',
-                    execute: function(args) {
-                        return '<span class="hacker">ORA Terminal Shell v2.0</span><br>' +
-                        '<span class="info">Secure Kali Linux-style terminal interface</span><br>' +
-                        '<span class="info">With ORA Tool integration</span><br>' +
-                        '<span class="info">Created by MKB - 2025</span><br><br>' +
-                        '<span class="info">Features:</span><br>' +
-                        '<span class="info">• Matrix background animation (color selectable)</span><br>' +
-                        '<span class="info">• Kali Linux command set</span><br>' +
-                        '<span class="info">• ORA Tool launcher (orastart)</span><br>' +
-                        '<span class="info">• Interactive command history</span><br>' +
-                        '<span class="info">• Tab auto-completion</span><br>' +
-                        '<span class="info">• Secure encrypted connection simulation</span><br>' +
-                        '<span class="info">• 80+ terminal commands</span>';
-                    }
-                }
-            };
-            
-            // ==============================
-            // INPUT HANDLING
-            // ==============================
-            function createInputLine() {
-                var inputLine = document.createElement('div');
-                inputLine.className = 'input-line';
-                
-                inputLine.innerHTML = '' +
-                    '<span class="prompt">ora@terminal:~$ </span>' +
-                    '<input type="text" class="command-input" autocomplete="off" id="main-command-input">' +
-                    '<span class="cursor"></span>';
-                
-                terminalOutput.appendChild(inputLine);
-                
-                var input = inputLine.querySelector('.command-input');
-                
-                setTimeout(function() {
-                    input.focus();
-                }, 100);
-                
-                input.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        var command = input.value.trim();
-                        inputLine.remove();
-                        processCommand(command);
-                    }
-                    
-                    // Tab completion
-                    if (e.key === 'Tab') {
-                        e.preventDefault();
-                        var currentInput = input.value.trim().split(' ')[0];
-                        var matchingCommands = Object.keys(commands).filter(function(cmd) {
-                            return cmd.startsWith(currentInput);
-                        });
-                        if (matchingCommands.length === 1) {
-                            input.value = matchingCommands[0] + ' ';
-                        } else if (matchingCommands.length > 1) {
-                            var outputDiv = document.createElement('div');
-                            outputDiv.className = 'output info';
-                            outputDiv.textContent = matchingCommands.join('  ');
-                            terminalOutput.appendChild(outputDiv);
-                        }
-                    }
-                    
-                    // Command history
-                    if (e.key === 'ArrowUp') {
-                        e.preventDefault();
-                        if (commandHistory.length > 0 && historyIndex > 0) {
-                            historyIndex--;
-                            input.value = commandHistory[historyIndex] || '';
-                        }
-                    }
-                    
-                    if (e.key === 'ArrowDown') {
-                        e.preventDefault();
-                        if (commandHistory.length > 0 && historyIndex < commandHistory.length - 1) {
-                            historyIndex++;
-                            input.value = commandHistory[historyIndex] || '';
-                        } else {
-                            historyIndex = commandHistory.length;
-                            input.value = '';
-                        }
-                    }
-                });
-                
-                terminalOutput.scrollTop = terminalOutput.scrollHeight;
-            }
-            
-            function processCommand(fullCommand) {
-                // Add to history
-                commandHistory.push(fullCommand);
-                historyIndex = commandHistory.length;
-                
-                // Display command
-                var commandOutput = document.createElement('div');
-                commandOutput.className = 'output';
-                commandOutput.innerHTML = '<span class="prompt">ora@terminal:~$ </span> <span class="command">' + fullCommand + '</span>';
-                terminalOutput.appendChild(commandOutput);
-                
-                // Parse command
-                var parts = fullCommand.split(' ');
-                var cmd = parts[0];
-                var args = parts.slice(1);
-                
-                var resultDiv = document.createElement('div');
-                resultDiv.className = 'output';
-                
-                if (cmd === '') {
-                    resultDiv.innerHTML = '';
-                } else if (commands[cmd]) {
-                    try {
-                        var result = commands[cmd].execute(args);
-                        resultDiv.innerHTML = result;
-                    } catch (error) {
-                        console.error('Command error:', error);
-                        resultDiv.innerHTML = '<span class="error">Error: ' + error.message + '</span>';
-                    }
-                } else {
-                    resultDiv.innerHTML = '<span class="error">Command not found: ' + cmd + '</span><br>' +
-                    'Type <span class="command">\'help\'</span> for available commands';
-                }
-                
-                if (resultDiv.innerHTML !== '') {
-                    terminalOutput.appendChild(resultDiv);
-                }
-                
-                createInputLine();
-                terminalOutput.scrollTop = terminalOutput.scrollHeight;
-            }
-            
-            // ==============================
-            // TERMINAL CONTROLS
-            // ==============================
-            function setupTerminalControls() {
-                // Close button
-                document.getElementById('close-btn').addEventListener('click', function() {
-                    terminalContainer.style.display = 'none';
-                    var message = document.createElement('div');
-                    message.className = 'output error';
-                    message.textContent = 'Terminal closed. Refresh page to restart.';
-                    terminalOutput.appendChild(message);
-                });
-                
-                // Minimize button
-                document.getElementById('minimize-btn').addEventListener('click', function() {
-                    terminalContainer.style.height = '45px';
-                    setTimeout(function() {
-                        terminalContainer.style.height = '600px';
-                    }, 2000);
-                });
-                
-                // Maximize button
-                document.getElementById('maximize-btn').addEventListener('click', function() {
-                    if (terminalContainer.style.width === '95vw') {
-                        terminalContainer.style.width = '900px';
-                        terminalContainer.style.height = '600px';
-                        terminalContainer.style.left = '50%';
-                        terminalContainer.style.top = '50%';
-                        terminalContainer.style.transform = 'translate(-50%, -50%)';
-                    } else {
-                        terminalContainer.style.width = '95vw';
-                        terminalContainer.style.height = '90vh';
-                        terminalContainer.style.left = '2.5vw';
-                        terminalContainer.style.top = '5vh';
-                        terminalContainer.style.transform = 'none';
-                    }
-                });
-                
-                // Draggable terminal
-                terminalHeader.addEventListener('mousedown', function(e) {
-                    if (e.target === terminalHeader || e.target.classList.contains('terminal-title')) {
-                        isDragging = true;
-                        var rect = terminalContainer.getBoundingClientRect();
-                        dragOffset.x = e.clientX - rect.left;
-                        dragOffset.y = e.clientY - rect.top;
-                        terminalContainer.style.cursor = 'grabbing';
-                    }
-                });
-                
-                document.addEventListener('mousemove', function(e) {
-                    if (isDragging) {
-                        terminalContainer.style.left = (e.clientX - dragOffset.x) + 'px';
-                        terminalContainer.style.top = (e.clientY - dragOffset.y) + 'px';
-                        terminalContainer.style.transform = 'none';
-                    }
-                });
-                
-                document.addEventListener('mouseup', function() {
-                    isDragging = false;
-                    terminalContainer.style.cursor = '';
-                });
-                
-                // Focus input on click
-                document.addEventListener('click', function() {
-                    setTimeout(function() {
-                        var input = document.querySelector('.command-input');
-                        if (input) input.focus();
-                    }, 100);
-                });
-                
-                // Handle window resize
-                window.addEventListener('resize', function() {
-                    initMatrix();
-                });
-            }
-            
-            // ==============================
-            // INITIALIZATION
-            // ==============================
-            async function init() {
-                // Initialize matrix animation
-                initMatrix();
-                setInterval(drawMatrix, 50);
-                
-                // Setup terminal controls
-                setupTerminalControls();
-                
-                // Start boot sequence
-                await runBootSequence();
-            }
-            
-            // Start the application when DOM is ready
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', init);
-            } else {
-                init();
-            }
-            
-        })(); // End of IIFE
-    </script>
+  <!-- Config reminder: bucket name is configurable below in JavaScript -->
+  <div class="bucket-config-note">
+    <i class="fas fa-database"></i>
+    <span>Bucket: <code id="bucketDisplay">exams</code> · connected to <code>kdrgdnrwibuqpvikjapx</code></span>
+  </div>
+
+  <!-- Drag & drop upload zone -->
+  <div id="dropZone" class="upload-zone">
+    <i class="fas fa-cloud-upload-alt"></i>
+    <div>
+      <span class="browse-text">Drag & drop files here</span> or <strong>browse</strong>
+    </div>
+    <div style="font-size:0.8rem; color:#64748b;">Any file type accepted</div>
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+  <input type="file" id="fileInput" multiple />
+
+  <!-- Search & refresh toolbar -->
+  <div class="toolbar">
+    <div class="search-wrapper">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Search files by name..." autocomplete="off">
+    </div>
+    <button id="refreshBtn" class="refresh-btn">
+      <i class="fas fa-sync-alt"></i> Refresh
+    </button>
+  </div>
+
+  <!-- File cards container -->
+  <div id="fileGrid" class="file-list">
+    <!-- dynamic js render -->
+  </div>
+</div>
+
+<!-- Toast container for notifications -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+  (function() {
+    // ---------- CONFIGURATION ----------
+    // INSTRUCTIONS:
+    // Replace these values if needed. Currently set to provided Supabase project.
+    // Bucket name must exist in Supabase Storage and have appropriate RLS policies (public read, authenticated insert/delete etc.)
+    const SUPABASE_URL = "https://kdrgdnrwibuqpvikjapx.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkcmdkbnJ3aWJ1cXB2aWtqYXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNjE4ODMsImV4cCI6MjA5NjkzNzg4M30.9wEbcIDziq9xDWZQ_BF0X-p25g4SQkuCCQV-5fhDnbY";
+    
+    // CONFIGURABLE BUCKET NAME - change "exams" to your desired bucket (must exist in Supabase storage)
+    const STORAGE_BUCKET = "exams";
+    
+    // -----------------------------------
+
+    // Display bucket name
+    document.getElementById('bucketDisplay').textContent = STORAGE_BUCKET;
+
+    // Initialize Supabase client
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // DOM elements
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressFill = document.getElementById('progressFill');
+    const searchInput = document.getElementById('searchInput');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const fileGrid = document.getElementById('fileGrid');
+    const toastContainer = document.getElementById('toastContainer');
+
+    // State: all files from bucket
+    let allFiles = [];
+
+    // ---------- Toast notifications ----------
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+      toast.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+      toastContainer.appendChild(toast);
+      setTimeout(() => {
+        toast.remove();
+      }, 3500);
+    }
+
+    // ---------- Format file size ----------
+    function formatSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // ---------- Fetch files from Supabase Storage ----------
+    async function fetchFiles() {
+      try {
+        const { data, error } = await supabase
+          .storage
+          .from(STORAGE_BUCKET)
+          .list('', {
+            limit: 100,
+            offset: 0,
+            sortBy: { column: 'created_at', order: 'desc' }
+          });
+        
+        if (error) {
+          throw error;
+        }
+        // Filter out folders if any (just in case)
+        allFiles = (data || []).filter(item => !item.id?.includes('/') && item.name);
+        renderFileGrid(allFiles);
+      } catch (err) {
+        console.error('Fetch error:', err);
+        showToast(`Failed to load files: ${err.message || 'Unknown error'}`, 'error');
+        allFiles = [];
+        renderFileGrid([]);
+      }
+    }
+
+    // ---------- Render grid with optional search filter ----------
+    function renderFileGrid(filesToRender = allFiles) {
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      let filtered = filesToRender;
+      if (searchTerm) {
+        filtered = filesToRender.filter(file => 
+          file.name.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      if (!filtered.length) {
+        fileGrid.innerHTML = `<div class="empty-state"><i class="far fa-folder-open" style="font-size:2rem; opacity:0.6;"></i><p>No files found.</p></div>`;
+        return;
+      }
+
+      fileGrid.innerHTML = filtered.map(file => {
+        const size = file.metadata?.size || 0;
+        const created = file.created_at ? new Date(file.created_at).toLocaleDateString() : '—';
+        return `
+          <div class="file-card" data-file-name="${escapeHtml(file.name)}">
+            <div class="file-icon"><i class="fas fa-file"></i></div>
+            <div class="file-info">
+              <span class="file-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</span>
+              <div class="file-meta">
+                <span>${formatSize(size)}</span>
+                <span>·</span>
+                <span>${created}</span>
+              </div>
+            </div>
+            <div class="actions">
+              <i class="fas fa-copy" title="Copy URL" data-action="copy" data-name="${escapeHtml(file.name)}"></i>
+              <i class="fas fa-download" title="Download" data-action="download" data-name="${escapeHtml(file.name)}"></i>
+              <i class="fas fa-trash-alt" title="Delete" data-action="delete" data-name="${escapeHtml(file.name)}"></i>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Attach event listeners to action icons
+      document.querySelectorAll('.actions i[data-action]').forEach(icon => {
+        icon.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const action = icon.getAttribute('data-action');
+          const fileName = icon.getAttribute('data-name');
+          if (!fileName) return;
+          
+          if (action === 'copy') await copyFileUrl(fileName);
+          else if (action === 'download') await downloadFile(fileName);
+          else if (action === 'delete') await deleteFile(fileName);
+        });
+      });
+    }
+
+    // Simple escape for HTML attributes
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // ---------- Get public URL ----------
+    function getPublicUrl(fileName) {
+      const { data } = supabase
+        .storage
+        .from(STORAGE_BUCKET)
+        .getPublicUrl(fileName);
+      return data?.publicUrl || '';
+    }
+
+    // ---------- Copy file URL ----------
+    async function copyFileUrl(fileName) {
+      try {
+        const url = getPublicUrl(fileName);
+        await navigator.clipboard.writeText(url);
+        showToast('URL copied to clipboard', 'success');
+      } catch (err) {
+        showToast('Failed to copy URL', 'error');
+      }
+    }
+
+    // ---------- Download file ----------
+    async function downloadFile(fileName) {
+      try {
+        const { data, error } = await supabase
+          .storage
+          .from(STORAGE_BUCKET)
+          .download(fileName);
+        if (error) throw error;
+        
+        // Create blob link
+        const url = URL.createObjectURL(data);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        showToast(`Downloading ${fileName}`, 'success');
+      } catch (err) {
+        showToast(`Download failed: ${err.message}`, 'error');
+      }
+    }
+
+    // ---------- Delete file ----------
+    async function deleteFile(fileName) {
+      if (!confirm(`Delete "${fileName}"? This cannot be undone.`)) return;
+      try {
+        const { error } = await supabase
+          .storage
+          .from(STORAGE_BUCKET)
+          .remove([fileName]);
+        if (error) throw error;
+        showToast(`Deleted ${fileName}`, 'success');
+        await fetchFiles(); // refresh list
+      } catch (err) {
+        showToast(`Delete error: ${err.message}`, 'error');
+      }
+    }
+
+    // ---------- Upload with progress (using XMLHttpRequest for progress) ----------
+    async function uploadFiles(fileList) {
+      if (!fileList || fileList.length === 0) return;
+      
+      // Show progress container
+      progressContainer.style.display = 'block';
+      progressFill.style.width = '0%';
+      
+      let successCount = 0;
+      let failCount = 0;
+      const total = fileList.length;
+      
+      for (let i = 0; i < total; i++) {
+        const file = fileList[i];
+        try {
+          await uploadSingleFileWithProgress(file, (percent) => {
+            // overall progress approximation (average)
+            const baseProgress = (i / total) * 100;
+            const currentFileContribution = (1 / total) * percent;
+            const overall = Math.min(100, baseProgress + currentFileContribution);
+            progressFill.style.width = overall + '%';
+          });
+          successCount++;
+        } catch (err) {
+          failCount++;
+          showToast(`Upload failed for ${file.name}: ${err.message}`, 'error');
+        }
+      }
+      
+      // Complete progress
+      progressFill.style.width = '100%';
+      setTimeout(() => {
+        progressContainer.style.display = 'none';
+        progressFill.style.width = '0%';
+      }, 700);
+      
+      if (successCount > 0) {
+        showToast(`${successCount} file(s) uploaded successfully`, 'success');
+      }
+      await fetchFiles(); // refresh list
+    }
+
+    function uploadSingleFileWithProgress(file, onProgress) {
+      return new Promise((resolve, reject) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const xhr = new XMLHttpRequest();
+        
+        // Build upload URL for Supabase Storage (standard REST)
+        const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${file.name}`;
+        
+        xhr.open('POST', uploadUrl, true);
+        xhr.setRequestHeader('Authorization', `Bearer ${SUPABASE_ANON_KEY}`);
+        // Supabase expects the file as form-data with 'file' field, no extra headers for content-type (browser sets multipart)
+        
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            const percent = Math.round((e.loaded / e.total) * 100);
+            onProgress(percent);
+          }
+        });
+        
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(JSON.parse(xhr.responseText));
+          } else {
+            let errorMsg = 'Upload error';
+            try {
+              const res = JSON.parse(xhr.responseText);
+              errorMsg = res.message || res.error || 'Unknown error';
+            } catch (e) {}
+            reject(new Error(errorMsg));
+          }
+        };
+        
+        xhr.onerror = () => reject(new Error('Network error'));
+        xhr.send(formData);
+      });
+    }
+
+    // ---------- Drag & Drop handlers ----------
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, preventDefaults, false);
+      document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    dropZone.addEventListener('dragenter', () => dropZone.classList.add('drag-active'));
+    dropZone.addEventListener('dragover', () => dropZone.classList.add('drag-active'));
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-active'));
+    dropZone.addEventListener('drop', (e) => {
+      dropZone.classList.remove('drag-active');
+      const dt = e.dataTransfer;
+      if (dt.files && dt.files.length) {
+        uploadFiles(dt.files);
+      }
+    });
+
+    // Click on drop zone triggers file input
+    dropZone.addEventListener('click', (e) => {
+      // Prevent if clicking on progress or child actions
+      if (e.target.closest('.progress-container') || e.target.closest('i')) {
+        // still allow open file dialog
+      }
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (fileInput.files.length) {
+        uploadFiles(fileInput.files);
+        fileInput.value = ''; // reset so same file can be selected again
+      }
+    });
+
+    // Search listener
+    searchInput.addEventListener('input', () => {
+      renderFileGrid(allFiles);
+    });
+
+    // Refresh button
+    refreshBtn.addEventListener('click', () => {
+      fetchFiles();
+    });
+
+    // Initial load
+    fetchFiles();
+
+    // Additional: handle window errors gracefully
+    window.addEventListener('error', (e) => {
+      console.warn('Global error captured:', e);
+    });
+
+  })();
+</script>
 </body>
 </html>

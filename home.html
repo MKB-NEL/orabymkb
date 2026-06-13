@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>VaultDrop · Social File Hub</title>
+  
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Boxicons -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #f0f2f5;
+      --surface: #ffffff;
+      --surface-hover: #f7f8fa;
+      --border: #e4e6eb;
+      --border-light: #f0f2f5;
+      --text-primary: #1c1e21;
+      --text-secondary: #65676b;
+      --text-tertiary: #8a8d91;
+      --accent: #1877f2;
+      --accent-hover: #166fe5;
+      --accent-light: #e7f3ff;
+      --accent-gradient: linear-gradient(135deg, #1877f2 0%, #00a2ff 100%);
+      --danger: #fa383e;
+      --danger-hover: #e02d32;
+      --danger-light: #ffebee;
+      --success: #31a24c;
+      --success-light: #e8f5e9;
+      --warning: #f7b928;
+      --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+      --shadow-xl: 0 12px 48px rgba(0,0,0,0.15);
+      --radius-xs: 6px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-full: 50px;
+      --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      line-height: 1.5;
+    }
+
+    /* Main App Container */
+    .social-app {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 8px;
+      padding-bottom: 32px;
+    }
+
+    /* Header Card */
+    .header-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 8px;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--accent-gradient);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 22px;
+      box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
+    }
+
+    .brand-info h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .brand-info span {
+      font-size: 0.7rem;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    .header-stats {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .stat-item i {
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    /* Create Post / Upload Card */
+    .upload-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+    }
+
+    .upload-trigger {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: var(--transition);
+      border: 2px dashed var(--border);
+    }
+
+    .upload-trigger:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+    }
+
+    .upload-trigger.drag-active {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      border-style: solid;
+      box-shadow: 0 0 0 4px rgba(24, 119, 242, 0.15);
+    }
+
+    .upload-trigger i {
+      font-size: 24px;
+      color: var(--accent);
+    }
+
+    .upload-trigger-text {
+      flex: 1;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .upload-btn-mini {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .upload-btn-mini:hover {
+      background: var(--accent-hover);
+      transform: scale(1.02);
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    /* Progress Card */
+    .progress-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--accent);
+      display: none;
+      animation: slideDown 0.3s ease;
+    }
+
+    .progress-card.active {
+      display: block;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .progress-bar-wrapper {
+      width: 100%;
+      height: 6px;
+      background: var(--border-light);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent-gradient);
+      border-radius: var(--radius-full);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .progress-detail {
+      font-size: 0.7rem;
+      color: var(--text-tertiary);
+      text-align: right;
+    }
+
+    /* Search Bar */
+    .search-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .search-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-wrapper i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-tertiary);
+      font-size: 1.1rem;
+      pointer-events: none;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 10px 12px 10px 40px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      font-size: 0.85rem;
+      font-family: inherit;
+      background: var(--bg);
+      color: var(--text-primary);
+      transition: var(--transition);
+      outline: none;
+    }
+
+    #searchInput:focus {
+      border-color: var(--accent);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.1);
+    }
+
+    .btn-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .btn-icon:hover {
+      background: var(--bg);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* File Feed */
+    .file-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .file-post {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: var(--transition);
+      animation: fadeInUp 0.4s ease;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .file-post:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--border);
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+    }
+
+    .post-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .post-avatar.image {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      color: #1976d2;
+    }
+
+    .post-avatar.document {
+      background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+      color: #f57c00;
+    }
+
+    .post-avatar.video {
+      background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+      color: #c2185b;
+    }
+
+    .post-avatar.other {
+      background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+      color: #616161;
+    }
+
+    .post-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .post-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+
+    .post-meta {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .post-actions-bar {
+      display: flex;
+      border-top: 1px solid var(--border-light);
+      padding: 4px 12px;
+      gap: 4px;
+    }
+
+    .post-action {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      border-radius: var(--radius-xs);
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    .post-action:hover {
+      background: var(--bg);
+      color: var(--accent);
+    }
+
+    .post-action.danger:hover {
+      background: var(--danger-light);
+      color: var(--danger);
+    }
+
+    .post-action i {
+      font-size: 1.2rem;
+    }
+
+    /* Empty State */
+    .empty-feed {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 60px 20px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+    }
+
+    .empty-feed i {
+      font-size: 64px;
+      color: var(--border);
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .empty-feed h3 {
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .empty-feed p {
+      font-size: 0.85rem;
+      color: var(--text-tertiary);
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 8px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--surface);
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      font-size: 0.85rem;
+      animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: all;
+      border-left: 4px solid;
+      min-width: 280px;
+      max-width: 420px;
+    }
+
+    .toast.success { border-left-color: var(--success); }
+    .toast.error { border-left-color: var(--danger); }
+
+    .toast i { font-size: 1.3rem; }
+    .toast.success i { color: var(--success); }
+    .toast.error i { color: var(--danger); }
+
+    @keyframes toastIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes toastOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(120%); opacity: 0; }
+    }
+
+    /* Responsive */
+    @media (max-width: 500px) {
+      .social-app {
+        gap: 10px;
+      }
+      .post-action span {
+        display: none;
+      }
+      .post-action {
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="social-app">
+    <!-- Header -->
+    <div class="header-card">
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="bx bx-cloud-lightning"></i>
+        </div>
+        <div class="brand-info">
+          <h2>VaultDrop</h2>
+          <span>Your files, socialized</span>
+        </div>
+      </div>
+      <div class="header-stats">
+        <div class="stat-item">
+          <i class="bx bx-file"></i>
+          <span id="fileCount">0</span>
+        </div>
+        <button class="btn-icon" id="refreshBtn" title="Refresh">
+          <i class="bx bx-refresh"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Upload Card -->
+    <div class="upload-card">
+      <div class="upload-trigger" id="dropZone">
+        <i class="bx bx-cloud-upload"></i>
+        <span class="upload-trigger-text">Drop files here or click to browse...</span>
+        <button class="upload-btn-mini" id="browseBtn">
+          <i class="bx bx-plus"></i> Add
+        </button>
+      </div>
+      <input type="file" id="fileInput" multiple />
+      
+      <!-- Progress -->
+      <div class="progress-card" id="progressCard">
+        <div class="progress-header">
+          <span id="progressLabel">Uploading files...</span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar-wrapper">
+          <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-detail" id="progressDetail"></div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-card">
+      <div class="search-wrapper">
+        <i class="bx bx-search"></i>
+        <input type="text" id="searchInput" placeholder="Search your files..." autocomplete="off">
+      </div>
+      <button class="btn-icon" id="sortBtn" title="Sort">
+        <i class="bx bx-sort-alt-2"></i>
+      </button>
+    </div>
+
+    <!-- File Feed -->
+    <div class="file-feed" id="fileFeed">
+      <!-- Dynamic posts -->
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    (function() {
+      // ==================== CONFIGURATION ====================
+      // Configure your Supabase project and bucket here.
+      // The bucket must exist with appropriate RLS policies.
+      // For uploads to work, the bucket must allow INSERT operations.
+      
+      const SUPABASE_URL = "https://kdrgdnrwibuqpvikjapx.supabase.co";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkcmdkbnJ3aWJ1cXB2aWtqYXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNjE4ODMsImV4cCI6MjA5NjkzNzg4M30.9wEbcIDziq9xDWZQ_BF0X-p25g4SQkuCCQV-5fhDnbY";
+      const STORAGE_BUCKET = "exams"; // Change to your bucket name
+      
+      // ==================== INITIALIZATION ====================
+      // Use a try-catch wrapper to prevent SDK initialization errors from breaking the page
+      let supabase;
+      try {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+          },
+          global: {
+            headers: {
+              'X-Client-Info': 'vaultdrop-file-manager',
+            },
+          },
+        });
+      } catch (initError) {
+        console.error('Supabase init error:', initError);
+        showToast('Failed to initialize storage client', 'error');
+      }
+      
+      // DOM Elements
+      const dropZone = document.getElementById('dropZone');
+      const fileInput = document.getElementById('fileInput');
+      const browseBtn = document.getElementById('browseBtn');
+      const progressCard = document.getElementById('progressCard');
+      const progressFill = document.getElementById('progressFill');
+      const progressLabel = document.getElementById('progressLabel');
+      const progressPercent = document.getElementById('progressPercent');
+      const progressDetail = document.getElementById('progressDetail');
+      const searchInput = document.getElementById('searchInput');
+      const sortBtn = document.getElementById('sortBtn');
+      const refreshBtn = document.getElementById('refreshBtn');
+      const fileFeed = document.getElementById('fileFeed');
+      const fileCountEl = document.getElementById('fileCount');
+      const toastContainer = document.getElementById('toastContainer');
+      
+      // State
+      let allFiles = [];
+      let sortOrder = 'newest'; // 'newest', 'oldest', 'name'
+      let uploadQueue = [];
+      let isUploading = false;
+      
+      // ==================== TOAST SYSTEM ====================
+      function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        const icon = type === 'success' ? 'bx-check-circle' : 'bx-error-circle';
+        toast.innerHTML = `<i class="bx ${icon}"></i> <span>${message}</span>`;
+        toastContainer.appendChild(toast);
+        
+        setTimeout(() => {
+          toast.style.animation = 'toastOut 0.3s ease forwards';
+          setTimeout(() => {
+            if (toast.parentNode) toast.remove();
+          }, 300);
+        }, 4000);
+      }
+      
+      // ==================== UTILITY FUNCTIONS ====================
+      function formatSize(bytes) {
+        if (!bytes || bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+      }
+      
+      function getFileExtension(filename) {
+        return (filename || '').split('.').pop().toLowerCase();
+      }
+      
+      function getFileCategory(filename) {
+        const ext = getFileExtension(filename);
+        const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp', 'ico', 'heic'];
+        const docExts = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'md', 'rtf'];
+        const videoExts = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm', 'm4v'];
+        
+        if (imageExts.includes(ext)) return 'image';
+        if (docExts.includes(ext)) return 'document';
+        if (videoExts.includes(ext)) return 'video';
+        return 'other';
+      }
+      
+      function getFileIcon(filename) {
+        const category = getFileCategory(filename);
+        switch(category) {
+          case 'image': return 'bx bx-image-alt';
+          case 'document': return 'bx bx-file';
+          case 'video': return 'bx bx-video';
+          default: return 'bx bx-file-blank';
+        }
+      }
+      
+      function sanitizeFileName(name) {
+        // Remove special characters and spaces for safer uploads
+        return name
+          .replace(/[^a-zA-Z0-9._-]/g, '_')
+          .replace(/_+/g, '_')
+          .replace(/^_|_$/g, '');
+      }
+      
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text || '';
+        return div.innerHTML;
+      }
+      
+      // ==================== FILE OPERATIONS ====================
+      async function fetchFiles() {
+        if (!supabase) {
+          showToast('Storage client not initialized', 'error');
+          return;
+        }
+        
+        try {
+          const { data, error } = await supabase
+            .storage
+            .from(STORAGE_BUCKET)
+            .list('', {
+              limit: 200,
+              offset: 0,
+              sortBy: { column: 'created_at', order: 'desc' }
+            });
+          
+          if (error) {
+            // Check if it's a permissions issue
+            if (error.message?.includes('policy') || error.message?.includes('permission')) {
+              throw new Error('Bucket permissions may need updating. Check RLS policies.');
+            }
+            throw error;
+          }
+          
+          allFiles = (data || []).filter(item => item && item.name && !item.name.endsWith('/'));
+          updateFileCount();
+          applySortAndRender();
+        } catch (err) {
+          console.error('Fetch error:', err);
+          showToast(`Load failed: ${err.message || 'Unknown error'}`, 'error');
+          allFiles = [];
+          renderFeed([]);
+        }
+      }
+      
+      function updateFileCount() {
+        const count = allFiles.length;
+        fileCountEl.textContent = count;
+      }
+      
+      function getPublicUrl(fileName) {
+        if (!supabase) return '';
+        const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
+        return data?.publicUrl || '';
+      }
+      
+      async function copyFileUrl(fileName) {
+        try {
+          const url = getPublicUrl(fileName);
+          if (!url) throw new Error('Could not generate URL');
+          await navigator.clipboard.writeText(url);
+          showToast('Link copied to clipboard!', 'success');
+        } catch (err) {
+          // Fallback for older browsers
+          try {
+            const url = getPublicUrl(fileName);
+            const textarea = document.createElement('textarea');
+            textarea.value = url;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('Link copied!', 'success');
+          } catch (fallbackErr) {
+            showToast('Failed to copy link', 'error');
+          }
+        }
+      }
+      
+      async function downloadFile(fileName) {
+        if (!supabase) return;
+        
+        try {
+          const { data, error } = await supabase
+            .storage
+            .from(STORAGE_BUCKET)
+            .download(fileName);
+          
+          if (error) throw error;
+          
+          const url = URL.createObjectURL(data);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }, 100);
+          
+          showToast(`Downloaded ${fileName}`, 'success');
+        } catch (err) {
+          showToast(`Download failed: ${err.message}`, 'error');
+        }
+      }
+      
+      async function deleteFile(fileName) {
+        if (!supabase) return;
+        if (!confirm(`Delete "${fileName}"? This action cannot be undone.`)) return;
+        
+        try {
+          const { error } = await supabase
+            .storage
+            .from(STORAGE_BUCKET)
+            .remove([fileName]);
+          
+          if (error) throw error;
+          
+          showToast(`Deleted ${fileName}`, 'success');
+          await fetchFiles();
+        } catch (err) {
+          showToast(`Delete failed: ${err.message}`, 'error');
+        }
+      }
+      
+      // ==================== ENHANCED UPLOAD SYSTEM ====================
+      async function uploadSingleFile(file) {
+        if (!supabase) throw new Error('Storage client not initialized');
+        
+        // Sanitize filename for safer uploads
+        const sanitizedName = sanitizeFileName(file.name);
+        if (!sanitizedName) throw new Error('Invalid filename');
+        
+        // Try upload with original name first, then fallback to sanitized
+        const attempts = [
+          { name: file.name, upsert: false },
+          { name: sanitizedName, upsert: false },
+          { name: `${Date.now()}_${sanitizedName}`, upsert: false },
+        ];
+        
+        for (const attempt of attempts) {
+          try {
+            const { data, error } = await supabase
+              .storage
+              .from(STORAGE_BUCKET)
+              .upload(attempt.name, file, {
+                cacheControl: '3600',
+                upsert: attempt.upsert,
+              });
+            
+            if (!error) return data;
+            
+            // If file exists, try next attempt
+            if (error.message?.includes('already exists') || error.statusCode === '409') {
+              continue;
+            }
+            
+            // If it's a permissions error, throw immediately
+            if (error.message?.includes('policy') || error.message?.includes('permission') || error.statusCode === '403') {
+              throw new Error('Upload permission denied. Check bucket RLS policies.');
+            }
+            
+            throw error;
+          } catch (uploadErr) {
+            // If it's the last attempt, throw the error
+            if (attempt === attempts[attempts.length - 1]) {
+              throw uploadErr;
+            }
+            // Otherwise continue to next attempt
+          }
+        }
+        
+        throw new Error('All upload attempts failed');
+      }
+      
+      async function processUploadQueue(files) {
+        if (!files || files.length === 0) return;
+        
+        progressCard.classList.add('active');
+        progressFill.style.width = '0%';
+        progressPercent.textContent = '0%';
+        progressLabel.textContent = 'Starting upload...';
+        progressDetail.textContent = `0 / ${files.length} files`;
+        
+        let successCount = 0;
+        let failCount = 0;
+        const total = files.length;
+        
+        for (let i = 0; i < total; i++) {
+          const file = files[i];
+          
+          try {
+            progressLabel.textContent = `Uploading: ${file.name}`;
+            
+            await uploadSingleFile(file);
+            
+            successCount++;
+            
+          } catch (err) {
+            failCount++;
+            console.error(`Upload error for ${file.name}:`, err);
+            showToast(`${file.name}: ${err.message}`, 'error');
+          }
+          
+          // Update progress
+          const progress = ((i + 1) / total) * 100;
+          progressFill.style.width = progress + '%';
+          progressPercent.textContent = Math.round(progress) + '%';
+          progressDetail.textContent = `${i + 1} / ${total} files processed`;
+        }
+        
+        // Complete
+        progressLabel.textContent = 'Upload complete!';
+        progressFill.style.width = '100%';
+        progressPercent.textContent = '100%';
+        progressDetail.textContent = `${successCount} successful, ${failCount} failed`;
+        
+        if (successCount > 0) {
+          showToast(`${successCount} file(s) uploaded successfully!`, 'success');
+        }
+        
+        // Hide progress after delay
+        setTimeout(() => {
+          progressCard.classList.remove('active');
+          progressFill.style.width = '0%';
+        }, 2500);
+        
+        // Refresh file list
+        await fetchFiles();
+      }
+      
+      function handleFiles(files) {
+        if (!files || files.length === 0) return;
+        processUploadQueue(files);
+      }
+      
+      // ==================== RENDERING ====================
+      function sortFiles(files) {
+        const sorted = [...files];
+        
+        switch(sortOrder) {
+          case 'newest':
+            return sorted.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+          case 'oldest':
+            return sorted.sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
+          case 'name':
+            return sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+          default:
+            return sorted;
+        }
+      }
+      
+      function applySortAndRender() {
+        const searchTerm = (searchInput.value || '').trim().toLowerCase();
+        let filtered = allFiles;
+        
+        if (searchTerm) {
+          filtered = allFiles.filter(file => 
+            (file.name || '').toLowerCase().includes(searchTerm)
+          );
+        }
+        
+        const sortedFiles = sortFiles(filtered);
+        renderFeed(sortedFiles);
+      }
+      
+      function renderFeed(files) {
+        if (!files || files.length === 0) {
+          fileFeed.innerHTML = `
+            <div class="empty-feed">
+              <i class="bx bx-folder-open"></i>
+              <h3>No files yet</h3>
+              <p>Drop files above to get started</p>
+            </div>
+          `;
+          return;
+        }
+        
+        fileFeed.innerHTML = files.map((file, index) => {
+          const fileName = file.name || 'unknown';
+          const size = file.metadata?.size || 0;
+          const created = file.created_at 
+            ? new Date(file.created_at).toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })
+            : 'Unknown date';
+          const category = getFileCategory(fileName);
+          const icon = getFileIcon(fileName);
+          const safeName = escapeHtml(fileName);
+          
+          return `
+            <div class="file-post" style="animation-delay: ${Math.min(index * 0.03, 0.5)}s" data-filename="${safeName}">
+              <div class="post-header">
+                <div class="post-avatar ${category}">
+                  <i class="${icon}"></i>
+                </div>
+                <div class="post-info">
+                  <div class="post-title" title="${safeName}">${safeName}</div>
+                  <div class="post-meta">
+                    <span>${formatSize(size)}</span>
+                    <span>·</span>
+                    <span>${created}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="post-actions-bar">
+                <button class="post-action" onclick="window.VaultDrop.copyUrl('${safeName}')" title="Copy link">
+                  <i class="bx bx-link"></i> <span>Copy</span>
+                </button>
+                <button class="post-action" onclick="window.VaultDrop.download('${safeName}')" title="Download">
+                  <i class="bx bx-download"></i> <span>Download</span>
+                </button>
+                <button class="post-action danger" onclick="window.VaultDrop.deleteFile('${safeName}')" title="Delete">
+                  <i class="bx bx-trash"></i> <span>Delete</span>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+      
+      // ==================== EVENT LISTENERS ====================
+      // Drag and Drop
+      function handleDragEvents() {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+          dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          });
+        });
+        
+        dropZone.addEventListener('dragenter', () => dropZone.classList.add('drag-active'));
+        dropZone.addEventListener('dragover', () => dropZone.classList.add('drag-active'));
+        dropZone.addEventListener('dragleave', (e) => {
+          if (!dropZone.contains(e.relatedTarget)) {
+            dropZone.classList.remove('drag-active');
+          }
+        });
+        dropZone.addEventListener('drop', (e) => {
+          dropZone.classList.remove('drag-active');
+          const files = e.dataTransfer?.files;
+          if (files && files.length > 0) {
+            handleFiles(files);
+          }
+        });
+      }
+      
+      // Click triggers
+      dropZone.addEventListener('click', (e) => {
+        if (e.target === progressCard || progressCard.contains(e.target)) return;
+        if (e.target.closest('button')) return;
+        fileInput.click();
+      });
+      
+      browseBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileInput.click();
+      });
+      
+      fileInput.addEventListener('change', (e) => {
+        if (fileInput.files && fileInput.files.length > 0) {
+          handleFiles(fileInput.files);
+          fileInput.value = '';
+        }
+      });
+      
+      // Search
+      searchInput.addEventListener('input', () => {
+        applySortAndRender();
+      });
+      
+      // Sort toggle
+      sortBtn.addEventListener('click', () => {
+        const orders = ['newest', 'oldest', 'name'];
+        const currentIndex = orders.indexOf(sortOrder);
+        sortOrder = orders[(currentIndex + 1) % orders.length];
+        sortBtn.title = `Sort: ${sortOrder}`;
+        applySortAndRender();
+      });
+      
+      // Refresh
+      refreshBtn.addEventListener('click', fetchFiles);
+      
+      // ==================== GLOBAL API ====================
+      window.VaultDrop = {
+        copyUrl: copyFileUrl,
+        download: downloadFile,
+        deleteFile: deleteFile,
+        refresh: fetchFiles,
+      };
+      
+      // ==================== KEYBOARD SHORTCUTS ====================
+      document.addEventListener('keydown', (e) => {
+        // Ctrl+K or Cmd+K to focus search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault();
+          searchInput.focus();
+        }
+        // Ctrl+R or Cmd+R to refresh (prevent default browser refresh)
+        if ((e.ctrlKey || e.metaKey) && e.key === 'r' && document.activeElement === document.body) {
+          e.preventDefault();
+          fetchFiles();
+        }
+      });
+      
+      // ==================== INITIALIZE ====================
+      handleDragEvents();
+      fetchFiles();
+      
+      // Handle global errors gracefully (the redirectionChain error is from a browser extension, not our code)
+      window.addEventListener('error', (e) => {
+        if (e.message && e.message.includes('Cannot redefine property')) {
+          // This is from browser extensions, suppress it
+          e.preventDefault();
+          return false;
+        }
+      });
+      
+      // Catch unhandled promise rejections from extensions
+      window.addEventListener('unhandledrejection', (e) => {
+        if (e.reason?.message?.includes('Cannot redefine property')) {
+          e.preventDefault();
+          return false;
+        }
+      });
+      
+    })();
+  </script>
+</body>
+</html>

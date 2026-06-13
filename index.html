@@ -3,13 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>Supabase File Manager · Light Modern UI</title>
-  <!-- Supabase SDK (official) -->
+  <title>CloudVault · File Manager</title>
+  
+  <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
   </script>
-  <!-- Font Awesome 6 for icons (light, clean) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <!-- Boxicons -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
   <style>
+    :root {
+      --bg: #fafbfc;
+      --surface: #ffffff;
+      --surface-hover: #f8fafc;
+      --border: #e8ecf1;
+      --border-hover: #d0d7de;
+      --text-primary: #1a1f36;
+      --text-secondary: #5e6b7e;
+      --text-tertiary: #8b95a5;
+      --accent: #0066ff;
+      --accent-light: #e8f0fe;
+      --accent-gradient: linear-gradient(135deg, #0066ff 0%, #5b4dff 100%);
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,0.08);
+      --shadow-xl: 0 20px 48px rgba(0,0,0,0.1);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -17,684 +50,1144 @@
     }
 
     body {
-      background: #f8fafc;
-      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background: linear-gradient(135deg, #f5f7fa 0%, #eef1f5 100%);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       min-height: 100vh;
-      margin: 0;
-      padding: 1.5rem;
-      transition: background 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    /* modern light card */
-    .file-manager {
-      max-width: 1100px;
+    .app-container {
       width: 100%;
-      background: #ffffff;
-      border-radius: 2.5rem;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
-      padding: 2rem 2rem 2.2rem;
-      transition: all 0.25s ease;
-      backdrop-filter: blur(2px);
+      max-width: 1280px;
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      gap: 2rem;
+      min-height: 85vh;
+      max-height: 90vh;
+      position: relative;
     }
 
-    h1 {
-      font-weight: 600;
-      font-size: 1.9rem;
-      letter-spacing: -0.5px;
-      color: #0f172a;
+    /* Header */
+    .app-header {
+      padding: 24px 32px;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.2rem;
-    }
-    h1 i {
-      color: #3b82f6;
-      font-size: 2rem;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      background: var(--surface);
+      backdrop-filter: blur(10px);
+      z-index: 10;
     }
 
-    /* bucket config note (hidden but accessible) */
-    .bucket-config-note {
-      background: #f1f5f9;
-      border-radius: 1rem;
-      padding: 0.8rem 1.2rem;
-      font-size: 0.9rem;
-      color: #334155;
+    .logo-section {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      border: 1px solid #e2e8f0;
-      margin-bottom: 0.2rem;
+      gap: 12px;
     }
-    .bucket-config-note i {
-      color: #3b82f6;
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--accent-gradient);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: white;
+      box-shadow: 0 8px 16px rgba(0, 102, 255, 0.2);
     }
-    code {
-      background: #e2e8f0;
-      padding: 0.2rem 0.5rem;
-      border-radius: 0.4rem;
-      font-family: 'Fira Code', monospace;
+
+    .logo-text h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+
+    .logo-text span {
+      font-size: 0.75rem;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stats-pill {
+      background: var(--surface-hover);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 50px;
       font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    /* upload area (drag & drop) */
-    .upload-zone {
-      border: 2px dashed #cbd5e1;
-      border-radius: 1.8rem;
-      background: #f9fafb;
-      padding: 2.5rem 1.5rem;
-      text-align: center;
-      transition: all 0.25s ease;
+    .stats-pill i {
+      font-size: 1.1rem;
+      color: var(--accent);
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 50px;
+      border: none;
+      font-weight: 600;
+      font-size: 0.85rem;
       cursor: pointer;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 0.7rem;
-      color: #475569;
+      gap: 8px;
+      transition: var(--transition);
+      font-family: inherit;
+      white-space: nowrap;
     }
+
+    .btn-primary {
+      background: var(--accent-gradient);
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(0, 102, 255, 0.4);
+    }
+
+    .btn-outline {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      color: var(--text-primary);
+    }
+
+    .btn-outline:hover {
+      background: var(--surface-hover);
+      border-color: var(--border-hover);
+    }
+
+    .btn-icon {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-icon:hover {
+      background: var(--surface-hover);
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+    }
+
+    /* Upload Zone */
+    .upload-section {
+      padding: 0 32px;
+      margin: 20px 0;
+    }
+
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      background: var(--surface-hover);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-zone:hover,
     .upload-zone.drag-active {
-      border-color: #3b82f6;
-      background: #eff6ff;
-      transform: scale(1.01);
-      box-shadow: 0 10px 20px -10px rgba(59,130,246,0.2);
+      border-color: var(--accent);
+      background: var(--accent-light);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
     }
-    .upload-zone i {
-      font-size: 2.8rem;
-      color: #3b82f6;
-      opacity: 0.9;
+
+    .upload-zone.drag-active {
+      border-style: solid;
+      animation: pulse 1.5s infinite;
     }
-    .upload-zone .browse-text {
-      font-weight: 500;
-      color: #0f172a;
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0, 102, 255, 0.1); }
+      50% { box-shadow: 0 0 0 16px rgba(0, 102, 255, 0); }
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      color: var(--accent);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .upload-zone h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .upload-zone p {
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+    }
+
+    .upload-zone .browse-link {
+      color: var(--accent);
+      font-weight: 600;
       text-decoration: underline;
-      text-underline-offset: 2px;
+      cursor: pointer;
     }
+
     #fileInput {
       display: none;
     }
 
-    /* progress bar */
-    .progress-container {
-      margin-top: 0.8rem;
-      width: 100%;
-      background: #e2e8f0;
-      height: 8px;
-      border-radius: 20px;
-      overflow: hidden;
+    /* Progress Bar */
+    .progress-wrapper {
+      margin-top: 16px;
       display: none;
-    }
-    .progress-fill {
-      width: 0%;
-      height: 100%;
-      background: linear-gradient(90deg, #2563eb, #38bdf8);
-      border-radius: 20px;
-      transition: width 0.2s ease;
+      animation: fadeIn 0.3s ease;
     }
 
-    /* search & toolbar */
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
+    .progress-wrapper.active {
+      display: block;
     }
-    .search-wrapper {
-      flex: 2;
-      min-width: 220px;
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 50px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent-gradient);
+      border-radius: 50px;
+      width: 0%;
+      transition: width 0.3s ease;
+      box-shadow: 0 0 8px rgba(0, 102, 255, 0.3);
+    }
+
+    /* Search Bar */
+    .search-section {
+      padding: 0 32px;
+      margin-bottom: 16px;
+    }
+
+    .search-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .search-input-wrapper {
+      flex: 1;
       position: relative;
     }
-    .search-wrapper i {
+
+    .search-input-wrapper i {
       position: absolute;
-      left: 1rem;
+      left: 16px;
       top: 50%;
       transform: translateY(-50%);
-      color: #94a3b8;
-    }
-    #searchInput {
-      width: 100%;
-      padding: 0.85rem 1rem 0.85rem 2.8rem;
-      border: 1px solid #e2e8f0;
-      border-radius: 2rem;
-      background: #ffffff;
-      font-size: 0.95rem;
-      transition: all 0.2s;
-      outline: none;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-    }
-    #searchInput:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-    }
-    .refresh-btn {
-      background: white;
-      border: 1px solid #e2e8f0;
-      padding: 0.8rem 1.3rem;
-      border-radius: 2rem;
-      font-weight: 500;
-      color: #1e293b;
-      background: #ffffff;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .refresh-btn:hover {
-      background: #f1f5f9;
-      border-color: #cbd5e1;
+      color: var(--text-tertiary);
+      font-size: 1.2rem;
+      pointer-events: none;
     }
 
-    /* file list grid */
-    .file-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 1.2rem;
-      margin: 1.2rem 0 0.8rem;
+    #searchInput {
+      width: 100%;
+      padding: 12px 16px 12px 48px;
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      background: var(--surface);
+      color: var(--text-primary);
+      transition: var(--transition);
+      outline: none;
     }
-    .file-card {
-      background: #ffffff;
-      border: 1px solid #edf2f7;
-      border-radius: 1.4rem;
-      padding: 1.2rem;
+
+    #searchInput:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+    }
+
+    #searchInput::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .clear-search {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: none;
+      padding: 4px;
+    }
+
+    .clear-search.visible {
+      display: block;
+    }
+
+    .sort-btn {
+      padding: 12px 20px;
+      border-radius: 50px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 0.85rem;
       display: flex;
       align-items: center;
-      gap: 1rem;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-      word-break: break-word;
+      gap: 8px;
+      transition: var(--transition);
+      white-space: nowrap;
     }
+
+    .sort-btn:hover {
+      background: var(--surface-hover);
+      border-color: var(--border-hover);
+    }
+
+    /* File Grid */
+    .files-section {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 32px 24px;
+    }
+
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .file-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: var(--transition);
+      cursor: default;
+      position: relative;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
     .file-card:hover {
-      border-color: #b9d0f0;
-      box-shadow: 0 12px 22px -12px rgba(0,0,0,0.08);
-      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+      background: var(--surface-hover);
     }
-    .file-icon {
-      font-size: 2rem;
+
+    .file-icon-wrapper {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .file-icon-wrapper.image {
+      background: linear-gradient(135deg, #e0f2fe, #dbeafe);
       color: #3b82f6;
-      width: 2.5rem;
-      text-align: center;
     }
+
+    .file-icon-wrapper.document {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      color: #f59e0b;
+    }
+
+    .file-icon-wrapper.video {
+      background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+      color: #ec4899;
+    }
+
+    .file-icon-wrapper.other {
+      background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+      color: #64748b;
+    }
+
     .file-info {
       flex: 1;
+      min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 0.2rem;
+      gap: 4px;
     }
+
     .file-name {
       font-weight: 600;
-      color: #0f172a;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
+      color: var(--text-primary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 180px;
     }
+
     .file-meta {
       font-size: 0.75rem;
-      color: #64748b;
+      color: var(--text-tertiary);
       display: flex;
-      gap: 0.5rem;
       align-items: center;
+      gap: 8px;
     }
-    .actions {
+
+    .file-meta .dot {
+      width: 3px;
+      height: 3px;
+      background: var(--text-tertiary);
+      border-radius: 50%;
+    }
+
+    .file-actions {
       display: flex;
-      gap: 0.5rem;
-      color: #475569;
+      gap: 4px;
+      opacity: 0;
+      transition: var(--transition);
     }
-    .actions i {
+
+    .file-card:hover .file-actions {
+      opacity: 1;
+    }
+
+    .action-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: var(--surface);
+      color: var(--text-secondary);
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 1.1rem;
-      padding: 0.4rem;
-      border-radius: 0.6rem;
-      transition: all 0.15s;
-      background: #f8fafc;
+      transition: var(--transition);
     }
-    .actions i:hover {
-      background: #e2e8f0;
-      color: #0f172a;
+
+    .action-btn:hover {
+      background: var(--accent-light);
+      color: var(--accent);
     }
+
+    .action-btn.delete:hover {
+      background: var(--danger-light);
+      color: var(--danger);
+    }
+
     .empty-state {
       grid-column: 1 / -1;
-      text-align: center;
-      color: #64748b;
-      padding: 3rem;
-      font-size: 1rem;
-      background: #f9fafb;
-      border-radius: 2rem;
-    }
-
-    /* notifications toast */
-    .toast-container {
-      position: fixed;
-      top: 2rem;
-      right: 2rem;
       display: flex;
       flex-direction: column;
-      gap: 0.8rem;
-      z-index: 9999;
-    }
-    .toast {
-      background: white;
-      padding: 1rem 1.5rem;
-      border-radius: 1rem;
-      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-      display: flex;
       align-items: center;
-      gap: 0.7rem;
-      font-weight: 500;
-      animation: slideIn 0.3s ease;
-      border-left: 5px solid;
-      min-width: 250px;
-    }
-    .toast.success { border-left-color: #10b981; }
-    .toast.error { border-left-color: #ef4444; }
-    @keyframes slideIn {
-      from { transform: translateX(120%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+      justify-content: center;
+      padding: 80px 20px;
+      text-align: center;
     }
 
-    @media (max-width: 550px) {
-      .file-manager {
-        padding: 1.5rem;
+    .empty-state i {
+      font-size: 80px;
+      color: var(--border);
+      margin-bottom: 20px;
+    }
+
+    .empty-state h3 {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .empty-state p {
+      color: var(--text-tertiary);
+      font-size: 0.85rem;
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 8px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--surface);
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 500;
+      font-size: 0.85rem;
+      animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: all;
+      border-left: 4px solid;
+      min-width: 300px;
+      max-width: 400px;
+    }
+
+    .toast.success {
+      border-left-color: var(--success);
+    }
+
+    .toast.error {
+      border-left-color: var(--danger);
+    }
+
+    .toast i {
+      font-size: 1.3rem;
+    }
+
+    .toast.success i {
+      color: var(--success);
+    }
+
+    .toast.error i {
+      color: var(--danger);
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(120%);
+        opacity: 0;
       }
-      .actions i {
-        padding: 0.3rem;
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOutRight {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(120%);
+        opacity: 0;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .app-container {
+        border-radius: var(--radius-lg);
+        max-height: 95vh;
+      }
+      
+      .app-header {
+        padding: 20px;
+        gap: 12px;
+      }
+      
+      .upload-section,
+      .search-section,
+      .files-section {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+      
+      .file-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      
+      .header-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .file-actions {
+        opacity: 1;
       }
     }
   </style>
 </head>
 <body>
-<div class="file-manager">
-  <h1>
-    <i class="fas fa-cloud-sun"></i> My Files
-  </h1>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-section">
+        <div class="logo-icon">
+          <i class="bx bx-cloud-lightning"></i>
+        </div>
+        <div class="logo-text">
+          <h1>CloudVault</h1>
+          <span>Secure File Storage</span>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <div class="stats-pill" id="statsPill">
+          <i class="bx bx-file"></i>
+          <span id="fileCount">0 files</span>
+        </div>
+        <button class="btn btn-outline" id="refreshBtn">
+          <i class="bx bx-refresh"></i> Refresh
+        </button>
+        <button class="btn btn-primary" id="uploadBtn">
+          <i class="bx bx-upload"></i> Upload
+        </button>
+      </div>
+    </header>
 
-  <!-- Config reminder: bucket name is configurable below in JavaScript -->
-  <div class="bucket-config-note">
-    <i class="fas fa-database"></i>
-    <span>Bucket: <code id="bucketDisplay">exams</code> · connected to <code>kdrgdnrwibuqpvikjapx</code></span>
-  </div>
-
-  <!-- Drag & drop upload zone -->
-  <div id="dropZone" class="upload-zone">
-    <i class="fas fa-cloud-upload-alt"></i>
-    <div>
-      <span class="browse-text">Drag & drop files here</span> or <strong>browse</strong>
+    <!-- Upload Zone -->
+    <div class="upload-section">
+      <div id="dropZone" class="upload-zone">
+        <i class="bx bx-cloud-upload upload-icon"></i>
+        <h3>Drag & drop files here</h3>
+        <p>or <span class="browse-link" id="browseLink">browse files</span> to upload</p>
+        <div class="progress-wrapper" id="progressWrapper">
+          <div class="progress-info">
+            <span id="progressLabel">Uploading...</span>
+            <span id="progressPercent">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+      </div>
+      <input type="file" id="fileInput" multiple />
     </div>
-    <div style="font-size:0.8rem; color:#64748b;">Any file type accepted</div>
-    <div class="progress-container" id="progressContainer">
-      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+
+    <!-- Search & Sort -->
+    <div class="search-section">
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <i class="bx bx-search"></i>
+          <input type="text" id="searchInput" placeholder="Search files by name..." autocomplete="off">
+          <button class="clear-search" id="clearSearch">
+            <i class="bx bx-x"></i>
+          </button>
+        </div>
+        <button class="sort-btn" id="sortBtn">
+          <i class="bx bx-sort-alt-2"></i> 
+          <span id="sortLabel">Newest</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- File Grid -->
+    <div class="files-section" id="filesSection">
+      <div class="file-grid" id="fileGrid">
+        <!-- Dynamic content -->
+      </div>
     </div>
   </div>
-  <input type="file" id="fileInput" multiple />
 
-  <!-- Search & refresh toolbar -->
-  <div class="toolbar">
-    <div class="search-wrapper">
-      <i class="fas fa-search"></i>
-      <input type="text" id="searchInput" placeholder="Search files by name..." autocomplete="off">
-    </div>
-    <button id="refreshBtn" class="refresh-btn">
-      <i class="fas fa-sync-alt"></i> Refresh
-    </button>
-  </div>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
 
-  <!-- File cards container -->
-  <div id="fileGrid" class="file-list">
-    <!-- dynamic js render -->
-  </div>
-</div>
-
-<!-- Toast container for notifications -->
-<div class="toast-container" id="toastContainer"></div>
-
-<script>
-  (function() {
-    // ---------- CONFIGURATION ----------
-    // INSTRUCTIONS:
-    // Replace these values if needed. Currently set to provided Supabase project.
-    // Bucket name must exist in Supabase Storage and have appropriate RLS policies (public read, authenticated insert/delete etc.)
-    const SUPABASE_URL = "https://kdrgdnrwibuqpvikjapx.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkcmdkbnJ3aWJ1cXB2aWtqYXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNjE4ODMsImV4cCI6MjA5NjkzNzg4M30.9wEbcIDziq9xDWZQ_BF0X-p25g4SQkuCCQV-5fhDnbY";
-    
-    // CONFIGURABLE BUCKET NAME - change "exams" to your desired bucket (must exist in Supabase storage)
-    const STORAGE_BUCKET = "exams";
-    
-    // -----------------------------------
-
-    // Display bucket name
-    document.getElementById('bucketDisplay').textContent = STORAGE_BUCKET;
-
-    // Initialize Supabase client
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // DOM elements
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('fileInput');
-    const progressContainer = document.getElementById('progressContainer');
-    const progressFill = document.getElementById('progressFill');
-    const searchInput = document.getElementById('searchInput');
-    const refreshBtn = document.getElementById('refreshBtn');
-    const fileGrid = document.getElementById('fileGrid');
-    const toastContainer = document.getElementById('toastContainer');
-
-    // State: all files from bucket
-    let allFiles = [];
-
-    // ---------- Toast notifications ----------
-    function showToast(message, type = 'success') {
-      const toast = document.createElement('div');
-      toast.className = `toast ${type}`;
-      const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-      toast.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
-      toastContainer.appendChild(toast);
-      setTimeout(() => {
-        toast.remove();
-      }, 3500);
-    }
-
-    // ---------- Format file size ----------
-    function formatSize(bytes) {
-      if (bytes === 0) return '0 Bytes';
-      const k = 1024;
-      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-
-    // ---------- Fetch files from Supabase Storage ----------
-    async function fetchFiles() {
-      try {
-        const { data, error } = await supabase
+  <script>
+    (function() {
+      // ==================== CONFIGURATION ====================
+      // INSTRUCTIONS: Configure your Supabase project and bucket here.
+      // The bucket must exist in your Supabase Storage with appropriate RLS policies.
+      // For public access: enable public bucket or set policies for authenticated/anon users.
+      
+      const SUPABASE_URL = "https://kdrgdnrwibuqpvikjapx.supabase.co";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkcmdkbnJ3aWJ1cXB2aWtqYXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNjE4ODMsImV4cCI6MjA5NjkzNzg4M30.9wEbcIDziq9xDWZQ_BF0X-p25g4SQkuCCQV-5fhDnbY";
+      const STORAGE_BUCKET = "exams"; // Change this to your bucket name
+      
+      // ==================== INITIALIZATION ====================
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      
+      // DOM Elements
+      const dropZone = document.getElementById('dropZone');
+      const fileInput = document.getElementById('fileInput');
+      const browseLink = document.getElementById('browseLink');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const progressWrapper = document.getElementById('progressWrapper');
+      const progressFill = document.getElementById('progressFill');
+      const progressLabel = document.getElementById('progressLabel');
+      const progressPercent = document.getElementById('progressPercent');
+      const searchInput = document.getElementById('searchInput');
+      const clearSearch = document.getElementById('clearSearch');
+      const sortBtn = document.getElementById('sortBtn');
+      const sortLabel = document.getElementById('sortLabel');
+      const refreshBtn = document.getElementById('refreshBtn');
+      const fileGrid = document.getElementById('fileGrid');
+      const fileCount = document.getElementById('fileCount');
+      const toastContainer = document.getElementById('toastContainer');
+      
+      // State
+      let allFiles = [];
+      let sortOrder = 'newest'; // 'newest' or 'oldest' or 'name'
+      
+      // ==================== TOAST SYSTEM ====================
+      function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        const icon = type === 'success' ? 'bx-check-circle' : 'bx-error-circle';
+        toast.innerHTML = `<i class="bx ${icon}"></i> ${message}`;
+        toastContainer.appendChild(toast);
+        
+        setTimeout(() => {
+          toast.style.animation = 'slideOutRight 0.3s ease forwards';
+          setTimeout(() => toast.remove(), 300);
+        }, 3500);
+      }
+      
+      // ==================== UTILITY FUNCTIONS ====================
+      function formatSize(bytes) {
+        if (!bytes || bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+      }
+      
+      function getFileExtension(filename) {
+        return filename.split('.').pop().toLowerCase();
+      }
+      
+      function getFileCategory(filename) {
+        const ext = getFileExtension(filename);
+        const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp', 'ico'];
+        const docExts = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'md'];
+        const videoExts = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm'];
+        
+        if (imageExts.includes(ext)) return 'image';
+        if (docExts.includes(ext)) return 'document';
+        if (videoExts.includes(ext)) return 'video';
+        return 'other';
+      }
+      
+      function getFileIcon(filename) {
+        const category = getFileCategory(filename);
+        switch(category) {
+          case 'image': return 'bx bx-image';
+          case 'document': return 'bx bx-file';
+          case 'video': return 'bx bx-video';
+          default: return 'bx bx-file-blank';
+        }
+      }
+      
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+      
+      // ==================== FILE OPERATIONS ====================
+      async function fetchFiles() {
+        try {
+          const { data, error } = await supabase
+            .storage
+            .from(STORAGE_BUCKET)
+            .list('', {
+              limit: 100,
+              offset: 0,
+              sortBy: { column: 'created_at', order: 'desc' }
+            });
+          
+          if (error) throw error;
+          
+          allFiles = (data || []).filter(item => item.name && !item.name.endsWith('/'));
+          updateFileCount();
+          applySortAndRender();
+        } catch (err) {
+          console.error('Fetch error:', err);
+          showToast(`Failed to load files: ${err.message}`, 'error');
+          allFiles = [];
+          renderFileGrid([]);
+        }
+      }
+      
+      function updateFileCount() {
+        const count = allFiles.length;
+        fileCount.textContent = `${count} file${count !== 1 ? 's' : ''}`;
+      }
+      
+      function getPublicUrl(fileName) {
+        const { data } = supabase
           .storage
           .from(STORAGE_BUCKET)
-          .list('', {
-            limit: 100,
-            offset: 0,
-            sortBy: { column: 'created_at', order: 'desc' }
-          });
-        
-        if (error) {
-          throw error;
+          .getPublicUrl(fileName);
+        return data?.publicUrl || '';
+      }
+      
+      async function copyFileUrl(fileName) {
+        try {
+          const url = getPublicUrl(fileName);
+          await navigator.clipboard.writeText(url);
+          showToast('URL copied to clipboard', 'success');
+        } catch (err) {
+          showToast('Failed to copy URL', 'error');
         }
-        // Filter out folders if any (just in case)
-        allFiles = (data || []).filter(item => !item.id?.includes('/') && item.name);
-        renderFileGrid(allFiles);
-      } catch (err) {
-        console.error('Fetch error:', err);
-        showToast(`Failed to load files: ${err.message || 'Unknown error'}`, 'error');
-        allFiles = [];
-        renderFileGrid([]);
       }
-    }
-
-    // ---------- Render grid with optional search filter ----------
-    function renderFileGrid(filesToRender = allFiles) {
-      const searchTerm = searchInput.value.trim().toLowerCase();
-      let filtered = filesToRender;
-      if (searchTerm) {
-        filtered = filesToRender.filter(file => 
-          file.name.toLowerCase().includes(searchTerm)
-        );
+      
+      async function downloadFile(fileName) {
+        try {
+          const { data, error } = await supabase
+            .storage
+            .from(STORAGE_BUCKET)
+            .download(fileName);
+          
+          if (error) throw error;
+          
+          const url = URL.createObjectURL(data);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          showToast(`Downloaded ${fileName}`, 'success');
+        } catch (err) {
+          showToast(`Download failed: ${err.message}`, 'error');
+        }
       }
-
-      if (!filtered.length) {
-        fileGrid.innerHTML = `<div class="empty-state"><i class="far fa-folder-open" style="font-size:2rem; opacity:0.6;"></i><p>No files found.</p></div>`;
-        return;
+      
+      async function deleteFile(fileName) {
+        if (!confirm(`Are you sure you want to delete "${fileName}"?`)) return;
+        
+        try {
+          const { error } = await supabase
+            .storage
+            .from(STORAGE_BUCKET)
+            .remove([fileName]);
+          
+          if (error) throw error;
+          
+          showToast(`Deleted ${fileName}`, 'success');
+          await fetchFiles();
+        } catch (err) {
+          showToast(`Delete failed: ${err.message}`, 'error');
+        }
       }
-
-      fileGrid.innerHTML = filtered.map(file => {
-        const size = file.metadata?.size || 0;
-        const created = file.created_at ? new Date(file.created_at).toLocaleDateString() : '—';
-        return `
-          <div class="file-card" data-file-name="${escapeHtml(file.name)}">
-            <div class="file-icon"><i class="fas fa-file"></i></div>
-            <div class="file-info">
-              <span class="file-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</span>
-              <div class="file-meta">
-                <span>${formatSize(size)}</span>
-                <span>·</span>
-                <span>${created}</span>
+      
+      async function uploadFiles(fileList) {
+        if (!fileList || fileList.length === 0) return;
+        
+        progressWrapper.classList.add('active');
+        progressFill.style.width = '0%';
+        progressPercent.textContent = '0%';
+        progressLabel.textContent = 'Preparing upload...';
+        
+        let successCount = 0;
+        let failCount = 0;
+        const total = fileList.length;
+        
+        for (let i = 0; i < total; i++) {
+          const file = fileList[i];
+          
+          try {
+            progressLabel.textContent = `Uploading ${file.name}...`;
+            
+            // Use Supabase SDK upload with progress simulation
+            const { data, error } = await supabase
+              .storage
+              .from(STORAGE_BUCKET)
+              .upload(file.name, file, {
+                cacheControl: '3600',
+                upsert: true
+              });
+            
+            if (error) {
+              // If file exists, try with unique name
+              if (error.message?.includes('already exists') || error.statusCode === '409') {
+                const timestamp = Date.now();
+                const nameParts = file.name.split('.');
+                const ext = nameParts.pop();
+                const baseName = nameParts.join('.');
+                const uniqueName = `${baseName}_${timestamp}.${ext}`;
+                
+                const { error: retryError } = await supabase
+                  .storage
+                  .from(STORAGE_BUCKET)
+                  .upload(uniqueName, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                  });
+                
+                if (retryError) throw retryError;
+              } else {
+                throw error;
+              }
+            }
+            
+            successCount++;
+            const overallProgress = ((i + 1) / total) * 100;
+            progressFill.style.width = overallProgress + '%';
+            progressPercent.textContent = Math.round(overallProgress) + '%';
+            
+          } catch (err) {
+            failCount++;
+            showToast(`Failed to upload ${file.name}: ${err.message}`, 'error');
+          }
+        }
+        
+        progressLabel.textContent = 'Upload complete!';
+        progressFill.style.width = '100%';
+        progressPercent.textContent = '100%';
+        
+        setTimeout(() => {
+          progressWrapper.classList.remove('active');
+          progressFill.style.width = '0%';
+        }, 1500);
+        
+        if (successCount > 0) {
+          showToast(`${successCount} file(s) uploaded successfully`, 'success');
+        }
+        
+        await fetchFiles();
+      }
+      
+      // ==================== RENDERING ====================
+      function sortFiles(files) {
+        const sorted = [...files];
+        
+        switch(sortOrder) {
+          case 'newest':
+            return sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+          case 'oldest':
+            return sorted.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+          case 'name':
+            return sorted.sort((a, b) => a.name.localeCompare(b.name));
+          default:
+            return sorted;
+        }
+      }
+      
+      function applySortAndRender() {
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        let filtered = allFiles;
+        
+        if (searchTerm) {
+          filtered = allFiles.filter(file => 
+            file.name.toLowerCase().includes(searchTerm)
+          );
+        }
+        
+        const sortedFiles = sortFiles(filtered);
+        renderFileGrid(sortedFiles);
+        updateFileCount();
+      }
+      
+      function renderFileGrid(files) {
+        if (!files || files.length === 0) {
+          fileGrid.innerHTML = `
+            <div class="empty-state">
+              <i class="bx bx-folder-open"></i>
+              <h3>No files found</h3>
+              <p>Upload files or adjust your search</p>
+            </div>
+          `;
+          return;
+        }
+        
+        fileGrid.innerHTML = files.map((file, index) => {
+          const size = file.metadata?.size || 0;
+          const created = file.created_at 
+            ? new Date(file.created_at).toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric' 
+              })
+            : 'Unknown';
+          const category = getFileCategory(file.name);
+          const icon = getFileIcon(file.name);
+          
+          return `
+            <div class="file-card" style="animation-delay: ${index * 0.05}s" data-filename="${escapeHtml(file.name)}">
+              <div class="file-icon-wrapper ${category}">
+                <i class="${icon}"></i>
+              </div>
+              <div class="file-info">
+                <div class="file-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</div>
+                <div class="file-meta">
+                  <span>${formatSize(size)}</span>
+                  <span class="dot"></span>
+                  <span>${created}</span>
+                </div>
+              </div>
+              <div class="file-actions">
+                <button class="action-btn" onclick="window.fileManager.copyUrl('${escapeHtml(file.name)}')" title="Copy URL">
+                  <i class="bx bx-copy"></i>
+                </button>
+                <button class="action-btn" onclick="window.fileManager.download('${escapeHtml(file.name)}')" title="Download">
+                  <i class="bx bx-download"></i>
+                </button>
+                <button class="action-btn delete" onclick="window.fileManager.deleteFile('${escapeHtml(file.name)}')" title="Delete">
+                  <i class="bx bx-trash"></i>
+                </button>
               </div>
             </div>
-            <div class="actions">
-              <i class="fas fa-copy" title="Copy URL" data-action="copy" data-name="${escapeHtml(file.name)}"></i>
-              <i class="fas fa-download" title="Download" data-action="download" data-name="${escapeHtml(file.name)}"></i>
-              <i class="fas fa-trash-alt" title="Delete" data-action="delete" data-name="${escapeHtml(file.name)}"></i>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      // Attach event listeners to action icons
-      document.querySelectorAll('.actions i[data-action]').forEach(icon => {
-        icon.addEventListener('click', async (e) => {
+          `;
+        }).join('');
+      }
+      
+      // ==================== EVENT LISTENERS ====================
+      // Drag and Drop
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
           e.stopPropagation();
-          const action = icon.getAttribute('data-action');
-          const fileName = icon.getAttribute('data-name');
-          if (!fileName) return;
-          
-          if (action === 'copy') await copyFileUrl(fileName);
-          else if (action === 'download') await downloadFile(fileName);
-          else if (action === 'delete') await deleteFile(fileName);
+        });
+        document.body.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
         });
       });
-    }
-
-    // Simple escape for HTML attributes
-    function escapeHtml(text) {
-      return String(text)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    // ---------- Get public URL ----------
-    function getPublicUrl(fileName) {
-      const { data } = supabase
-        .storage
-        .from(STORAGE_BUCKET)
-        .getPublicUrl(fileName);
-      return data?.publicUrl || '';
-    }
-
-    // ---------- Copy file URL ----------
-    async function copyFileUrl(fileName) {
-      try {
-        const url = getPublicUrl(fileName);
-        await navigator.clipboard.writeText(url);
-        showToast('URL copied to clipboard', 'success');
-      } catch (err) {
-        showToast('Failed to copy URL', 'error');
-      }
-    }
-
-    // ---------- Download file ----------
-    async function downloadFile(fileName) {
-      try {
-        const { data, error } = await supabase
-          .storage
-          .from(STORAGE_BUCKET)
-          .download(fileName);
-        if (error) throw error;
-        
-        // Create blob link
-        const url = URL.createObjectURL(data);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-        showToast(`Downloading ${fileName}`, 'success');
-      } catch (err) {
-        showToast(`Download failed: ${err.message}`, 'error');
-      }
-    }
-
-    // ---------- Delete file ----------
-    async function deleteFile(fileName) {
-      if (!confirm(`Delete "${fileName}"? This cannot be undone.`)) return;
-      try {
-        const { error } = await supabase
-          .storage
-          .from(STORAGE_BUCKET)
-          .remove([fileName]);
-        if (error) throw error;
-        showToast(`Deleted ${fileName}`, 'success');
-        await fetchFiles(); // refresh list
-      } catch (err) {
-        showToast(`Delete error: ${err.message}`, 'error');
-      }
-    }
-
-    // ---------- Upload with progress (using XMLHttpRequest for progress) ----------
-    async function uploadFiles(fileList) {
-      if (!fileList || fileList.length === 0) return;
       
-      // Show progress container
-      progressContainer.style.display = 'block';
-      progressFill.style.width = '0%';
-      
-      let successCount = 0;
-      let failCount = 0;
-      const total = fileList.length;
-      
-      for (let i = 0; i < total; i++) {
-        const file = fileList[i];
-        try {
-          await uploadSingleFileWithProgress(file, (percent) => {
-            // overall progress approximation (average)
-            const baseProgress = (i / total) * 100;
-            const currentFileContribution = (1 / total) * percent;
-            const overall = Math.min(100, baseProgress + currentFileContribution);
-            progressFill.style.width = overall + '%';
-          });
-          successCount++;
-        } catch (err) {
-          failCount++;
-          showToast(`Upload failed for ${file.name}: ${err.message}`, 'error');
+      dropZone.addEventListener('dragenter', () => dropZone.classList.add('drag-active'));
+      dropZone.addEventListener('dragover', () => dropZone.classList.add('drag-active'));
+      dropZone.addEventListener('dragleave', (e) => {
+        if (!dropZone.contains(e.relatedTarget)) {
+          dropZone.classList.remove('drag-active');
         }
-      }
-      
-      // Complete progress
-      progressFill.style.width = '100%';
-      setTimeout(() => {
-        progressContainer.style.display = 'none';
-        progressFill.style.width = '0%';
-      }, 700);
-      
-      if (successCount > 0) {
-        showToast(`${successCount} file(s) uploaded successfully`, 'success');
-      }
-      await fetchFiles(); // refresh list
-    }
-
-    function uploadSingleFileWithProgress(file, onProgress) {
-      return new Promise((resolve, reject) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        const xhr = new XMLHttpRequest();
-        
-        // Build upload URL for Supabase Storage (standard REST)
-        const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${file.name}`;
-        
-        xhr.open('POST', uploadUrl, true);
-        xhr.setRequestHeader('Authorization', `Bearer ${SUPABASE_ANON_KEY}`);
-        // Supabase expects the file as form-data with 'file' field, no extra headers for content-type (browser sets multipart)
-        
-        xhr.upload.addEventListener('progress', (e) => {
-          if (e.lengthComputable) {
-            const percent = Math.round((e.loaded / e.total) * 100);
-            onProgress(percent);
-          }
-        });
-        
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            resolve(JSON.parse(xhr.responseText));
-          } else {
-            let errorMsg = 'Upload error';
-            try {
-              const res = JSON.parse(xhr.responseText);
-              errorMsg = res.message || res.error || 'Unknown error';
-            } catch (e) {}
-            reject(new Error(errorMsg));
-          }
-        };
-        
-        xhr.onerror = () => reject(new Error('Network error'));
-        xhr.send(formData);
       });
-    }
-
-    // ---------- Drag & Drop handlers ----------
-    function preventDefaults(e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      dropZone.addEventListener(eventName, preventDefaults, false);
-      document.body.addEventListener(eventName, preventDefaults, false);
-    });
-
-    dropZone.addEventListener('dragenter', () => dropZone.classList.add('drag-active'));
-    dropZone.addEventListener('dragover', () => dropZone.classList.add('drag-active'));
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-active'));
-    dropZone.addEventListener('drop', (e) => {
-      dropZone.classList.remove('drag-active');
-      const dt = e.dataTransfer;
-      if (dt.files && dt.files.length) {
-        uploadFiles(dt.files);
-      }
-    });
-
-    // Click on drop zone triggers file input
-    dropZone.addEventListener('click', (e) => {
-      // Prevent if clicking on progress or child actions
-      if (e.target.closest('.progress-container') || e.target.closest('i')) {
-        // still allow open file dialog
-      }
-      fileInput.click();
-    });
-
-    fileInput.addEventListener('change', (e) => {
-      if (fileInput.files.length) {
-        uploadFiles(fileInput.files);
-        fileInput.value = ''; // reset so same file can be selected again
-      }
-    });
-
-    // Search listener
-    searchInput.addEventListener('input', () => {
-      renderFileGrid(allFiles);
-    });
-
-    // Refresh button
-    refreshBtn.addEventListener('click', () => {
+      dropZone.addEventListener('drop', (e) => {
+        dropZone.classList.remove('drag-active');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          uploadFiles(files);
+        }
+      });
+      
+      // Click to upload
+      dropZone.addEventListener('click', (e) => {
+        if (e.target === progressWrapper || progressWrapper.contains(e.target)) return;
+        fileInput.click();
+      });
+      
+      browseLink.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileInput.click();
+      });
+      
+      uploadBtn.addEventListener('click', () => fileInput.click());
+      
+      fileInput.addEventListener('change', (e) => {
+        if (fileInput.files.length > 0) {
+          uploadFiles(fileInput.files);
+          fileInput.value = '';
+        }
+      });
+      
+      // Search
+      searchInput.addEventListener('input', () => {
+        clearSearch.classList.toggle('visible', searchInput.value.length > 0);
+        applySortAndRender();
+      });
+      
+      clearSearch.addEventListener('click', () => {
+        searchInput.value = '';
+        clearSearch.classList.remove('visible');
+        applySortAndRender();
+        searchInput.focus();
+      });
+      
+      // Sort
+      sortBtn.addEventListener('click', () => {
+        const orders = ['newest', 'oldest', 'name'];
+        const currentIndex = orders.indexOf(sortOrder);
+        sortOrder = orders[(currentIndex + 1) % orders.length];
+        sortLabel.textContent = sortOrder.charAt(0).toUpperCase() + sortOrder.slice(1);
+        applySortAndRender();
+      });
+      
+      // Refresh
+      refreshBtn.addEventListener('click', fetchFiles);
+      
+      // ==================== GLOBAL API FOR INLINE HANDLERS ====================
+      window.fileManager = {
+        copyUrl: copyFileUrl,
+        download: downloadFile,
+        deleteFile: deleteFile
+      };
+      
+      // ==================== INITIAL LOAD ====================
       fetchFiles();
-    });
-
-    // Initial load
-    fetchFiles();
-
-    // Additional: handle window errors gracefully
-    window.addEventListener('error', (e) => {
-      console.warn('Global error captured:', e);
-    });
-
-  })();
-</script>
+      
+      // Keyboard shortcut for search
+      document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+          e.preventDefault();
+          searchInput.focus();
+        }
+      });
+      
+    })();
+  </script>
 </body>
 </html>

@@ -6,8 +6,7 @@
   <title>VaultDrop · Social File Hub</title>
   
   <!-- Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <!-- Boxicons -->
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
@@ -35,7 +34,6 @@
       --success: #31a24c;
       --success-light: #e8f5e9;
       --warning: #f7b928;
-      --warning-light: #fff8e1;
       --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
       --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
@@ -149,64 +147,7 @@
       color: var(--accent);
     }
 
-    .connection-status {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: var(--radius-full);
-    }
-
-    .connection-status.connected {
-      background: var(--success-light);
-      color: var(--success);
-    }
-
-    .connection-status.error {
-      background: var(--danger-light);
-      color: var(--danger);
-    }
-
-    .connection-status.checking {
-      background: var(--warning-light);
-      color: var(--warning);
-    }
-
-    /* Setup Instructions */
-    .setup-card {
-      background: var(--warning-light);
-      border: 1px solid var(--warning);
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      margin-bottom: 8px;
-    }
-
-    .setup-card h3 {
-      font-size: 0.95rem;
-      color: #8b6914;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .setup-card ol {
-      margin-left: 20px;
-      font-size: 0.8rem;
-      color: #6b5a1a;
-      line-height: 1.8;
-    }
-
-    .setup-card code {
-      background: rgba(0,0,0,0.08);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-    }
-
-    /* Upload Card */
+    /* Create Post / Upload Card */
     .upload-card {
       background: var(--surface);
       border-radius: var(--radius-lg);
@@ -269,11 +210,6 @@
       transform: scale(1.02);
     }
 
-    .upload-btn-mini:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
     #fileInput {
       display: none;
     }
@@ -286,7 +222,6 @@
       box-shadow: var(--shadow-md);
       border: 1px solid var(--accent);
       display: none;
-      margin-top: 12px;
       animation: slideDown 0.3s ease;
     }
 
@@ -639,9 +574,6 @@
         </div>
       </div>
       <div class="header-stats">
-        <span class="connection-status checking" id="connectionStatus">
-          <i class="bx bx-loader-alt bx-spin"></i> Checking
-        </span>
         <div class="stat-item">
           <i class="bx bx-file"></i>
           <span id="fileCount">0</span>
@@ -650,25 +582,6 @@
           <i class="bx bx-refresh"></i>
         </button>
       </div>
-    </div>
-
-    <!-- Setup Instructions (shown when bucket has issues) -->
-    <div class="setup-card" id="setupCard" style="display:none;">
-      <h3><i class="bx bx-info-circle"></i> Bucket Setup Required</h3>
-      <p style="font-size:0.8rem; color:#6b5a1a; margin-bottom:10px;">
-        The bucket <strong>"exams"</strong> may need proper configuration in Supabase.
-      </p>
-      <ol>
-        <li>Go to <strong>Supabase Dashboard</strong> → <strong>Storage</strong></li>
-        <li>Create a bucket named <code>exams</code> (if not exists)</li>
-        <li>Make it <strong>public</strong> or set RLS policies:</li>
-        <li>Add policy: <code>allow insert for all</code></li>
-        <li>Add policy: <code>allow select for all</code></li>
-        <li>Add policy: <code>allow delete for all</code></li>
-      </ol>
-      <button class="upload-btn-mini" id="retryConnectionBtn" style="margin-top:12px; width:100%;">
-        <i class="bx bx-refresh"></i> Retry Connection
-      </button>
     </div>
 
     <!-- Upload Card -->
@@ -718,40 +631,32 @@
   <script>
     (function() {
       // ==================== CONFIGURATION ====================
-      // INSTRUCTIONS: 
-      // 1. Go to Supabase Dashboard → Storage → Create bucket "exams" (or change STORAGE_BUCKET below)
-      // 2. Make bucket PUBLIC or add RLS policies for INSERT, SELECT, DELETE
-      // 3. The access key is already included in the anon key below
+      // Configure your Supabase project and bucket here.
+      // The bucket must exist with appropriate RLS policies.
+      // For uploads to work, the bucket must allow INSERT operations.
       
       const SUPABASE_URL = "https://kdrgdnrwibuqpvikjapx.supabase.co";
       const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkcmdkbnJ3aWJ1cXB2aWtqYXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNjE4ODMsImV4cCI6MjA5NjkzNzg4M30.9wEbcIDziq9xDWZQ_BF0X-p25g4SQkuCCQV-5fhDnbY";
       const STORAGE_BUCKET = "exams"; // Change to your bucket name
-      const ACCESS_KEY = "45d2c7fa912f0ffaf64af2b45af69193"; // Your access key
       
       // ==================== INITIALIZATION ====================
+      // Use a try-catch wrapper to prevent SDK initialization errors from breaking the page
       let supabase;
-      let bucketReady = false;
-      
-      function initSupabase() {
-        try {
-          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: {
-              persistSession: false,
-              autoRefreshToken: false,
+      try {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+          },
+          global: {
+            headers: {
+              'X-Client-Info': 'vaultdrop-file-manager',
             },
-            global: {
-              headers: {
-                'X-Client-Info': 'vaultdrop-file-manager',
-                'Authorization': `Bearer ${ACCESS_KEY}`,
-              },
-            },
-          });
-          return true;
-        } catch (initError) {
-          console.error('Supabase init error:', initError);
-          showToast('Failed to initialize storage client', 'error');
-          return false;
-        }
+          },
+        });
+      } catch (initError) {
+        console.error('Supabase init error:', initError);
+        showToast('Failed to initialize storage client', 'error');
       }
       
       // DOM Elements
@@ -769,13 +674,12 @@
       const fileFeed = document.getElementById('fileFeed');
       const fileCountEl = document.getElementById('fileCount');
       const toastContainer = document.getElementById('toastContainer');
-      const connectionStatus = document.getElementById('connectionStatus');
-      const setupCard = document.getElementById('setupCard');
-      const retryConnectionBtn = document.getElementById('retryConnectionBtn');
       
       // State
       let allFiles = [];
       let sortOrder = 'newest'; // 'newest', 'oldest', 'name'
+      let uploadQueue = [];
+      let isUploading = false;
       
       // ==================== TOAST SYSTEM ====================
       function showToast(message, type = 'success') {
@@ -828,72 +732,25 @@
         }
       }
       
+      function sanitizeFileName(name) {
+        // Remove special characters and spaces for safer uploads
+        return name
+          .replace(/[^a-zA-Z0-9._-]/g, '_')
+          .replace(/_+/g, '_')
+          .replace(/^_|_$/g, '');
+      }
+      
       function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text || '';
         return div.innerHTML;
       }
       
-      // ==================== CONNECTION CHECK ====================
-      async function checkBucketConnection() {
-        if (!supabase) {
-          updateConnectionStatus('error', 'Not initialized');
-          return false;
-        }
-        
-        updateConnectionStatus('checking', 'Checking...');
-        
-        try {
-          // Try to list files to verify connection
-          const { data, error } = await supabase
-            .storage
-            .from(STORAGE_BUCKET)
-            .list('', { limit: 1 });
-          
-          if (error) {
-            console.error('Bucket check error:', error);
-            updateConnectionStatus('error', 'Bucket error');
-            setupCard.style.display = 'block';
-            return false;
-          }
-          
-          updateConnectionStatus('connected', 'Connected');
-          setupCard.style.display = 'none';
-          bucketReady = true;
-          return true;
-        } catch (err) {
-          console.error('Connection check failed:', err);
-          updateConnectionStatus('error', 'Connection failed');
-          setupCard.style.display = 'block';
-          return false;
-        }
-      }
-      
-      function updateConnectionStatus(status, text) {
-        connectionStatus.className = `connection-status ${status}`;
-        let icon = '';
-        switch(status) {
-          case 'connected':
-            icon = '<i class="bx bx-check-circle"></i>';
-            break;
-          case 'error':
-            icon = '<i class="bx bx-error-circle"></i>';
-            break;
-          case 'checking':
-            icon = '<i class="bx bx-loader-alt bx-spin"></i>';
-            break;
-        }
-        connectionStatus.innerHTML = `${icon} ${text}`;
-      }
-      
       // ==================== FILE OPERATIONS ====================
       async function fetchFiles() {
-        if (!supabase || !bucketReady) {
-          const ready = await checkBucketConnection();
-          if (!ready) {
-            renderFeed([]);
-            return;
-          }
+        if (!supabase) {
+          showToast('Storage client not initialized', 'error');
+          return;
         }
         
         try {
@@ -906,20 +763,20 @@
               sortBy: { column: 'created_at', order: 'desc' }
             });
           
-          if (error) throw error;
+          if (error) {
+            // Check if it's a permissions issue
+            if (error.message?.includes('policy') || error.message?.includes('permission')) {
+              throw new Error('Bucket permissions may need updating. Check RLS policies.');
+            }
+            throw error;
+          }
           
           allFiles = (data || []).filter(item => item && item.name && !item.name.endsWith('/'));
           updateFileCount();
           applySortAndRender();
-          
-          // If we got here, connection is good
-          updateConnectionStatus('connected', 'Connected');
-          setupCard.style.display = 'none';
         } catch (err) {
           console.error('Fetch error:', err);
           showToast(`Load failed: ${err.message || 'Unknown error'}`, 'error');
-          updateConnectionStatus('error', 'Fetch failed');
-          setupCard.style.display = 'block';
           allFiles = [];
           renderFeed([]);
         }
@@ -943,6 +800,7 @@
           await navigator.clipboard.writeText(url);
           showToast('Link copied to clipboard!', 'success');
         } catch (err) {
+          // Fallback for older browsers
           try {
             const url = getPublicUrl(fileName);
             const textarea = document.createElement('textarea');
@@ -1008,46 +866,55 @@
       // ==================== ENHANCED UPLOAD SYSTEM ====================
       async function uploadSingleFile(file) {
         if (!supabase) throw new Error('Storage client not initialized');
-        if (!bucketReady) throw new Error('Bucket not ready. Check connection.');
         
-        // Generate unique filename
-        const timestamp = Date.now();
-        const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        const uniqueName = `${timestamp}_${sanitizedName}`;
+        // Sanitize filename for safer uploads
+        const sanitizedName = sanitizeFileName(file.name);
+        if (!sanitizedName) throw new Error('Invalid filename');
         
-        // Try upload with unique name
-        const { data, error } = await supabase
-          .storage
-          .from(STORAGE_BUCKET)
-          .upload(uniqueName, file, {
-            cacheControl: '3600',
-            upsert: false,
-          });
+        // Try upload with original name first, then fallback to sanitized
+        const attempts = [
+          { name: file.name, upsert: false },
+          { name: sanitizedName, upsert: false },
+          { name: `${Date.now()}_${sanitizedName}`, upsert: false },
+        ];
         
-        if (error) {
-          // Check for common errors
-          if (error.message?.includes('policy') || error.message?.includes('permission') || error.statusCode === '403') {
-            throw new Error('Upload permission denied. Check bucket RLS policies in Supabase Dashboard.');
+        for (const attempt of attempts) {
+          try {
+            const { data, error } = await supabase
+              .storage
+              .from(STORAGE_BUCKET)
+              .upload(attempt.name, file, {
+                cacheControl: '3600',
+                upsert: attempt.upsert,
+              });
+            
+            if (!error) return data;
+            
+            // If file exists, try next attempt
+            if (error.message?.includes('already exists') || error.statusCode === '409') {
+              continue;
+            }
+            
+            // If it's a permissions error, throw immediately
+            if (error.message?.includes('policy') || error.message?.includes('permission') || error.statusCode === '403') {
+              throw new Error('Upload permission denied. Check bucket RLS policies.');
+            }
+            
+            throw error;
+          } catch (uploadErr) {
+            // If it's the last attempt, throw the error
+            if (attempt === attempts[attempts.length - 1]) {
+              throw uploadErr;
+            }
+            // Otherwise continue to next attempt
           }
-          if (error.statusCode === '400') {
-            throw new Error('Upload failed (400). Bucket may not exist or be misconfigured. Create bucket "exams" in Supabase Storage.');
-          }
-          throw error;
         }
         
-        return data;
+        throw new Error('All upload attempts failed');
       }
       
       async function processUploadQueue(files) {
         if (!files || files.length === 0) return;
-        
-        if (!bucketReady) {
-          const ready = await checkBucketConnection();
-          if (!ready) {
-            showToast('Cannot upload: bucket not ready. Check setup instructions.', 'error');
-            return;
-          }
-        }
         
         progressCard.classList.add('active');
         progressFill.style.width = '0%';
@@ -1066,6 +933,7 @@
             progressLabel.textContent = `Uploading: ${file.name}`;
             
             await uploadSingleFile(file);
+            
             successCount++;
             
           } catch (err) {
@@ -1074,12 +942,14 @@
             showToast(`${file.name}: ${err.message}`, 'error');
           }
           
+          // Update progress
           const progress = ((i + 1) / total) * 100;
           progressFill.style.width = progress + '%';
           progressPercent.textContent = Math.round(progress) + '%';
           progressDetail.textContent = `${i + 1} / ${total} files processed`;
         }
         
+        // Complete
         progressLabel.textContent = 'Upload complete!';
         progressFill.style.width = '100%';
         progressPercent.textContent = '100%';
@@ -1089,11 +959,13 @@
           showToast(`${successCount} file(s) uploaded successfully!`, 'success');
         }
         
+        // Hide progress after delay
         setTimeout(() => {
           progressCard.classList.remove('active');
           progressFill.style.width = '0%';
         }, 2500);
         
+        // Refresh file list
         await fetchFiles();
       }
       
@@ -1192,6 +1064,7 @@
       }
       
       // ==================== EVENT LISTENERS ====================
+      // Drag and Drop
       function handleDragEvents() {
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
           dropZone.addEventListener(eventName, (e) => {
@@ -1216,6 +1089,7 @@
         });
       }
       
+      // Click triggers
       dropZone.addEventListener('click', (e) => {
         if (e.target === progressCard || progressCard.contains(e.target)) return;
         if (e.target.closest('button')) return;
@@ -1234,10 +1108,12 @@
         }
       });
       
+      // Search
       searchInput.addEventListener('input', () => {
         applySortAndRender();
       });
       
+      // Sort toggle
       sortBtn.addEventListener('click', () => {
         const orders = ['newest', 'oldest', 'name'];
         const currentIndex = orders.indexOf(sortOrder);
@@ -1246,14 +1122,8 @@
         applySortAndRender();
       });
       
+      // Refresh
       refreshBtn.addEventListener('click', fetchFiles);
-      
-      retryConnectionBtn.addEventListener('click', async () => {
-        await checkBucketConnection();
-        if (bucketReady) {
-          await fetchFiles();
-        }
-      });
       
       // ==================== GLOBAL API ====================
       window.VaultDrop = {
@@ -1265,68 +1135,38 @@
       
       // ==================== KEYBOARD SHORTCUTS ====================
       document.addEventListener('keydown', (e) => {
+        // Ctrl+K or Cmd+K to focus search
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
           e.preventDefault();
           searchInput.focus();
         }
-      });
-      
-      // ==================== SUPPRESS EXTERNAL ERRORS ====================
-      // These errors come from browser extensions (contentScript.js, redirectionChainSiteScript.js)
-      // and cannot be fixed by our code. We suppress them from the console.
-      const originalConsoleError = console.error;
-      console.error = function(...args) {
-        const errorStr = args.join(' ');
-        if (
-          errorStr.includes('contentScript.js') ||
-          errorStr.includes('redirectionChainSiteScript') ||
-          errorStr.includes('Cannot redefine property: location') ||
-          errorStr.includes('i18next')
-        ) {
-          // Suppress these external errors
-          return;
-        }
-        originalConsoleError.apply(console, args);
-      };
-      
-      window.addEventListener('error', (e) => {
-        if (
-          e.filename?.includes('contentScript') ||
-          e.filename?.includes('redirectionChainSiteScript') ||
-          e.message?.includes('Cannot redefine property')
-        ) {
+        // Ctrl+R or Cmd+R to refresh (prevent default browser refresh)
+        if ((e.ctrlKey || e.metaKey) && e.key === 'r' && document.activeElement === document.body) {
           e.preventDefault();
-          e.stopPropagation();
-          return false;
-        }
-      });
-      
-      window.addEventListener('unhandledrejection', (e) => {
-        if (
-          e.reason?.message?.includes('Cannot redefine property') ||
-          e.reason?.stack?.includes('contentScript') ||
-          e.reason?.stack?.includes('redirectionChainSiteScript')
-        ) {
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
+          fetchFiles();
         }
       });
       
       // ==================== INITIALIZE ====================
-      function init() {
-        if (!initSupabase()) {
-          showToast('Failed to initialize. Check console for details.', 'error');
-          return;
-        }
-        
-        handleDragEvents();
-        checkBucketConnection().then(() => {
-          fetchFiles();
-        });
-      }
+      handleDragEvents();
+      fetchFiles();
       
-      init();
+      // Handle global errors gracefully (the redirectionChain error is from a browser extension, not our code)
+      window.addEventListener('error', (e) => {
+        if (e.message && e.message.includes('Cannot redefine property')) {
+          // This is from browser extensions, suppress it
+          e.preventDefault();
+          return false;
+        }
+      });
+      
+      // Catch unhandled promise rejections from extensions
+      window.addEventListener('unhandledrejection', (e) => {
+        if (e.reason?.message?.includes('Cannot redefine property')) {
+          e.preventDefault();
+          return false;
+        }
+      });
       
     })();
   </script>

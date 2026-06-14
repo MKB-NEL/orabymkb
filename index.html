@@ -89,7 +89,7 @@
         }
 
         /* Answer dots */
-        .answer-dots { display: flex; gap: 10px; justify-content: center; }
+        .answer-dots { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
         .answer-dot {
             width: 12px; height: 12px; border-radius: 50%;
             border: 2px solid #d1d5db; background: transparent;
@@ -114,37 +114,41 @@
             position: absolute; opacity: 0; height: 0; width: 0; pointer-events: none;
         }
 
-        /* Number grid */
-        .num-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 10px; width: 100%; background: var(--surface);
+        /* Input grid - supports letters + numbers */
+        .input-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr);
+            gap: 8px; width: 100%; background: var(--surface);
             border: 1px solid var(--border); border-radius: 16px;
             padding: 14px;
         }
-        .num-btn {
-            aspect-ratio: 1; border-radius: 12px;
+        .grid-btn {
+            aspect-ratio: 1; border-radius: 10px;
             border: 1px solid var(--border); background: var(--bg);
-            color: var(--text); font-size: 1.3rem; font-weight: 600;
+            color: var(--text); font-size: 0.95rem; font-weight: 600;
             cursor: pointer; transition: all 0.15s ease;
             display: flex; align-items: center; justify-content: center;
             font-family: var(--font); -webkit-tap-highlight-color: transparent;
+            text-transform: lowercase;
         }
-        .num-btn:hover { background: #e8e6e0; border-color: #c0bfbc; }
-        .num-btn:active { transform: scale(0.94); background: #ddd; }
-        .num-btn.flash-ok {
+        .grid-btn:hover { background: #e8e6e0; border-color: #c0bfbc; }
+        .grid-btn:active { transform: scale(0.93); background: #ddd; }
+        .grid-btn.flash-ok {
             background: #e9f7ef !important; border-color: var(--success) !important;
             color: var(--success) !important; animation: pop 0.3s ease;
         }
-        .num-btn.flash-no {
+        .grid-btn.flash-no {
             background: #fdecea !important; border-color: var(--danger) !important;
             color: var(--danger) !important; animation: shake 0.3s ease;
         }
-        .num-btn.placeholder { border: none; background: transparent; pointer-events: none; }
-        .num-btn.del-btn {
+        .grid-btn.del-btn {
             background: transparent; border-color: transparent; color: var(--text-tertiary);
-            font-size: 1rem;
+            font-size: 0.85rem; aspect-ratio: auto; grid-column: span 1;
         }
-        .num-btn.del-btn:hover { background: var(--bg); border-color: var(--border); color: var(--danger); }
+        .grid-btn.del-btn:hover { background: var(--bg); border-color: var(--border); color: var(--danger); }
+        .grid-btn.space-btn {
+            grid-column: span 3; aspect-ratio: auto; font-size: 0.65rem;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
 
         /* Action row */
         .action-row { display: flex; gap: 8px; width: 100%; }
@@ -156,12 +160,14 @@
         }
         .action-btn:hover { background: #f9fafb; color: var(--text-secondary); }
 
-        /* Subtle message */
-        .subtle-msg {
-            font-size: 0.68rem; color: var(--text-tertiary); min-height: 16px;
+        /* Messages with colors */
+        .msg {
+            font-size: 0.72rem; font-weight: 500; min-height: 18px;
             text-align: center; transition: all 0.3s ease;
         }
-        .subtle-msg.no { color: var(--danger); }
+        .msg.red { color: var(--danger); }
+        .msg.green { color: var(--success); }
+        .msg.gray { color: var(--text-tertiary); }
 
         /* Done */
         .done-circle {
@@ -178,8 +184,8 @@
 
         @media (max-width: 380px) {
             .screen { gap: 22px; padding: 0 4px; }
-            .num-grid { gap: 8px; padding: 10px; }
-            .num-btn { border-radius: 10px; font-size: 1.15rem; }
+            .input-grid { gap: 6px; padding: 10px; }
+            .grid-btn { border-radius: 8px; font-size: 0.85rem; }
             .q-text { font-size: 0.9rem; }
         }
     </style>
@@ -193,7 +199,7 @@
             <input type="text" class="text-input" id="usernameInput" placeholder="Enter your username" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
         </div>
         <button class="btn" id="usernameBtn" disabled>Continue</button>
-        <span class="subtle-msg" id="usernameMsg"></span>
+        <span class="msg" id="usernameMsg"></span>
     </div>
 
     <!-- ========== SCREEN 2: QUESTIONS ========== -->
@@ -202,25 +208,59 @@
             <span class="q-hint" id="qNumber">Question 1/2</span>
             <span class="q-text" id="qText">...</span>
             <div class="answer-dots" id="answerDots"></div>
-            <span class="subtle-msg" id="qMsg"></span>
+            <span class="msg" id="qMsg"></span>
         </div>
 
-        <input type="text" class="hidden-input" id="hiddenInput" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off">
+        <input type="text" class="hidden-input" id="hiddenInput" autocomplete="off">
 
-        <div class="num-grid" id="numGrid">
-            <button class="num-btn" data-num="1">1</button>
-            <button class="num-btn" data-num="2">2</button>
-            <button class="num-btn" data-num="3">3</button>
-            <button class="num-btn" data-num="4">4</button>
-            <button class="num-btn" data-num="5">5</button>
-            <button class="num-btn" data-num="6">6</button>
-            <button class="num-btn" data-num="7">7</button>
-            <button class="num-btn" data-num="8">8</button>
-            <button class="num-btn" data-num="9">9</button>
-            <button class="num-btn placeholder"></button>
-            <button class="num-btn" data-num="0">0</button>
-            <button class="num-btn del-btn" id="delBtn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 4H8l-7 8 7 8h13a2 2 0 002-2V6a2 2 0 00-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
+        <div class="input-grid" id="inputGrid">
+            <!-- Row 1: 1-5 -->
+            <button class="grid-btn" data-char="1">1</button>
+            <button class="grid-btn" data-char="2">2</button>
+            <button class="grid-btn" data-char="3">3</button>
+            <button class="grid-btn" data-char="4">4</button>
+            <button class="grid-btn" data-char="5">5</button>
+            <!-- Row 2: 6-0 -->
+            <button class="grid-btn" data-char="6">6</button>
+            <button class="grid-btn" data-char="7">7</button>
+            <button class="grid-btn" data-char="8">8</button>
+            <button class="grid-btn" data-char="9">9</button>
+            <button class="grid-btn" data-char="0">0</button>
+            <!-- Row 3: a-e -->
+            <button class="grid-btn" data-char="a">a</button>
+            <button class="grid-btn" data-char="b">b</button>
+            <button class="grid-btn" data-char="c">c</button>
+            <button class="grid-btn" data-char="d">d</button>
+            <button class="grid-btn" data-char="e">e</button>
+            <!-- Row 4: f-j -->
+            <button class="grid-btn" data-char="f">f</button>
+            <button class="grid-btn" data-char="g">g</button>
+            <button class="grid-btn" data-char="h">h</button>
+            <button class="grid-btn" data-char="i">i</button>
+            <button class="grid-btn" data-char="j">j</button>
+            <!-- Row 5: k-o -->
+            <button class="grid-btn" data-char="k">k</button>
+            <button class="grid-btn" data-char="l">l</button>
+            <button class="grid-btn" data-char="m">m</button>
+            <button class="grid-btn" data-char="n">n</button>
+            <button class="grid-btn" data-char="o">o</button>
+            <!-- Row 6: p-t -->
+            <button class="grid-btn" data-char="p">p</button>
+            <button class="grid-btn" data-char="q">q</button>
+            <button class="grid-btn" data-char="r">r</button>
+            <button class="grid-btn" data-char="s">s</button>
+            <button class="grid-btn" data-char="t">t</button>
+            <!-- Row 7: u-y -->
+            <button class="grid-btn" data-char="u">u</button>
+            <button class="grid-btn" data-char="v">v</button>
+            <button class="grid-btn" data-char="w">w</button>
+            <button class="grid-btn" data-char="x">x</button>
+            <button class="grid-btn" data-char="y">y</button>
+            <!-- Row 8: z, space, delete -->
+            <button class="grid-btn" data-char="z">z</button>
+            <button class="grid-btn space-btn" data-char=" ">space</button>
+            <button class="grid-btn del-btn" id="delBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 4H8l-7 8 7 8h13a2 2 0 002-2V6a2 2 0 00-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
             </button>
         </div>
 
@@ -243,26 +283,25 @@
             const $ = (id) => document.getElementById(id);
 
             // ==================== LOAD AUTH DATA ====================
-            let AUTH_DATA = {};
+            let AUTH_DATA = { users: [] };
 
             async function loadAuthData() {
                 try {
                     const res = await fetch('auth-data.json');
                     if (res.ok) {
-                        AUTH_DATA = await res.json();
+                        const data = await res.json();
+                        if (data && data.users) {
+                            AUTH_DATA = data;
+                        }
                     }
                 } catch (e) {
-                    console.log('No auth-data.json found, using defaults');
+                    console.log('Could not load auth-data.json');
                 }
-                // Fallback default
-                if (!AUTH_DATA || Object.keys(AUTH_DATA).length === 0) {
-                    AUTH_DATA = {
-                        'oraby': {
-                            q1: { q: 'What is your birth year?', a: ['1', '9', '9', '5'] },
-                            q2: { q: 'What is your access code?', a: ['2', '5', '8', '0'] }
-                        }
-                    };
-                }
+            }
+
+            function findUser(username) {
+                const name = username.trim().toLowerCase();
+                return AUTH_DATA.users.find(u => u.username.toLowerCase() === name) || null;
             }
 
             // ==================== STATE ====================
@@ -287,6 +326,7 @@
                 const val = usernameInput.value.trim();
                 usernameBtn.disabled = val.length < 2;
                 usernameMsg.textContent = '';
+                usernameMsg.className = 'msg';
             });
 
             usernameInput.addEventListener('keydown', (e) => {
@@ -299,18 +339,20 @@
                 const name = usernameInput.value.trim().toLowerCase();
                 if (name.length < 2) return;
 
-                currentUser = name;
-                const userData = AUTH_DATA[name];
+                const user = findUser(name);
 
-                if (!userData || !userData.q1 || !userData.q2) {
-                    usernameMsg.textContent = 'user not found';
+                if (!user) {
+                    usernameMsg.textContent = 'username not found';
+                    usernameMsg.className = 'msg red';
                     return;
                 }
 
-                // Build 2 questions
+                currentUser = user;
+
+                // Build 2 questions from user data
                 questions = [
-                    { q: userData.q1.q, answer: userData.q1.a },
-                    { q: userData.q2.q, answer: userData.q2.a }
+                    { q: user.question1, answer: user.answer1 },
+                    { q: user.question2, answer: user.answer2 }
                 ];
 
                 currentQIndex = 0;
@@ -327,7 +369,7 @@
             const answerDots = $('answerDots');
             const qMsg = $('qMsg');
             const hiddenInput = $('hiddenInput');
-            const numGrid = $('numGrid');
+            const inputGrid = $('inputGrid');
             const delBtn = $('delBtn');
             const qClearBtn = $('qClearBtn');
             const qKeyboardBtn = $('qKeyboardBtn');
@@ -342,6 +384,7 @@
                 qNumber.textContent = `Question ${currentQIndex + 1}/2`;
                 qText.textContent = question.q;
                 
+                // Create answer dots matching answer length
                 answerDots.innerHTML = '';
                 for (let i = 0; i < question.answer.length; i++) {
                     const dot = document.createElement('div');
@@ -353,6 +396,7 @@
                 isProcessing = false;
                 attempts = 0;
                 qMsg.textContent = '';
+                qMsg.className = 'msg';
                 
                 updateDots();
                 focusHiddenInput();
@@ -370,8 +414,8 @@
                 });
             }
 
-            function flashButton(num, type) {
-                const btn = numGrid.querySelector(`[data-num="${num}"]`);
+            function flashButton(char, type) {
+                const btn = inputGrid.querySelector(`[data-char="${char}"]`);
                 if (!btn) return;
                 btn.classList.add(type === 'ok' ? 'flash-ok' : 'flash-no');
                 setTimeout(() => btn.classList.remove('flash-ok', 'flash-no'), 400);
@@ -383,53 +427,55 @@
 
                 isProcessing = true;
 
-                let allCorrect = true;
-                for (let i = 0; i < question.answer.length; i++) {
-                    if (enteredAnswer[i] !== question.answer[i]) {
-                        allCorrect = false;
-                        break;
-                    }
-                }
+                const userAnswer = enteredAnswer.join('');
+                const correctAnswer = question.answer;
 
-                if (allCorrect) {
+                if (userAnswer === correctAnswer) {
                     updateDots('correct');
-                    qMsg.textContent = '';
+                    qMsg.textContent = 'correct';
+                    qMsg.className = 'msg green';
                     
-                    question.answer.forEach(d => flashButton(d, 'ok'));
+                    // Flash correct characters
+                    correctAnswer.split('').forEach(c => flashButton(c, 'ok'));
                     
                     setTimeout(() => {
                         currentQIndex++;
                         loadQuestion();
-                    }, 500);
+                    }, 600);
 
                 } else {
                     updateDots('wrong');
                     attempts++;
+                    qMsg.textContent = 'wrong answer';
+                    qMsg.className = 'msg red';
                     
-                    enteredAnswer.forEach((d, i) => {
-                        if (d === question.answer[i]) flashButton(d, 'ok');
-                        else flashButton(d, 'no');
+                    // Flash matching chars green, wrong chars red
+                    enteredAnswer.forEach((c, i) => {
+                        if (c === correctAnswer[i]) flashButton(c, 'ok');
+                        else flashButton(c, 'no');
                     });
 
                     shakeDots();
 
                     if (attempts >= MAX_ATTEMPTS) {
-                        qMsg.textContent = 'too many tries';
+                        qMsg.textContent = 'too many attempts, resetting...';
+                        qMsg.className = 'msg red';
                         disableGrid(true);
                         setTimeout(() => {
                             disableGrid(false);
                             enteredAnswer = [];
                             updateDots();
                             qMsg.textContent = '';
+                            qMsg.className = 'msg';
                             isProcessing = false;
                             attempts = 0;
-                        }, 2000);
+                        }, 2500);
                     } else {
                         setTimeout(() => {
                             enteredAnswer = [];
                             updateDots();
                             isProcessing = false;
-                        }, 400);
+                        }, 500);
                     }
                 }
             }
@@ -444,32 +490,33 @@
             }
 
             function disableGrid(disabled) {
-                const btns = numGrid.querySelectorAll('.num-btn:not(.placeholder)');
+                const btns = inputGrid.querySelectorAll('.grid-btn');
                 btns.forEach(b => {
                     b.style.opacity = disabled ? '0.35' : '1';
                     b.style.pointerEvents = disabled ? 'none' : 'auto';
                 });
             }
 
-            function addDigit(d) {
+            function addChar(c) {
                 if (isProcessing) return;
                 const question = questions[currentQIndex];
                 if (enteredAnswer.length >= question.answer.length) return;
 
-                enteredAnswer.push(d);
+                enteredAnswer.push(c);
                 updateDots();
 
                 if (enteredAnswer.length === question.answer.length) {
-                    setTimeout(() => checkAnswer(), 200);
+                    setTimeout(() => checkAnswer(), 250);
                 }
             }
 
-            function removeDigit() {
+            function removeChar() {
                 if (isProcessing) return;
                 if (enteredAnswer.length === 0) return;
                 enteredAnswer.pop();
                 updateDots();
                 qMsg.textContent = '';
+                qMsg.className = 'msg';
             }
 
             // ==================== KEYBOARD ====================
@@ -480,26 +527,31 @@
 
             hiddenInput.addEventListener('input', () => {
                 const val = hiddenInput.value;
-                const last = val.charAt(val.length - 1);
-                if (/^\d$/.test(last)) addDigit(last);
+                if (val.length > 0) {
+                    const last = val.charAt(val.length - 1).toLowerCase();
+                    if (/^[a-z0-9 ]$/.test(last)) {
+                        addChar(last);
+                    }
+                }
                 hiddenInput.value = '';
             });
 
             hiddenInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Backspace' || e.key === 'Delete') {
                     e.preventDefault();
-                    removeDigit();
+                    removeChar();
                     hiddenInput.value = '';
                 }
             });
 
             // ==================== EVENT LISTENERS ====================
-            numGrid.addEventListener('click', (e) => {
-                const btn = e.target.closest('.num-btn');
-                if (!btn || btn.classList.contains('placeholder')) return;
-                const num = btn.dataset.num;
-                if (num !== undefined) {
-                    addDigit(num);
+            inputGrid.addEventListener('click', (e) => {
+                const btn = e.target.closest('.grid-btn');
+                if (!btn) return;
+                
+                const char = btn.dataset.char;
+                if (char !== undefined) {
+                    addChar(char);
                     btn.style.transform = 'scale(0.9)';
                     setTimeout(() => btn.style.transform = '', 100);
                 }
@@ -507,13 +559,14 @@
 
             delBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                removeDigit();
+                removeChar();
             });
 
             qClearBtn.addEventListener('click', () => {
                 enteredAnswer = [];
                 updateDots();
                 qMsg.textContent = '';
+                qMsg.className = 'msg';
                 isProcessing = false;
             });
 
@@ -527,13 +580,14 @@
                 if (questionScreen.classList.contains('hidden')) return;
                 if (isProcessing) return;
 
-                if (/^\d$/.test(e.key)) {
+                const key = e.key.toLowerCase();
+                if (/^[a-z0-9 ]$/.test(key) && key.length === 1) {
                     e.preventDefault();
-                    addDigit(e.key);
+                    addChar(key);
                 }
                 if (e.key === 'Backspace' || e.key === 'Delete') {
                     e.preventDefault();
-                    removeDigit();
+                    removeChar();
                 }
                 if (e.key === 'Escape') {
                     e.preventDefault();

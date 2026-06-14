@@ -4,20 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Access</title>
-    <meta name="theme-color" content="#0d0d0d">
+    <meta name="theme-color" content="#f4f2ee">
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+            --bg: #f4f2ee;
+            --surface: #ffffff;
+            --border: #e5e7eb;
+            --text: #191919;
+            --text-secondary: #595856;
+            --text-tertiary: #868482;
+            --primary: #6c47ff;
+            --primary-hover: #5835e8;
+            --success: #057642;
+            --danger: #d11124;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         html, body {
             width: 100%; height: 100%; overflow: hidden;
-            font-family: var(--font); background: #08080c; color: #ccc;
+            font-family: var(--font); background: var(--bg); color: var(--text);
             -webkit-font-smoothing: antialiased; user-select: none;
             -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
@@ -30,74 +40,72 @@
 
         .screen {
             width: 100%; max-width: 360px; display: flex;
-            flex-direction: column; align-items: center; gap: 32px;
-            animation: fadeIn 0.4s ease;
+            flex-direction: column; align-items: center; gap: 28px;
+            animation: fadeIn 0.35s ease;
         }
         .screen.hidden { display: none; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes shake { 0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)} }
-        @keyframes pop { 0%{transform:scale(0.6)}60%{transform:scale(1.1)}100%{transform:scale(1)} }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)} }
+        @keyframes pop { 0%{transform:scale(0.7)}60%{transform:scale(1.08)}100%{transform:scale(1)} }
 
-        /* Username Screen */
+        /* Input */
         .input-group {
-            width: 100%; display: flex; flex-direction: column; gap: 8px;
+            width: 100%; display: flex; flex-direction: column; gap: 6px;
         }
         .input-label {
             font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 1.5px; color: #555;
+            letter-spacing: 1.2px; color: var(--text-tertiary);
         }
         .text-input {
-            width: 100%; padding: 14px 18px; border-radius: 16px;
-            border: 1.5px solid #1a1a24; background: #0e0e14;
-            color: #e0e0e0; font-size: 1rem; font-family: var(--font);
+            width: 100%; padding: 14px 18px; border-radius: 14px;
+            border: 1.5px solid var(--border); background: var(--surface);
+            color: var(--text); font-size: 1rem; font-family: var(--font);
             outline: none; transition: all 0.2s ease;
         }
-        .text-input:focus { border-color: #6c47ff; box-shadow: 0 0 0 3px rgba(108,71,255,0.12); }
-        .text-input::placeholder { color: #333; }
+        .text-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108,71,255,0.1); }
+        .text-input::placeholder { color: #b0b0b0; }
 
         .btn {
-            width: 100%; padding: 14px; border-radius: 16px; border: none;
+            width: 100%; padding: 14px; border-radius: 14px; border: none;
             font-weight: 600; font-size: 0.9rem; font-family: var(--font);
-            cursor: pointer; transition: all 0.2s ease;
+            cursor: pointer; transition: all 0.2s ease; background: var(--primary);
+            color: #fff;
         }
         .btn:active { transform: scale(0.97); }
-        .btn-primary { background: #6c47ff; color: #fff; }
-        .btn-primary:hover { background: #7b5ce8; }
-        .btn-primary:disabled { opacity: 0.35; pointer-events: none; }
+        .btn:hover { background: var(--primary-hover); }
+        .btn:disabled { opacity: 0.4; pointer-events: none; }
 
-        /* Question Screen */
+        /* Question */
         .question-box {
-            width: 100%; display: flex; flex-direction: column; align-items: center; gap: 24px;
-        }
-        .q-text {
-            font-size: 1.05rem; font-weight: 600; color: #ddd;
-            text-align: center; line-height: 1.4;
+            width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px;
         }
         .q-hint {
-            font-size: 0.65rem; color: #555; text-transform: uppercase;
-            letter-spacing: 1px;
+            font-size: 0.65rem; color: var(--text-tertiary);
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .q-text {
+            font-size: 1rem; font-weight: 600; color: var(--text);
+            text-align: center; line-height: 1.4;
         }
 
-        /* Hidden answer - dots */
-        .answer-dots {
-            display: flex; gap: 10px; justify-content: center;
-        }
+        /* Answer dots */
+        .answer-dots { display: flex; gap: 10px; justify-content: center; }
         .answer-dot {
-            width: 10px; height: 10px; border-radius: 50%;
-            border: 1.5px solid #222; background: transparent;
+            width: 12px; height: 12px; border-radius: 50%;
+            border: 2px solid #d1d5db; background: transparent;
             transition: all 0.2s ease;
         }
         .answer-dot.filled {
-            border-color: #6c47ff; background: #6c47ff;
-            animation: pop 0.25s ease;
+            border-color: var(--primary); background: var(--primary);
+            animation: pop 0.2s ease;
         }
         .answer-dot.correct {
-            border-color: #22c55e; background: #22c55e;
-            box-shadow: 0 0 10px rgba(34,197,94,0.4);
+            border-color: var(--success); background: var(--success);
+            box-shadow: 0 0 8px rgba(5,118,66,0.3);
         }
         .answer-dot.wrong {
-            border-color: #ef4444; background: #ef4444;
-            box-shadow: 0 0 10px rgba(239,68,68,0.4);
+            border-color: var(--danger); background: var(--danger);
+            box-shadow: 0 0 8px rgba(209,17,36,0.3);
             animation: shake 0.4s ease;
         }
 
@@ -109,69 +117,70 @@
         /* Number grid */
         .num-grid {
             display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 10px; width: 100%;
+            gap: 10px; width: 100%; background: var(--surface);
+            border: 1px solid var(--border); border-radius: 16px;
+            padding: 14px;
         }
         .num-btn {
-            aspect-ratio: 1; border-radius: 16px;
-            border: 1.5px solid #15151f; background: #0c0c14;
-            color: #ccc; font-size: 1.4rem; font-weight: 600;
+            aspect-ratio: 1; border-radius: 12px;
+            border: 1px solid var(--border); background: var(--bg);
+            color: var(--text); font-size: 1.3rem; font-weight: 600;
             cursor: pointer; transition: all 0.15s ease;
             display: flex; align-items: center; justify-content: center;
             font-family: var(--font); -webkit-tap-highlight-color: transparent;
         }
-        .num-btn:hover { background: #12121d; border-color: #252540; }
-        .num-btn:active { transform: scale(0.93); background: #1a1a2a; }
+        .num-btn:hover { background: #e8e6e0; border-color: #c0bfbc; }
+        .num-btn:active { transform: scale(0.94); background: #ddd; }
         .num-btn.flash-ok {
-            background: #0a1a0a !important; border-color: #22c55e !important;
-            color: #22c55e !important; animation: pop 0.3s ease;
+            background: #e9f7ef !important; border-color: var(--success) !important;
+            color: var(--success) !important; animation: pop 0.3s ease;
         }
         .num-btn.flash-no {
-            background: #1a0a0a !important; border-color: #ef4444 !important;
-            color: #ef4444 !important; animation: shake 0.3s ease;
+            background: #fdecea !important; border-color: var(--danger) !important;
+            color: var(--danger) !important; animation: shake 0.3s ease;
         }
         .num-btn.placeholder { border: none; background: transparent; pointer-events: none; }
         .num-btn.del-btn {
-            background: transparent; border-color: transparent; color: #444; font-size: 1.1rem;
+            background: transparent; border-color: transparent; color: var(--text-tertiary);
+            font-size: 1rem;
         }
-        .num-btn.del-btn:hover { background: #12121d; border-color: #252540; color: #ef4444; }
+        .num-btn.del-btn:hover { background: var(--bg); border-color: var(--border); color: var(--danger); }
 
         /* Action row */
-        .action-row {
-            display: flex; gap: 8px; width: 100%;
-        }
+        .action-row { display: flex; gap: 8px; width: 100%; }
         .action-btn {
-            flex: 1; padding: 10px; border-radius: 12px; border: 1px solid #1a1a24;
-            background: transparent; color: #555; font-size: 0.72rem; font-weight: 600;
-            cursor: pointer; font-family: var(--font); transition: all 0.2s ease;
-            display: flex; align-items: center; justify-content: center; gap: 5px;
+            flex: 1; padding: 10px; border-radius: 12px; border: 1px solid var(--border);
+            background: var(--surface); color: var(--text-tertiary); font-size: 0.7rem;
+            font-weight: 600; cursor: pointer; font-family: var(--font);
+            transition: all 0.2s ease; text-align: center;
         }
-        .action-btn:hover { background: #11111a; color: #888; border-color: #252540; }
+        .action-btn:hover { background: #f9fafb; color: var(--text-secondary); }
 
         /* Subtle message */
         .subtle-msg {
-            font-size: 0.68rem; color: #444; min-height: 18px;
+            font-size: 0.68rem; color: var(--text-tertiary); min-height: 16px;
             text-align: center; transition: all 0.3s ease;
         }
-        .subtle-msg.ok { color: #22c55e; }
-        .subtle-msg.no { color: #ef4444; }
+        .subtle-msg.no { color: var(--danger); }
 
-        /* Done screen */
-        .done-screen {
-            display: flex; flex-direction: column; align-items: center; gap: 16px;
-        }
+        /* Done */
         .done-circle {
-            width: 48px; height: 48px; border-radius: 50%;
-            border: 2px solid #22c55e; display: flex; align-items: center;
-            justify-content: center; animation: pop 0.5s ease;
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 2px solid var(--success); display: flex;
+            align-items: center; justify-content: center;
+            animation: pop 0.5s ease;
         }
-        .done-circle svg { width: 24px; height: 24px; stroke: #22c55e; fill: none; stroke-width: 3; }
-        .done-text { font-size: 0.85rem; color: #666; }
+        .done-circle svg {
+            width: 22px; height: 22px; stroke: var(--success);
+            fill: none; stroke-width: 3;
+        }
+        .done-text { font-size: 0.8rem; color: var(--text-tertiary); }
 
         @media (max-width: 380px) {
-            .screen { gap: 24px; padding: 0 8px; }
-            .num-grid { gap: 8px; }
-            .num-btn { border-radius: 14px; font-size: 1.2rem; }
-            .q-text { font-size: 0.95rem; }
+            .screen { gap: 22px; padding: 0 4px; }
+            .num-grid { gap: 8px; padding: 10px; }
+            .num-btn { border-radius: 10px; font-size: 1.15rem; }
+            .q-text { font-size: 0.9rem; }
         }
     </style>
 </head>
@@ -183,21 +192,20 @@
             <span class="input-label">Username</span>
             <input type="text" class="text-input" id="usernameInput" placeholder="Enter your username" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
         </div>
-        <button class="btn btn-primary" id="usernameBtn" disabled>Continue</button>
+        <button class="btn" id="usernameBtn" disabled>Continue</button>
         <span class="subtle-msg" id="usernameMsg"></span>
     </div>
 
     <!-- ========== SCREEN 2: QUESTIONS ========== -->
     <div class="screen hidden" id="questionScreen">
         <div class="question-box">
-            <span class="q-hint" id="qNumber">Question 1/4</span>
+            <span class="q-hint" id="qNumber">Question 1/2</span>
             <span class="q-text" id="qText">...</span>
             <div class="answer-dots" id="answerDots"></div>
             <span class="subtle-msg" id="qMsg"></span>
         </div>
 
-        <!-- Hidden input for keyboard -->
-        <input type="text" class="hidden-input" id="hiddenInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off">
+        <input type="text" class="hidden-input" id="hiddenInput" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off">
 
         <div class="num-grid" id="numGrid">
             <button class="num-btn" data-num="1">1</button>
@@ -224,58 +232,42 @@
 
     <!-- ========== SCREEN 3: DONE ========== -->
     <div class="screen hidden" id="doneScreen">
-        <div class="done-screen">
-            <div class="done-circle">
-                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
-            <div class="done-text">redirecting...</div>
+        <div class="done-circle">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
+        <div class="done-text">redirecting...</div>
     </div>
 
     <script>
         (function() {
             const $ = (id) => document.getElementById(id);
 
-            // ==================== USER DATABASE ====================
-            // Each user has: username, questions (array of {q, answer: [digits]})
-            const USERS = {
-                'oraby': {
-                    questions: [
-                        { q: 'Year of birth?', answer: ['1', '9', '9', '5'] },
-                        { q: 'Month of birth? (MM)', answer: ['0', '7'] },
-                        { q: 'Lucky number?', answer: ['2', '3'] },
-                        { q: 'Access code?', answer: ['2', '5', '8', '0'] },
-                    ]
-                },
-                'admin': {
-                    questions: [
-                        { q: 'System year?', answer: ['2', '0', '2', '4'] },
-                        { q: 'Root digits?', answer: ['1', '0'] },
-                        { q: 'Security pin?', answer: ['7', '7', '7'] },
-                        { q: 'Master key?', answer: ['9', '1', '1'] },
-                    ]
-                },
-                'mkb': {
-                    questions: [
-                        { q: 'Birth day? (DD)', answer: ['1', '5'] },
-                        { q: 'Favorite digit?', answer: ['7'] },
-                        { q: 'Code part 1?', answer: ['3', '6'] },
-                        { q: 'Code part 2?', answer: ['9', '0'] },
-                    ]
-                }
-            };
+            // ==================== LOAD AUTH DATA ====================
+            let AUTH_DATA = {};
 
-            // Default questions for unknown users
-            const DEFAULT_QUESTIONS = [
-                { q: 'Enter PIN part 1', answer: ['1', '2', '3'] },
-                { q: 'Enter PIN part 2', answer: ['4', '5', '6'] },
-                { q: 'Enter PIN part 3', answer: ['7', '8'] },
-                { q: 'Enter PIN part 4', answer: ['9', '0'] },
-            ];
+            async function loadAuthData() {
+                try {
+                    const res = await fetch('auth-data.json');
+                    if (res.ok) {
+                        AUTH_DATA = await res.json();
+                    }
+                } catch (e) {
+                    console.log('No auth-data.json found, using defaults');
+                }
+                // Fallback default
+                if (!AUTH_DATA || Object.keys(AUTH_DATA).length === 0) {
+                    AUTH_DATA = {
+                        'oraby': {
+                            q1: { q: 'What is your birth year?', a: ['1', '9', '9', '5'] },
+                            q2: { q: 'What is your access code?', a: ['2', '5', '8', '0'] }
+                        }
+                    };
+                }
+            }
 
             // ==================== STATE ====================
             let currentUser = null;
-            let currentQuestions = [];
+            let questions = [];
             let currentQIndex = 0;
             let enteredAnswer = [];
             let isProcessing = false;
@@ -295,13 +287,10 @@
                 const val = usernameInput.value.trim();
                 usernameBtn.disabled = val.length < 2;
                 usernameMsg.textContent = '';
-                usernameMsg.className = 'subtle-msg';
             });
 
             usernameInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !usernameBtn.disabled) {
-                    startQuestions();
-                }
+                if (e.key === 'Enter' && !usernameBtn.disabled) startQuestions();
             });
 
             usernameBtn.addEventListener('click', startQuestions);
@@ -311,14 +300,18 @@
                 if (name.length < 2) return;
 
                 currentUser = name;
-                
-                // Find user or use default
-                if (USERS[name]) {
-                    currentQuestions = USERS[name].questions;
-                } else {
-                    // Shuffle default questions for variety
-                    currentQuestions = [...DEFAULT_QUESTIONS].sort(() => Math.random() - 0.5);
+                const userData = AUTH_DATA[name];
+
+                if (!userData || !userData.q1 || !userData.q2) {
+                    usernameMsg.textContent = 'user not found';
+                    return;
                 }
+
+                // Build 2 questions
+                questions = [
+                    { q: userData.q1.q, answer: userData.q1.a },
+                    { q: userData.q2.q, answer: userData.q2.a }
+                ];
 
                 currentQIndex = 0;
                 attempts = 0;
@@ -340,17 +333,15 @@
             const qKeyboardBtn = $('qKeyboardBtn');
 
             function loadQuestion() {
-                if (currentQIndex >= currentQuestions.length) {
-                    // All questions answered correctly
+                if (currentQIndex >= questions.length) {
                     showDone();
                     return;
                 }
 
-                const question = currentQuestions[currentQIndex];
-                qNumber.textContent = `Question ${currentQIndex + 1}/${currentQuestions.length}`;
+                const question = questions[currentQIndex];
+                qNumber.textContent = `Question ${currentQIndex + 1}/2`;
                 qText.textContent = question.q;
                 
-                // Create answer dots
                 answerDots.innerHTML = '';
                 for (let i = 0; i < question.answer.length; i++) {
                     const dot = document.createElement('div');
@@ -362,7 +353,6 @@
                 isProcessing = false;
                 attempts = 0;
                 qMsg.textContent = '';
-                qMsg.className = 'subtle-msg';
                 
                 updateDots();
                 focusHiddenInput();
@@ -388,7 +378,7 @@
             }
 
             function checkAnswer() {
-                const question = currentQuestions[currentQIndex];
+                const question = questions[currentQIndex];
                 if (enteredAnswer.length !== question.answer.length) return;
 
                 isProcessing = true;
@@ -404,14 +394,13 @@
                 if (allCorrect) {
                     updateDots('correct');
                     qMsg.textContent = '';
-                    qMsg.className = 'subtle-msg';
                     
                     question.answer.forEach(d => flashButton(d, 'ok'));
                     
                     setTimeout(() => {
                         currentQIndex++;
                         loadQuestion();
-                    }, 600);
+                    }, 500);
 
                 } else {
                     updateDots('wrong');
@@ -426,14 +415,12 @@
 
                     if (attempts >= MAX_ATTEMPTS) {
                         qMsg.textContent = 'too many tries';
-                        qMsg.className = 'subtle-msg no';
                         disableGrid(true);
                         setTimeout(() => {
                             disableGrid(false);
                             enteredAnswer = [];
                             updateDots();
                             qMsg.textContent = '';
-                            qMsg.className = 'subtle-msg';
                             isProcessing = false;
                             attempts = 0;
                         }, 2000);
@@ -442,7 +429,7 @@
                             enteredAnswer = [];
                             updateDots();
                             isProcessing = false;
-                        }, 500);
+                        }, 400);
                     }
                 }
             }
@@ -459,21 +446,21 @@
             function disableGrid(disabled) {
                 const btns = numGrid.querySelectorAll('.num-btn:not(.placeholder)');
                 btns.forEach(b => {
-                    b.style.opacity = disabled ? '0.3' : '1';
+                    b.style.opacity = disabled ? '0.35' : '1';
                     b.style.pointerEvents = disabled ? 'none' : 'auto';
                 });
             }
 
             function addDigit(d) {
                 if (isProcessing) return;
-                const question = currentQuestions[currentQIndex];
+                const question = questions[currentQIndex];
                 if (enteredAnswer.length >= question.answer.length) return;
 
                 enteredAnswer.push(d);
                 updateDots();
 
                 if (enteredAnswer.length === question.answer.length) {
-                    setTimeout(() => checkAnswer(), 250);
+                    setTimeout(() => checkAnswer(), 200);
                 }
             }
 
@@ -483,7 +470,6 @@
                 enteredAnswer.pop();
                 updateDots();
                 qMsg.textContent = '';
-                qMsg.className = 'subtle-msg';
             }
 
             // ==================== KEYBOARD ====================
@@ -528,7 +514,6 @@
                 enteredAnswer = [];
                 updateDots();
                 qMsg.textContent = '';
-                qMsg.className = 'subtle-msg';
                 isProcessing = false;
             });
 
@@ -570,8 +555,11 @@
                 doneScreen.classList.remove('hidden');
                 setTimeout(() => {
                     window.location.href = 'home.html';
-                }, 1200);
+                }, 1000);
             }
+
+            // ==================== INIT ====================
+            loadAuthData();
 
         })();
     </script>

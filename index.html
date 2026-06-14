@@ -31,7 +31,6 @@
             font-family: var(--font); background: var(--bg); color: var(--text);
             -webkit-font-smoothing: antialiased; user-select: none;
             -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
         }
 
         body {
@@ -41,22 +40,21 @@
 
         .screen {
             width: 100%; max-width: 340px; display: flex;
-            flex-direction: column; align-items: center; gap: 32px;
+            flex-direction: column; align-items: center; gap: 28px;
             animation: fadeIn 0.35s ease;
         }
         .screen.hidden { display: none; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes shake { 0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)} }
         @keyframes pop { 0%{transform:scale(0.7)}60%{transform:scale(1.08)}100%{transform:scale(1)} }
+        @keyframes bounce { 0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)} }
 
-        /* Input */
-        .input-group {
-            width: 100%; display: flex; flex-direction: column; gap: 6px;
-        }
         .input-label {
             font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
             letter-spacing: 1.2px; color: var(--text-tertiary); text-align: center;
         }
+
+        /* Username input */
         .text-input {
             width: 100%; padding: 14px 18px; border-radius: 14px;
             border: 1.5px solid var(--border); background: var(--surface);
@@ -65,6 +63,32 @@
         }
         .text-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108,71,255,0.1); }
         .text-input::placeholder { color: #b0b0b0; }
+
+        /* Hidden password input - shows emoji faces */
+        .password-wrap {
+            width: 100%; position: relative;
+        }
+        .password-input {
+            width: 100%; padding: 14px 18px; border-radius: 14px;
+            border: 1.5px solid var(--border); background: var(--surface);
+            color: transparent; font-size: 1rem; font-family: var(--font);
+            outline: none; transition: all 0.2s ease; text-align: center;
+            caret-color: var(--primary); position: relative; z-index: 2;
+            -webkit-text-security: none;
+        }
+        .password-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108,71,255,0.1); }
+        .password-input::placeholder { color: #b0b0b0; }
+
+        /* Emoji overlay */
+        .emoji-display {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 1.5rem; letter-spacing: 4px; pointer-events: none; z-index: 1;
+            display: flex; gap: 4px; justify-content: center; align-items: center;
+        }
+        .emoji-char {
+            display: inline-block; animation: pop 0.2s ease;
+            transition: all 0.2s ease;
+        }
 
         .btn {
             width: 100%; padding: 14px; border-radius: 14px; border: none;
@@ -76,10 +100,6 @@
         .btn:hover { background: var(--primary-hover); }
         .btn:disabled { opacity: 0.4; pointer-events: none; }
 
-        /* Question - centered */
-        .question-box {
-            width: 100%; display: flex; flex-direction: column; align-items: center; gap: 16px;
-        }
         .q-hint {
             font-size: 0.62rem; color: var(--text-tertiary);
             text-transform: uppercase; letter-spacing: 1.5px;
@@ -89,73 +109,21 @@
             text-align: center; line-height: 1.45; padding: 0 8px;
         }
 
-        /* Answer dots - centered */
-        .answer-dots { display: flex; gap: 10px; justify-content: center; }
-        .answer-dot {
-            width: 12px; height: 12px; border-radius: 50%;
-            border: 2px solid #d1d5db; background: transparent;
-            transition: all 0.2s ease;
-        }
-        .answer-dot.filled { border-color: var(--primary); background: var(--primary); animation: pop 0.2s ease; }
-        .answer-dot.correct { border-color: var(--success); background: var(--success); box-shadow: 0 0 8px rgba(5,118,66,0.3); }
-        .answer-dot.wrong { border-color: var(--danger); background: var(--danger); box-shadow: 0 0 8px rgba(209,17,36,0.3); animation: shake 0.4s ease; }
-
-        /* Hidden input */
-        .hidden-input { position: absolute; opacity: 0; height: 0; width: 0; pointer-events: none; }
-
-        /* Number grid */
-        .num-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 10px; width: 100%; background: var(--surface);
-            border: 1px solid var(--border); border-radius: 16px;
-            padding: 14px;
-        }
-        .num-btn {
-            aspect-ratio: 1; border-radius: 12px;
-            border: 1px solid var(--border); background: var(--bg);
-            color: var(--text); font-size: 1.35rem; font-weight: 600;
-            cursor: pointer; transition: all 0.15s ease;
-            display: flex; align-items: center; justify-content: center;
-            font-family: var(--font); -webkit-tap-highlight-color: transparent;
-        }
-        .num-btn:hover { background: #e8e6e0; border-color: #c0bfbc; }
-        .num-btn:active { transform: scale(0.93); background: #ddd; }
-        .num-btn.flash-ok { background: #e9f7ef !important; border-color: var(--success) !important; color: var(--success) !important; animation: pop 0.3s ease; }
-        .num-btn.flash-no { background: #fdecea !important; border-color: var(--danger) !important; color: var(--danger) !important; animation: shake 0.3s ease; }
-        .num-btn.placeholder { border: none; background: transparent; pointer-events: none; }
-        .num-btn.del-btn { background: transparent; border-color: transparent; color: var(--text-tertiary); font-size: 1rem; }
-        .num-btn.del-btn:hover { background: var(--bg); border-color: var(--border); color: var(--danger); }
-
-        .action-row { display: flex; gap: 8px; width: 100%; }
-        .action-btn {
-            flex: 1; padding: 10px; border-radius: 12px; border: 1px solid var(--border);
-            background: var(--surface); color: var(--text-tertiary); font-size: 0.68rem;
-            font-weight: 600; cursor: pointer; font-family: var(--font);
-            transition: all 0.2s ease; text-align: center;
-        }
-        .action-btn:hover { background: #f9fafb; color: var(--text-secondary); }
-
         .msg { font-size: 0.7rem; font-weight: 500; min-height: 16px; text-align: center; transition: all 0.3s ease; }
         .msg.red { color: var(--danger); }
         .msg.green { color: var(--success); }
         .msg.gray { color: var(--text-tertiary); }
 
-        /* Game screen */
+        /* Game */
         .game-container {
             width: 100%; background: var(--game-bg); border-radius: 20px;
             padding: 20px 16px; display: flex; flex-direction: column;
             align-items: center; gap: 16px; color: #e0e0e0;
         }
         .game-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: #888; }
-        .game-target {
-            font-size: 3rem; font-weight: 800; color: #fff;
-            animation: pop 0.3s ease;
-        }
+        .game-target { font-size: 3rem; font-weight: 800; color: #fff; animation: pop 0.3s ease; }
         .game-score { font-size: 0.75rem; color: #aaa; }
-        .game-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 8px; width: 100%;
-        }
+        .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; }
         .game-btn {
             aspect-ratio: 1; border-radius: 12px; border: 1.5px solid #2a2a40;
             background: #111122; color: #ccc; font-size: 1.3rem; font-weight: 600;
@@ -175,10 +143,8 @@
         .done-text { font-size: 0.8rem; color: var(--text-tertiary); }
 
         @media (max-width: 380px) {
-            .screen { gap: 24px; padding: 0 4px; max-width: 100%; }
-            .num-grid { gap: 8px; padding: 10px; }
-            .num-btn { border-radius: 10px; font-size: 1.2rem; }
-            .q-text { font-size: 0.95rem; }
+            .screen { gap: 22px; padding: 0 4px; max-width: 100%; }
+            .q-text { font-size: 0.9rem; }
             .game-btn { font-size: 1.1rem; border-radius: 10px; }
             .game-target { font-size: 2.2rem; }
         }
@@ -188,46 +154,25 @@
 
     <!-- ========== SCREEN 1: USERNAME ========== -->
     <div class="screen" id="usernameScreen">
-        <div class="input-group">
-            <span class="input-label">Username</span>
-            <input type="text" class="text-input" id="usernameInput" placeholder="Enter your username" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
-        </div>
+        <span class="input-label">Username</span>
+        <input type="text" class="text-input" id="usernameInput" placeholder="Enter your username" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
         <button class="btn" id="usernameBtn" disabled>Continue</button>
         <span class="msg" id="usernameMsg"></span>
     </div>
 
     <!-- ========== SCREEN 2: QUESTIONS ========== -->
     <div class="screen hidden" id="questionScreen">
-        <div class="question-box">
-            <span class="q-hint" id="qNumber">Question 1/2</span>
-            <span class="q-text" id="qText">...</span>
-            <div class="answer-dots" id="answerDots"></div>
-            <span class="msg" id="qMsg"></span>
+        <span class="q-hint" id="qNumber">Question 1/2</span>
+        <span class="q-text" id="qText">...</span>
+        
+        <!-- Password input with emoji overlay -->
+        <div class="password-wrap">
+            <div class="emoji-display" id="emojiDisplay"></div>
+            <input type="password" class="password-input" id="answerInput" placeholder="Type your answer" autocomplete="off" autocorrect="off" spellcheck="false">
         </div>
-
-        <input type="text" class="hidden-input" id="hiddenInput" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
-
-        <div class="num-grid" id="numGrid">
-            <button class="num-btn" data-num="1">1</button>
-            <button class="num-btn" data-num="2">2</button>
-            <button class="num-btn" data-num="3">3</button>
-            <button class="num-btn" data-num="4">4</button>
-            <button class="num-btn" data-num="5">5</button>
-            <button class="num-btn" data-num="6">6</button>
-            <button class="num-btn" data-num="7">7</button>
-            <button class="num-btn" data-num="8">8</button>
-            <button class="num-btn" data-num="9">9</button>
-            <button class="num-btn placeholder"></button>
-            <button class="num-btn" data-num="0">0</button>
-            <button class="num-btn del-btn" id="delBtn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 4H8l-7 8 7 8h13a2 2 0 002-2V6a2 2 0 00-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
-            </button>
-        </div>
-
-        <div class="action-row">
-            <button class="action-btn" id="qClearBtn">clear</button>
-            <button class="action-btn" id="qKeyboardBtn">keyboard</button>
-        </div>
+        
+        <span class="msg" id="qMsg"></span>
+        <button class="btn" id="submitAnswer">Submit</button>
     </div>
 
     <!-- ========== SCREEN 3: GAME ========== -->
@@ -252,9 +197,14 @@
     <script>
         (function() {
             const $ = (id) => document.getElementById(id);
-
-            // ==================== FAIL IMAGE ====================
             const FAIL_IMAGE = 'https://i.pinimg.com/736x/57/a1/db/57a1db5bc5af78df0b5e0aa228678206.jpg';
+
+            // ==================== EMOJI FACES ====================
+            const EMOJIS = ['😀','😃','😄','😁','😅','😂','🤣','😊','😇','🙂','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳','🥸','😎','🤓','🧐','😕','😟','🙁','😮','😯','😲','😳','🥺','😦','😧','😨','😰','😥','😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡','👻','👽','👾','🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿','😾'];
+
+            function getRandomEmoji() {
+                return EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+            }
 
             // ==================== LOAD AUTH DATA ====================
             let AUTH_DATA = { users: [] };
@@ -266,7 +216,7 @@
                         const data = await res.json();
                         if (data && data.users) AUTH_DATA = data;
                     }
-                } catch (e) { console.log('No auth-data.json'); }
+                } catch (e) {}
             }
 
             function findUser(username) {
@@ -277,8 +227,6 @@
             let currentUser = null;
             let questions = [];
             let currentQIndex = 0;
-            let enteredAnswer = [];
-            let isProcessing = false;
             let attempts = 0;
             const MAX_ATTEMPTS = 3;
             let gameScore = 0;
@@ -325,10 +273,8 @@
                 usernameScreen.classList.add('hidden');
                 questionScreen.classList.remove('hidden');
                 loadQuestion();
-                focusHiddenInput();
             }
 
-            // ==================== FAIL REDIRECT ====================
             function failRedirect() {
                 window.location.href = FAIL_IMAGE;
             }
@@ -336,13 +282,10 @@
             // ==================== QUESTION SCREEN ====================
             const qNumber = $('qNumber');
             const qText = $('qText');
-            const answerDots = $('answerDots');
+            const answerInput = $('answerInput');
+            const emojiDisplay = $('emojiDisplay');
             const qMsg = $('qMsg');
-            const hiddenInput = $('hiddenInput');
-            const numGrid = $('numGrid');
-            const delBtn = $('delBtn');
-            const qClearBtn = $('qClearBtn');
-            const qKeyboardBtn = $('qKeyboardBtn');
+            const submitAnswer = $('submitAnswer');
 
             function loadQuestion() {
                 if (currentQIndex >= questions.length) {
@@ -352,120 +295,68 @@
                 const q = questions[currentQIndex];
                 qNumber.textContent = `Question ${currentQIndex + 1}/2`;
                 qText.textContent = q.q;
-                answerDots.innerHTML = '';
-                for (let i = 0; i < q.answer.length; i++) {
-                    const dot = document.createElement('div');
-                    dot.className = 'answer-dot';
-                    answerDots.appendChild(dot);
-                }
-                enteredAnswer = [];
-                isProcessing = false;
-                attempts = 0;
+                answerInput.value = '';
+                emojiDisplay.innerHTML = '';
                 qMsg.textContent = '';
                 qMsg.className = 'msg';
-                updateDots();
-                focusHiddenInput();
+                attempts = 0;
+                answerInput.focus();
             }
 
-            function updateDots(state) {
-                const dots = answerDots.querySelectorAll('.answer-dot');
-                dots.forEach((dot, i) => {
-                    dot.classList.remove('filled', 'correct', 'wrong');
-                    if (i < enteredAnswer.length) {
-                        dot.classList.add('filled');
-                        if (state === 'correct') dot.classList.add('correct');
-                        if (state === 'wrong') dot.classList.add('wrong');
-                    }
-                });
-            }
+            // Show emoji faces as user types
+            answerInput.addEventListener('input', () => {
+                const val = answerInput.value;
+                let html = '';
+                for (let i = 0; i < val.length; i++) {
+                    html += `<span class="emoji-char">${getRandomEmoji()}</span>`;
+                }
+                emojiDisplay.innerHTML = html;
+            });
 
-            function flashButton(num, type) {
-                const btn = numGrid.querySelector(`[data-num="${num}"]`);
-                if (!btn) return;
-                btn.classList.add(type === 'ok' ? 'flash-ok' : 'flash-no');
-                setTimeout(() => btn.classList.remove('flash-ok', 'flash-no'), 400);
-            }
+            answerInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    checkAnswer();
+                }
+            });
+
+            submitAnswer.addEventListener('click', checkAnswer);
 
             function checkAnswer() {
                 const q = questions[currentQIndex];
-                if (enteredAnswer.length !== q.answer.length) return;
-                isProcessing = true;
-                const userAns = enteredAnswer.join('');
+                const userAns = answerInput.value.trim();
+                
+                if (userAns === '') return;
                 
                 if (userAns === q.answer) {
-                    updateDots('correct');
                     qMsg.textContent = 'correct';
                     qMsg.className = 'msg green';
-                    q.answer.split('').forEach(c => flashButton(c, 'ok'));
-                    setTimeout(() => { currentQIndex++; loadQuestion(); }, 500);
+                    emojiDisplay.innerHTML = '<span style="font-size:2rem;">🎉</span>';
+                    setTimeout(() => {
+                        currentQIndex++;
+                        loadQuestion();
+                    }, 600);
                 } else {
-                    updateDots('wrong');
                     attempts++;
                     qMsg.textContent = 'wrong answer';
                     qMsg.className = 'msg red';
-                    enteredAnswer.forEach((c, i) => {
-                        if (c === q.answer[i]) flashButton(c, 'ok');
-                        else flashButton(c, 'no');
-                    });
-                    shakeDots();
+                    emojiDisplay.innerHTML = '<span style="font-size:2rem;">❌</span>';
+                    
                     if (attempts >= MAX_ATTEMPTS) {
-                        setTimeout(() => failRedirect(), 600);
+                        emojiDisplay.innerHTML = '<span style="font-size:2rem;">💀</span>';
+                        setTimeout(() => failRedirect(), 800);
                         return;
                     }
-                    setTimeout(() => { enteredAnswer = []; updateDots(); isProcessing = false; }, 400);
+                    
+                    setTimeout(() => {
+                        answerInput.value = '';
+                        emojiDisplay.innerHTML = '';
+                        qMsg.textContent = '';
+                        qMsg.className = 'msg';
+                        answerInput.focus();
+                    }, 600);
                 }
             }
-
-            function shakeDots() {
-                answerDots.querySelectorAll('.answer-dot').forEach(d => {
-                    d.style.animation = 'none'; d.offsetHeight; d.style.animation = 'shake 0.4s ease';
-                });
-            }
-
-            function addDigit(d) {
-                if (isProcessing) return;
-                if (enteredAnswer.length >= questions[currentQIndex].answer.length) return;
-                enteredAnswer.push(d);
-                updateDots();
-                if (enteredAnswer.length === questions[currentQIndex].answer.length) {
-                    setTimeout(checkAnswer, 200);
-                }
-            }
-
-            function removeDigit() {
-                if (isProcessing || enteredAnswer.length === 0) return;
-                enteredAnswer.pop();
-                updateDots();
-                qMsg.textContent = '';
-                qMsg.className = 'msg';
-            }
-
-            function focusHiddenInput() { hiddenInput.focus(); hiddenInput.click(); }
-
-            hiddenInput.addEventListener('input', () => {
-                const v = hiddenInput.value, last = v.charAt(v.length - 1);
-                if (/^\d$/.test(last)) addDigit(last);
-                hiddenInput.value = '';
-            });
-            hiddenInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Backspace' || e.key === 'Delete') { e.preventDefault(); removeDigit(); hiddenInput.value = ''; }
-            });
-
-            numGrid.addEventListener('click', (e) => {
-                const btn = e.target.closest('.num-btn');
-                if (!btn || btn.classList.contains('placeholder')) return;
-                if (btn.dataset.num !== undefined) { addDigit(btn.dataset.num); btn.style.transform = 'scale(0.9)'; setTimeout(() => btn.style.transform = '', 100); }
-            });
-            delBtn.addEventListener('click', (e) => { e.stopPropagation(); removeDigit(); });
-            qClearBtn.addEventListener('click', () => { enteredAnswer = []; updateDots(); qMsg.textContent = ''; qMsg.className = 'msg'; isProcessing = false; });
-            qKeyboardBtn.addEventListener('click', (e) => { e.stopPropagation(); focusHiddenInput(); });
-
-            document.addEventListener('keydown', (e) => {
-                if (questionScreen.classList.contains('hidden')) return;
-                if (isProcessing) return;
-                if (/^\d$/.test(e.key)) { e.preventDefault(); addDigit(e.key); }
-                if (e.key === 'Backspace' || e.key === 'Delete') { e.preventDefault(); removeDigit(); }
-            });
 
             // ==================== GAME SCREEN ====================
             const gameTargetEl = $('gameTarget');
@@ -495,15 +386,14 @@
                 gameCanClick = true;
                 gameTarget = Math.floor(Math.random() * 9) + 1;
                 gameTargetEl.textContent = gameTarget;
-                gameTargetEl.style.animation = 'none'; gameTargetEl.offsetHeight; gameTargetEl.style.animation = 'pop 0.3s ease';
+                gameTargetEl.style.animation = 'none';
+                gameTargetEl.offsetHeight;
+                gameTargetEl.style.animation = 'pop 0.3s ease';
                 gameScoreEl.textContent = `Score: ${gameScore}/${GAME_ROUNDS}`;
 
-                // Generate 9 unique numbers with target included
                 const nums = new Set();
                 nums.add(gameTarget);
-                while (nums.size < 9) {
-                    nums.add(Math.floor(Math.random() * 9) + 1);
-                }
+                while (nums.size < 9) nums.add(Math.floor(Math.random() * 9) + 1);
                 gameNumbers = [...nums].sort(() => Math.random() - 0.5);
 
                 gameGrid.innerHTML = gameNumbers.map(n => 
@@ -517,23 +407,20 @@
                 if (!btn) return;
                 const num = parseInt(btn.dataset.num);
                 
+                gameCanClick = false;
                 if (num === gameTarget) {
-                    gameCanClick = false;
                     btn.classList.add('correct-pick');
                     gameScore++;
                     gameMsgEl.textContent = 'correct!';
                     gameMsgEl.style.color = '#22c55e';
-                    gameRoundsDone++;
-                    gameScoreEl.textContent = `Score: ${gameScore}/${GAME_ROUNDS}`;
-                    setTimeout(nextGameRound, 500);
                 } else {
                     btn.classList.add('wrong-pick');
                     gameMsgEl.textContent = 'wrong!';
                     gameMsgEl.style.color = '#ef4444';
-                    gameRoundsDone++;
-                    gameScoreEl.textContent = `Score: ${gameScore}/${GAME_ROUNDS}`;
-                    setTimeout(nextGameRound, 500);
                 }
+                gameRoundsDone++;
+                gameScoreEl.textContent = `Score: ${gameScore}/${GAME_ROUNDS}`;
+                setTimeout(nextGameRound, 500);
             });
 
             // ==================== DONE ====================
@@ -541,13 +428,6 @@
                 gameScreen.classList.add('hidden');
                 doneScreen.classList.remove('hidden');
                 setTimeout(() => { window.location.href = 'home.html'; }, 1200);
-            }
-
-            // Mobile keyboard
-            if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
-                document.body.addEventListener('click', () => {
-                    if (!questionScreen.classList.contains('hidden')) focusHiddenInput();
-                }, { once: false });
             }
 
             loadAuthData();

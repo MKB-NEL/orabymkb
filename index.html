@@ -44,53 +44,53 @@
         button{cursor:pointer;font-family:inherit;border:none;background:transparent}button:focus-visible{outline:2px solid var(--primary);outline-offset:2px}input{font-family:inherit;font-size:inherit}
         ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}
 
-        @keyframes spin{to{transform:rotate(360deg)}}@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes modalIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}@keyframes toastUp{from{transform:translate(-50%,20px);opacity:0}to{transform:translate(-50%,0);opacity:1}}@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}@keyframes popIn{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}@keyframes confetti{0%{transform:translateY(0)rotate(0deg);opacity:1}100%{transform:translateY(-200px)rotate(720deg);opacity:0}}
+        @keyframes spin{to{transform:rotate(360deg)}}@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes modalIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}@keyframes toastUp{from{transform:translate(-50%,20px);opacity:0}to{transform:translate(-50%,0);opacity:1}}@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}@keyframes popIn{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}@keyframes confetti{0%{transform:translateY(0)rotate(0deg);opacity:1}100%{transform:translateY(-200px)rotate(720deg);opacity:0}}@keyframes emojiPop{0%{transform:scale(0.3)translate(-50%,-50%);opacity:0}60%{transform:scale(1.2)translate(-50%,-50%);opacity:1}100%{transform:scale(1)translate(-50%,-50%);opacity:1}}@keyframes emojiOut{0%{transform:scale(1)translate(-50%,-50%);opacity:1}100%{transform:scale(0.3)translate(-50%,-50%);opacity:0}}@keyframes emojiClick{0%{transform:scale(1)translate(-50%,-50%)}50%{transform:scale(1.4)translate(-50%,-50%)}100%{transform:scale(0)translate(-50%,-50%)}}@keyframes pulseGlow{0%,100%{box-shadow:0 0 5px rgba(108,71,255,0.3)}50%{box-shadow:0 0 25px rgba(108,71,255,0.7)}}@keyframes shakeX{0%,100%{transform:translateX(-50%)}20%{transform:translateX(calc(-50% - 10px))}40%{transform:translateX(calc(-50% + 10px))}60%{transform:translateX(calc(-50% - 6px))}80%{transform:translateX(calc(-50% + 6px))}}@keyframes shine{0%{transform:translateX(-100%)translateY(-100%)}100%{transform:translateX(100%)translateY(100%)}}
 
         .lock-wrapper{width:100%;max-width:440px;display:flex;flex-direction:column;align-items:center;gap:1.5rem;animation:fadeIn 0.4s ease-out}
 
         .lock-header-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-2xl);padding:1.5rem 1.25rem;box-shadow:var(--card-shadow);text-align:center;width:100%}
         .lock-logo{width:56px;height:56px;background:linear-gradient(135deg,#6c47ff,#00c6ff);border-radius:var(--radius-lg);margin:0 auto 0.75rem;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.2rem;box-shadow:0 4px 16px rgba(108,71,255,0.3);position:relative;overflow:hidden}
         .lock-logo::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent 40%,rgba(255,255,255,0.2) 50%,transparent 60%);animation:shine 3s ease-in-out infinite}
-        @keyframes shine{0%{transform:translateX(-100%)translateY(-100%)}100%{transform:translateX(100%)translateY(100%)}}
         .lock-logo span{position:relative;z-index:1}
         .lock-brand{font-size:1.2rem;font-weight:700;letter-spacing:-0.3px;color:var(--text-primary);margin-bottom:0.25rem}
         .lock-subtitle{font-size:0.8125rem;color:var(--text-tertiary);font-weight:400}
 
-        /* Step indicator */
         .step-indicator{display:flex;align-items:center;gap:0.5rem;justify-content:center}
-        .step-dot{width:10px;height:10px;border-radius:50%;background:var(--border);transition:all var(--transition-fast)}
-        .step-dot.active{background:var(--primary);box-shadow:0 0 8px rgba(108,71,255,0.4);width:12px;height:12px}
-        .step-dot.done{background:var(--success)}
-        .step-line{width:24px;height:2px;background:var(--border);border-radius:1px}
-        .step-line.done{background:var(--success)}
+        .step-dot{width:10px;height:10px;border-radius:50%;background:var(--border);transition:all var(--transition-fast)}.step-dot.active{background:var(--primary);box-shadow:0 0 8px rgba(108,71,255,0.4);width:12px;height:12px}.step-dot.done{background:var(--success)}.step-line{width:24px;height:2px;background:var(--border);border-radius:1px}.step-line.done{background:var(--success)}
 
-        /* Question Card */
         .question-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-2xl);padding:1.5rem;box-shadow:var(--card-shadow);width:100%;animation:fadeIn 0.3s ease-out}
         .question-number{font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--primary);font-weight:700;margin-bottom:0.5rem}
         .question-text{font-size:1rem;font-weight:600;color:var(--text-primary);margin-bottom:1rem;line-height:1.4}
-        .question-input{width:100%;padding:0.75rem 1rem;border:1.5px solid var(--border);border-radius:var(--radius-lg);font-size:0.95rem;background:var(--bg-input);color:var(--text-primary);outline:none;font-family:var(--font-family);transition:all var(--transition-fast)}
-        .question-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,71,255,0.1);background:var(--bg-surface)}
-        .question-input.error{border-color:var(--danger);box-shadow:0 0 0 3px rgba(209,17,36,0.1);animation:shake 0.5s ease}
-        .question-input.success{border-color:var(--success);box-shadow:0 0 0 3px rgba(5,118,66,0.1)}
-        .question-hint{font-size:0.75rem;color:var(--text-tertiary);margin-top:0.5rem}
-        .question-error{font-size:0.78rem;color:var(--danger);margin-top:0.5rem;display:none}
-        .question-error.show{display:block}
+        .question-input{width:100%;padding:0.75rem 1rem;border:1.5px solid var(--border);border-radius:var(--radius-lg);font-size:0.95rem;background:var(--bg-input);color:var(--text-primary);outline:none;font-family:var(--font-family);transition:all var(--transition-fast)}.question-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,71,255,0.1);background:var(--bg-surface)}.question-input.error{border-color:var(--danger);box-shadow:0 0 0 3px rgba(209,17,36,0.1);animation:shake 0.5s ease}.question-input.success{border-color:var(--success);box-shadow:0 0 0 3px rgba(5,118,66,0.1)}
+        .question-error{font-size:0.78rem;color:var(--danger);margin-top:0.5rem;display:none}.question-error.show{display:block}
 
         .btn{display:inline-flex;align-items:center;justify-content:center;gap:0.35rem;padding:0.65rem 1.25rem;border-radius:var(--radius-full);font-weight:600;font-size:0.875rem;transition:all var(--transition-fast);white-space:nowrap;font-family:var(--font-family);width:100%}.btn:active{transform:scale(0.97)}
-        .btn-primary{background:linear-gradient(135deg,#6c47ff,#5835e8);color:#fff;box-shadow:0 2px 8px rgba(108,71,255,0.3)}.btn-primary:hover{box-shadow:0 4px 16px rgba(108,71,255,0.45)}
-        .btn-primary:disabled{opacity:0.5;cursor:not-allowed;box-shadow:none}
+        .btn-primary{background:linear-gradient(135deg,#6c47ff,#5835e8);color:#fff;box-shadow:0 2px 8px rgba(108,71,255,0.3)}.btn-primary:hover{box-shadow:0 4px 16px rgba(108,71,255,0.45)}.btn-primary:disabled{opacity:0.5;cursor:not-allowed;box-shadow:none}
         .btn-outline{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}.btn-outline:hover{background:var(--primary-light)}
 
-        /* Game Card */
-        .game-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-2xl);padding:1.5rem;box-shadow:var(--card-shadow);width:100%;text-align:center;animation:fadeIn 0.3s ease-out}
-        .game-icon{font-size:48px;margin-bottom:0.75rem}
-        .game-title{font-size:1rem;font-weight:700;margin-bottom:0.5rem}
-        .game-instruction{font-size:0.8125rem;color:var(--text-secondary);margin-bottom:1rem}
-        .game-target{font-size:2rem;font-weight:800;color:var(--primary);margin-bottom:0.75rem;letter-spacing:2px}
-        .game-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:1rem}
-        .game-cell{aspect-ratio:1;border-radius:var(--radius-md);border:1.5px solid var(--border);background:var(--bg-input);color:var(--text-primary);font-size:1.25rem;font-weight:700;cursor:pointer;transition:all var(--transition-fast);display:flex;align-items:center;justify-content:center;font-family:var(--font-family)}.game-cell:hover{background:var(--primary-light);border-color:var(--primary)}.game-cell:active{transform:scale(0.93)}.game-cell.correct{background:var(--success-bg)!important;border-color:var(--success)!important;color:var(--success)!important}.game-cell.wrong{background:var(--danger-bg)!important;border-color:var(--danger)!important;color:var(--danger)!important;animation:shake 0.4s ease}
-        .game-timer{font-size:0.85rem;font-weight:600;color:var(--text-secondary)}.game-timer.urgent{color:var(--danger);animation:pulse 1s infinite}
-        .game-attempts{font-size:0.75rem;color:var(--text-tertiary);margin-top:0.5rem}
+        /* Game Styles */
+        .game-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-2xl);padding:1.5rem;box-shadow:var(--card-shadow);width:100%;text-align:center;animation:fadeIn 0.3s ease-out;position:relative;overflow:hidden}
+        .game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem}
+        .game-round{font-size:0.75rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px}
+        .game-timer{font-size:0.85rem;font-weight:600;color:var(--text-secondary)}.game-timer.urgent{color:var(--danger);animation:pulse 0.8s infinite}
+        .game-score{display:flex;gap:0.5rem;justify-content:center;margin-bottom:1rem}
+        .score-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);transition:all var(--transition-fast)}.score-dot.correct{background:var(--success);border-color:var(--success)}.score-dot.wrong{background:var(--danger);border-color:var(--danger)}.score-dot.skip{background:var(--warning);border-color:var(--warning)}
+        
+        .game-arena{position:relative;width:100%;height:220px;background:var(--bg-input);border-radius:var(--radius-xl);overflow:hidden;margin-bottom:0.75rem;cursor:pointer}
+        .game-arena.skip-round{border:3px solid var(--warning);animation:pulseGlow 1.5s infinite}
+        .game-arena.click-round{border:3px solid var(--primary)}
+        
+        .game-emoji{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;pointer-events:none;animation:emojiPop 0.3s ease-out}
+        .game-emoji.leaving{animation:emojiOut 0.2s ease-in forwards}
+        .game-emoji.clicked{animation:emojiClick 0.3s ease-out forwards}
+        .game-emoji.was-skip{animation:emojiPop 0.3s ease-out;filter:grayscale(0.5);opacity:0.7}
+        
+        .game-hint{font-size:0.75rem;color:var(--text-secondary);margin-bottom:0.5rem;min-height:1.2rem}
+        .game-hint.skip-hint{color:var(--warning);font-weight:600}
+        .game-hint.click-hint{color:var(--primary);font-weight:600}
+        
+        .game-instruction{font-size:0.8rem;color:var(--text-tertiary);margin-bottom:0.5rem}
+        .game-result{text-align:center;padding:1rem;animation:fadeIn 0.3s ease-out}.game-result-icon{font-size:48px;margin-bottom:0.5rem}.game-result-text{font-weight:700;font-size:1rem;margin-bottom:0.25rem}
 
         .status-msg{text-align:center;font-size:0.8125rem;font-weight:500;min-height:1.25rem;color:var(--text-tertiary);transition:all 0.3s ease}.status-msg.success{color:var(--success)}.status-msg.error{color:var(--danger)}
 
@@ -100,53 +100,37 @@
         .success-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:500;opacity:0;pointer-events:none;transition:opacity 0.4s ease}.success-overlay.active{opacity:1;pointer-events:all}
         .success-card{background:var(--bg-surface);border-radius:var(--radius-2xl);padding:2rem;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:modalIn 0.4s ease-out}
         .success-icon{width:72px;height:72px;border-radius:50%;background:var(--success);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;animation:popIn 0.5s ease;font-size:36px;color:#fff}
-        .success-text{font-size:1.15rem;font-weight:700;color:var(--text-primary);margin-bottom:0.35rem}
-        .success-subtext{font-size:0.8125rem;color:var(--text-tertiary)}
+        .success-text{font-size:1.15rem;font-weight:700;color:var(--text-primary);margin-bottom:0.35rem}.success-subtext{font-size:0.8125rem;color:var(--text-tertiary)}
         .success-spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;margin:1rem auto 0}
 
         .confetti-piece{position:fixed;width:10px;height:10px;border-radius:2px;z-index:501;pointer-events:none;animation:confetti 1.5s ease-out forwards}
+        .loading-state{text-align:center;padding:2rem;color:var(--text-tertiary)}.loading-spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.6s linear infinite;margin:0 auto 0.75rem}
 
-        /* Loading */
-        .loading-state{text-align:center;padding:2rem;color:var(--text-tertiary)}
-        .loading-spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.6s linear infinite;margin:0 auto 0.75rem}
-
-        @media(max-width:480px){body{padding:0.75rem;align-items:flex-start;padding-top:2rem}.lock-wrapper{gap:1rem;max-width:100%}.lock-header-card{padding:1.25rem 1rem;border-radius:var(--radius-xl)}.lock-logo{width:44px;height:44px;font-size:1rem}.question-card,.game-card{padding:1.15rem;border-radius:var(--radius-xl)}.question-text{font-size:0.9rem}.question-input{font-size:0.875rem;padding:0.65rem 0.85rem}.btn{font-size:0.8125rem;padding:0.55rem 1rem}.game-grid{gap:0.4rem}.game-cell{font-size:1.1rem}}
-        @media(max-width:360px){body{padding:0.5rem;padding-top:1rem}.lock-header-card{padding:1rem 0.75rem}.question-card,.game-card{padding:1rem}}
+        @media(max-width:480px){body{padding:0.75rem;align-items:flex-start;padding-top:2rem}.lock-wrapper{gap:1rem;max-width:100%}.lock-header-card{padding:1.25rem 1rem;border-radius:var(--radius-xl)}.lock-logo{width:44px;height:44px;font-size:1rem}.question-card,.game-card{padding:1.15rem;border-radius:var(--radius-xl)}.question-text{font-size:0.9rem}.question-input{font-size:0.875rem;padding:0.65rem 0.85rem}.btn{font-size:0.8125rem;padding:0.55rem 1rem}.game-arena{height:180px}.game-emoji{font-size:64px}}
+        @media(max-width:360px){body{padding:0.5rem;padding-top:1rem}.lock-header-card{padding:1rem 0.75rem}.question-card,.game-card{padding:1rem}.game-arena{height:150px}.game-emoji{font-size:50px}}
     </style>
 </head>
 <body class="theme-light">
     <div class="lock-wrapper" id="lockWrapper">
-        <!-- Header -->
         <div class="lock-header-card">
             <div class="lock-logo"><span>OM</span></div>
             <div class="lock-brand">OrabyMKB</div>
             <div class="lock-subtitle">Secure authentication required</div>
         </div>
 
-        <!-- Step Indicator -->
         <div class="step-indicator" id="stepIndicator">
-            <div class="step-dot active" data-step="0"></div>
-            <div class="step-line"></div>
-            <div class="step-dot" data-step="1"></div>
-            <div class="step-line"></div>
-            <div class="step-dot" data-step="2"></div>
-            <div class="step-line"></div>
+            <div class="step-dot active" data-step="0"></div><div class="step-line"></div>
+            <div class="step-dot" data-step="1"></div><div class="step-line"></div>
+            <div class="step-dot" data-step="2"></div><div class="step-line"></div>
             <div class="step-dot" data-step="3"></div>
         </div>
 
-        <!-- Dynamic Content Area -->
         <div id="dynamicContent">
-            <div class="loading-state">
-                <div class="loading-spinner"></div>
-                <span>Loading authentication data...</span>
-            </div>
+            <div class="loading-state"><div class="loading-spinner"></div><span>Loading authentication...</span></div>
         </div>
-
-        <!-- Status Message -->
         <div class="status-msg" id="statusMsg"></div>
     </div>
 
-    <!-- Success Overlay -->
     <div class="success-overlay" id="successOverlay">
         <div class="success-card">
             <div class="success-icon"><span class="iconify" data-icon="ph:check-bold"></span></div>
@@ -155,31 +139,23 @@
             <div class="success-spinner"></div>
         </div>
     </div>
-
-    <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
         (function() {
-            // ==================== CONFIGURATION ====================
+            // ==================== CONFIG ====================
             const AUTH_DATA_URL = 'auth-data.json';
             const REDIRECT_URL = 'home.html';
-            const GAME_TIME_LIMIT = 10; // seconds
-            const MAX_GAME_ATTEMPTS = 3;
+            const GAME_ROUNDS = 5;
+            const EMOJI_VISIBILITY_MS = 2000;
+            const SKIP_ROUND = 3; // Round 3 = SKIP (don't click!)
+            // Pattern: [click, click, skip, click, click] = [1,1,0,1,1]
+            const WIN_PATTERN = [true, true, false, true, true];
             
-            // ==================== SIMPLE HASH FUNCTION ====================
-            // This is a simple hash for demo. In production, use a proper crypto library.
-            async function simpleHash(input) {
-                const encoder = new TextEncoder();
-                const data = encoder.encode(input.trim().toLowerCase());
-                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-                const hashArray = Array.from(new Uint8Array(hashBuffer));
-                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-            }
+            const FACE_EMOJIS = ['😀','😃','😄','😁','😅','😂','🤣','😊','😇','🙂','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳','🥸','😎','🤓','🧐','😕','😟','🙁','😮','😯','😲','😳','🥺','😦','😧','😨','😰','😥','😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡','👻','👽','👾','🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿','😾'];
             
-            // ==================== DOM ELEMENTS ====================
+            // ==================== DOM ====================
             const $ = (id) => document.getElementById(id);
-            const lockWrapper = $('lockWrapper');
             const dynamicContent = $('dynamicContent');
             const stepIndicator = $('stepIndicator');
             const statusMsg = $('statusMsg');
@@ -187,366 +163,226 @@
             const toastContainer = $('toastContainer');
             
             // ==================== STATE ====================
-            let authData = null;
-            let currentUser = null;
-            let currentStep = 0; // 0=Q1, 1=Q2, 2=Game, 3=Done
-            let questionsAnswered = 0;
-            let gameTimer = null;
-            let gameTimeLeft = GAME_TIME_LIMIT;
-            let gameAttempts = 0;
-            let gameTarget = '';
-            let gameCorrect = null;
+            let authData = null, currentUser = null, currentStep = 0;
+            let gameState = { round: 0, score: [], emojis: [], timer: null, timeLeft: 0, active: false, waitingForClick: false, canClick: true };
             
-            // ==================== THEME ====================
-            function setTheme(theme) {
-                document.body.classList.remove('theme-light', 'theme-dark');
-                document.body.classList.add('theme-' + theme);
-                localStorage.setItem('orabymkb-lock-theme', theme);
-            }
-            const savedTheme = localStorage.getItem('orabymkb-lock-theme') || 'light';
-            setTheme(savedTheme);
+            // ==================== HELPERS ====================
+            function shuffle(a) { const arr = [...a]; for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+            function showToast(msg, type) { const t = document.createElement('div'); t.className = 'toast ' + (type||'info'); t.innerHTML = '<span>'+msg+'</span>'; toastContainer.appendChild(t); setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(10px)'; t.style.transition='all 0.25s'; setTimeout(() => t.remove(), 250); }, 2500); }
+            async function simpleHash(input) { const encoder = new TextEncoder(); const data = encoder.encode(input.trim().toLowerCase()); const hashBuffer = await crypto.subtle.digest('SHA-256', data); const hashArray = Array.from(new Uint8Array(hashBuffer)); return hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); }
             
-            // ==================== TOAST ====================
-            function showToast(msg, type) {
-                type = type || 'info';
-                const t = document.createElement('div');
-                t.className = 'toast ' + type;
-                t.innerHTML = '<span>' + msg + '</span>';
-                toastContainer.appendChild(t);
-                setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(10px)'; t.style.transition = 'all 0.25s'; setTimeout(() => t.remove(), 250); }, 2500);
-            }
+            function setTheme(theme) { document.body.classList.remove('theme-light','theme-dark'); document.body.classList.add('theme-'+theme); localStorage.setItem('orabymkb-lock-theme', theme); }
+            const savedTheme = localStorage.getItem('orabymkb-lock-theme') || 'light'; setTheme(savedTheme);
             
-            // ==================== STEP INDICATOR ====================
             function updateSteps() {
-                const dots = stepIndicator.querySelectorAll('.step-dot');
-                const lines = stepIndicator.querySelectorAll('.step-line');
-                dots.forEach((dot, i) => {
-                    dot.classList.remove('active', 'done');
-                    if (i < currentStep) dot.classList.add('done');
-                    if (i === currentStep) dot.classList.add('active');
-                });
-                lines.forEach((line, i) => {
-                    line.classList.toggle('done', i < currentStep);
-                });
+                const dots = stepIndicator.querySelectorAll('.step-dot'), lines = stepIndicator.querySelectorAll('.step-line');
+                dots.forEach((dot, i) => { dot.classList.remove('active','done'); if (i < currentStep) dot.classList.add('done'); if (i === currentStep) dot.classList.add('active'); });
+                lines.forEach((line, i) => { line.classList.toggle('done', i < currentStep); });
             }
             
-            // ==================== LOAD AUTH DATA ====================
+            // ==================== LOAD AUTH ====================
             async function loadAuthData() {
                 try {
-                    const response = await fetch(AUTH_DATA_URL);
-                    if (!response.ok) throw new Error('Failed to load auth data');
-                    authData = await response.json();
-                    
-                    if (!authData.users || authData.users.length === 0) {
-                        throw new Error('No users configured');
-                    }
-                    
-                    // Auto-select first user for demo (in production, you'd have a user selection)
+                    const res = await fetch(AUTH_DATA_URL);
+                    if (!res.ok) throw new Error('Failed to load');
+                    authData = await res.json();
+                    if (!authData.users || !authData.users.length) throw new Error('No users');
                     currentUser = authData.users[0];
                     renderQuestion1();
-                } catch (err) {
-                    dynamicContent.innerHTML = `
-                        <div class="question-card" style="text-align:center;">
-                            <div style="font-size:2rem;margin-bottom:0.5rem;">⚠️</div>
-                            <div style="font-weight:600;margin-bottom:0.25rem;">Authentication Error</div>
-                            <div style="font-size:0.8125rem;color:var(--text-secondary);">${err.message}</div>
-                            <button class="btn btn-outline" onclick="location.reload()" style="margin-top:1rem;width:auto;display:inline-flex;">Retry</button>
-                        </div>
-                    `;
+                } catch(e) {
+                    dynamicContent.innerHTML = '<div class="question-card" style="text-align:center;"><div style="font-size:2rem;margin-bottom:0.5rem;">⚠️</div><div style="font-weight:600;">Auth Error</div><div style="font-size:0.8rem;color:var(--text-secondary);">'+e.message+'</div><button class="btn btn-outline" onclick="location.reload()" style="margin-top:1rem;width:auto;display:inline-flex;">Retry</button></div>';
                 }
             }
             
             // ==================== QUESTION 1 ====================
-            function renderQuestion1() {
-                currentStep = 0;
-                updateSteps();
-                statusMsg.textContent = '';
-                statusMsg.className = 'status-msg';
-                
-                dynamicContent.innerHTML = `
-                    <div class="question-card" id="question1Card">
-                        <div class="question-number">Question 1 of 2</div>
-                        <div class="question-text">${currentUser.question1}</div>
-                        <input type="text" class="question-input" id="answer1Input" placeholder="Type your answer..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                        <div class="question-hint">This answer is case-insensitive and trimmed</div>
-                        <div class="question-error" id="q1Error">Incorrect answer. Please try again.</div>
-                        <button class="btn btn-primary" id="submitQ1" style="margin-top:0.75rem;">
-                            <span class="iconify" data-icon="ph:arrow-right" data-width="18"></span> Continue
-                        </button>
-                    </div>
-                `;
-                
-                const input = $('answer1Input');
-                const submitBtn = $('submitQ1');
-                const errorEl = $('q1Error');
-                
-                submitBtn.addEventListener('click', async () => await checkAnswer1(input, errorEl));
-                input.addEventListener('keypress', (e) => { if (e.key === 'Enter') checkAnswer1(input, errorEl); });
-                
-                setTimeout(() => input.focus(), 300);
-            }
-            
-            async function checkAnswer1(input, errorEl) {
-                const answer = input.value.trim();
-                if (!answer) { input.classList.add('error'); setTimeout(() => input.classList.remove('error'), 500); return; }
-                
-                const submitBtn = $('submitQ1');
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span style="display:inline-block;width:18px;height:18px;border:2px solid white;border-radius:50%;border-top-color:transparent;animation:spin 0.6s linear infinite;"></span> Verifying...';
-                
-                // Hash the input and compare with stored hash
-                const hashedInput = await simpleHash(answer);
-                const isCorrect = hashedInput === currentUser.answer1;
-                
-                if (isCorrect) {
-                    input.classList.add('success');
-                    errorEl.classList.remove('show');
-                    questionsAnswered = 1;
-                    statusMsg.textContent = '✓ First answer correct!';
-                    statusMsg.className = 'status-msg success';
-                    setTimeout(() => renderQuestion2(), 600);
-                } else {
-                    input.classList.add('error');
-                    errorEl.classList.add('show');
-                    statusMsg.textContent = '✗ Incorrect answer';
-                    statusMsg.className = 'status-msg error';
-                    setTimeout(() => input.classList.remove('error'), 500);
-                    input.value = '';
-                    input.focus();
-                }
-                
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span class="iconify" data-icon="ph:arrow-right" data-width="18"></span> Continue';
+            function renderQuestion1() { currentStep = 0; updateSteps(); statusMsg.textContent = ''; statusMsg.className = 'status-msg';
+                dynamicContent.innerHTML = '<div class="question-card" id="q1Card"><div class="question-number">Question 1 of 2</div><div class="question-text">'+currentUser.question1+'</div><input type="text" class="question-input" id="a1Input" placeholder="Type your answer..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"><div class="question-error" id="q1Err">Incorrect answer.</div><button class="btn btn-primary" id="subQ1" style="margin-top:0.75rem;"><span class="iconify" data-icon="ph:arrow-right" data-width="18"></span> Continue</button></div>';
+                const inp = $('a1Input'), btn = $('subQ1'), err = $('q1Err');
+                btn.onclick = async () => { const a = inp.value.trim(); if (!a) { inp.classList.add('error'); setTimeout(() => inp.classList.remove('error'),500); return; } btn.disabled = true; btn.innerHTML = '<span style="display:inline-block;width:18px;height:18px;border:2px solid white;border-radius:50%;border-top-color:transparent;animation:spin 0.6s linear infinite;"></span>'; const h = await simpleHash(a); if (h === currentUser.answer1) { inp.classList.add('success'); err.classList.remove('show'); statusMsg.textContent = '✓ Correct!'; statusMsg.className = 'status-msg success'; setTimeout(renderQuestion2, 600); } else { inp.classList.add('error'); err.classList.add('show'); statusMsg.textContent = '✗ Wrong'; statusMsg.className = 'status-msg error'; setTimeout(() => inp.classList.remove('error'),500); inp.value = ''; inp.focus(); btn.disabled = false; btn.innerHTML = '<span class="iconify" data-icon="ph:arrow-right" data-width="18"></span> Continue'; } };
+                inp.onkeypress = (e) => { if (e.key === 'Enter') btn.click(); };
+                setTimeout(() => inp.focus(), 300);
             }
             
             // ==================== QUESTION 2 ====================
-            function renderQuestion2() {
-                currentStep = 1;
-                updateSteps();
-                statusMsg.textContent = '';
-                statusMsg.className = 'status-msg';
-                
-                dynamicContent.innerHTML = `
-                    <div class="question-card" id="question2Card">
-                        <div class="question-number">Question 2 of 2</div>
-                        <div class="question-text">${currentUser.question2}</div>
-                        <input type="text" class="question-input" id="answer2Input" placeholder="Type your answer..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                        <div class="question-hint">This answer is case-insensitive and trimmed</div>
-                        <div class="question-error" id="q2Error">Incorrect answer. Please try again.</div>
-                        <button class="btn btn-primary" id="submitQ2" style="margin-top:0.75rem;">
-                            <span class="iconify" data-icon="ph:arrow-right" data-width="18"></span> Continue
-                        </button>
-                    </div>
-                `;
-                
-                const input = $('answer2Input');
-                const submitBtn = $('submitQ2');
-                const errorEl = $('q2Error');
-                
-                submitBtn.addEventListener('click', async () => await checkAnswer2(input, errorEl));
-                input.addEventListener('keypress', (e) => { if (e.key === 'Enter') checkAnswer2(input, errorEl); });
-                
-                setTimeout(() => input.focus(), 300);
+            function renderQuestion2() { currentStep = 1; updateSteps(); statusMsg.textContent = ''; statusMsg.className = 'status-msg';
+                dynamicContent.innerHTML = '<div class="question-card" id="q2Card"><div class="question-number">Question 2 of 2</div><div class="question-text">'+currentUser.question2+'</div><input type="text" class="question-input" id="a2Input" placeholder="Type your answer..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"><div class="question-error" id="q2Err">Incorrect answer.</div><button class="btn btn-primary" id="subQ2" style="margin-top:0.75rem;"><span class="iconify" data-icon="ph:arrow-right" data-width="18"></span> Continue</button></div>';
+                const inp = $('a2Input'), btn = $('subQ2'), err = $('q2Err');
+                btn.onclick = async () => { const a = inp.value.trim(); if (!a) { inp.classList.add('error'); setTimeout(() => inp.classList.remove('error'),500); return; } btn.disabled = true; btn.innerHTML = '<span style="display:inline-block;width:18px;height:18px;border:2px solid white;border-radius:50%;border-top-color:transparent;animation:spin 0.6s linear infinite;"></span>'; const h = await simpleHash(a); if (h === currentUser.answer2) { inp.classList.add('success'); err.classList.remove('show'); statusMsg.textContent = '✓ Correct!'; statusMsg.className = 'status-msg success'; setTimeout(renderGame, 700); } else { inp.classList.add('error'); err.classList.add('show'); statusMsg.textContent = '✗ Wrong'; statusMsg.className = 'status-msg error'; setTimeout(() => inp.classList.remove('error'),500); inp.value = ''; inp.focus(); btn.disabled = false; btn.innerHTML = '<span class="iconify" data-icon="ph:arrow-right" data-width="18"></span> Continue'; } };
+                inp.onkeypress = (e) => { if (e.key === 'Enter') btn.click(); };
+                setTimeout(() => inp.focus(), 300);
             }
             
-            async function checkAnswer2(input, errorEl) {
-                const answer = input.value.trim();
-                if (!answer) { input.classList.add('error'); setTimeout(() => input.classList.remove('error'), 500); return; }
+            // ==================== GAME ====================
+            function renderGame() {
+                currentStep = 2; updateSteps(); statusMsg.textContent = ''; statusMsg.className = 'status-msg';
+                gameState = { round: 0, score: [], emojis: shuffle(FACE_EMOJIS).slice(0, GAME_ROUNDS + 2), timer: null, timeLeft: EMOJI_VISIBILITY_MS / 1000, active: true, waitingForClick: false, canClick: true };
                 
-                const submitBtn = $('submitQ2');
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span style="display:inline-block;width:18px;height:18px;border:2px solid white;border-radius:50%;border-top-color:transparent;animation:spin 0.6s linear infinite;"></span> Verifying...';
+                dynamicContent.innerHTML = '<div class="game-card" id="gameCard"><div class="game-header"><span class="game-round" id="gRound">Round 1/'+GAME_ROUNDS+'</span><span class="game-timer" id="gTimer">⏱ '+gameState.timeLeft+'s</span></div><div class="game-score" id="gScore">'+[...Array(GAME_ROUNDS)].map(() => '<div class="score-dot"></div>').join('')+'</div><div class="game-arena" id="gArena"><div class="game-emoji" id="gEmoji"></div></div><div class="game-hint" id="gHint">Watch the emoji...</div><div class="game-instruction">Tap the emoji when it appears — EXCEPT on Round 3!</div></div>';
                 
-                const hashedInput = await simpleHash(answer);
-                const isCorrect = hashedInput === currentUser.answer2;
-                
-                if (isCorrect) {
-                    input.classList.add('success');
-                    errorEl.classList.remove('show');
-                    questionsAnswered = 2;
-                    statusMsg.textContent = '✓ Both answers correct!';
-                    statusMsg.className = 'status-msg success';
-                    
-                    if (currentUser.gameChallenge) {
-                        setTimeout(() => renderGameChallenge(), 700);
-                    } else {
-                        setTimeout(() => grantAccess(), 500);
-                    }
-                } else {
-                    input.classList.add('error');
-                    errorEl.classList.add('show');
-                    statusMsg.textContent = '✗ Incorrect answer';
-                    statusMsg.className = 'status-msg error';
-                    setTimeout(() => input.classList.remove('error'), 500);
-                    input.value = '';
-                    input.focus();
-                }
-                
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span class="iconify" data-icon="ph:arrow-right" data-width="18"></span> Continue';
+                $('gEmoji').style.display = 'none';
+                $('gArena').onclick = handleGameClick;
+                startNextRound();
             }
             
-            // ==================== GAME CHALLENGE ====================
-            function renderGameChallenge() {
-                currentStep = 2;
-                updateSteps();
-                statusMsg.textContent = '';
-                statusMsg.className = 'status-msg';
-                gameAttempts = 0;
-                gameTimeLeft = GAME_TIME_LIMIT;
+            function startNextRound() {
+                if (!gameState.active) return;
+                gameState.round++;
+                gameState.canClick = true;
+                gameState.waitingForClick = true;
                 
-                // Generate random 3-digit number
-                gameTarget = String(Math.floor(Math.random() * 900) + 100);
+                if (gameState.round > GAME_ROUNDS) { gameWin(); return; }
                 
-                // Create a 3x3 grid with numbers including the target
-                const numbers = new Set();
-                numbers.add(gameTarget);
-                while (numbers.size < 9) {
-                    numbers.add(String(Math.floor(Math.random() * 900) + 100));
+                const round = gameState.round;
+                const isSkipRound = (round === SKIP_ROUND);
+                const emoji = gameState.emojis[round - 1];
+                
+                // Update UI
+                $('gRound').textContent = 'Round ' + round + '/' + GAME_ROUNDS;
+                $('gTimer').textContent = '⏱ ' + (EMOJI_VISIBILITY_MS / 1000) + 's';
+                $('gTimer').classList.remove('urgent');
+                $('gHint').textContent = 'Watch carefully...';
+                $('gHint').className = 'game-hint';
+                $('gArena').className = 'game-arena ' + (isSkipRound ? 'skip-round' : 'click-round');
+                
+                // Show emoji
+                const emojiEl = $('gEmoji');
+                emojiEl.textContent = emoji;
+                emojiEl.className = 'game-emoji';
+                emojiEl.style.display = 'block';
+                emojiEl.style.left = (45 + Math.random() * 10) + '%';
+                emojiEl.style.top = (40 + Math.random() * 20) + '%';
+                
+                if (isSkipRound) {
+                    emojiEl.classList.add('was-skip');
+                    $('gHint').textContent = '⚠️ DO NOT CLICK! Skip this round!';
+                    $('gHint').className = 'game-hint skip-hint';
                 }
-                const shuffledNumbers = [...numbers].sort(() => Math.random() - 0.5);
                 
-                dynamicContent.innerHTML = `
-                    <div class="game-card" id="gameCard">
-                        <div class="game-icon">🎯</div>
-                        <div class="game-title">Quick Match Challenge</div>
-                        <div class="game-instruction">Find and tap this number:</div>
-                        <div class="game-target" id="gameTarget">${gameTarget}</div>
-                        <div class="game-grid" id="gameGrid">
-                            ${shuffledNumbers.map(n => `<button class="game-cell" data-num="${n}">${n}</button>`).join('')}
-                        </div>
-                        <div class="game-timer" id="gameTimer">⏱ ${gameTimeLeft}s remaining</div>
-                        <div class="game-attempts" id="gameAttempts">Attempts: ${gameAttempts}/${MAX_GAME_ATTEMPTS}</div>
-                    </div>
-                `;
-                
-                // Start timer
-                startGameTimer();
-                
-                // Grid click handler
-                $('gameGrid').addEventListener('click', (e) => {
-                    const cell = e.target.closest('.game-cell');
-                    if (!cell) return;
-                    
-                    const num = cell.dataset.num;
-                    if (num === gameTarget) {
-                        // Correct!
-                        cell.classList.add('correct');
-                        stopGameTimer();
-                        statusMsg.textContent = '✓ Game passed!';
-                        statusMsg.className = 'status-msg success';
-                        disableGameGrid();
-                        setTimeout(() => grantAccess(), 800);
-                    } else {
-                        // Wrong
-                        cell.classList.add('wrong');
-                        gameAttempts++;
-                        $('gameAttempts').textContent = `Attempts: ${gameAttempts}/${MAX_GAME_ATTEMPTS}`;
-                        
-                        if (gameAttempts >= MAX_GAME_ATTEMPTS) {
-                            stopGameTimer();
-                            statusMsg.textContent = '✗ Too many attempts. Restarting...';
-                            statusMsg.className = 'status-msg error';
-                            disableGameGrid();
-                            setTimeout(() => {
-                                questionsAnswered = 0;
-                                currentStep = 0;
-                                renderQuestion1();
-                            }, 2000);
-                        } else {
-                            setTimeout(() => cell.classList.remove('wrong'), 400);
+                // Timer
+                gameState.timeLeft = EMOJI_VISIBILITY_MS / 1000;
+                clearInterval(gameState.timer);
+                gameState.timer = setInterval(() => {
+                    gameState.timeLeft = Math.max(0, gameState.timeLeft - 0.1);
+                    $('gTimer').textContent = '⏱ ' + gameState.timeLeft.toFixed(1) + 's';
+                    if (gameState.timeLeft <= 1) $('gTimer').classList.add('urgent');
+                    if (gameState.timeLeft <= 0) {
+                        clearInterval(gameState.timer);
+                        if (gameState.waitingForClick) {
+                            // Time expired
+                            if (isSkipRound) {
+                                // Correct! They didn't click (which is right for skip)
+                                handleRoundResult(true, false);
+                            } else {
+                                // Wrong! They didn't click when they should have
+                                handleRoundResult(false, false);
+                            }
                         }
                     }
-                });
+                }, 100);
             }
             
-            function startGameTimer() {
-                gameTimeLeft = GAME_TIME_LIMIT;
-                updateGameTimer();
-                gameTimer = setInterval(() => {
-                    gameTimeLeft--;
-                    updateGameTimer();
-                    if (gameTimeLeft <= 0) {
-                        stopGameTimer();
-                        statusMsg.textContent = '⏱ Time expired! Restarting...';
-                        statusMsg.className = 'status-msg error';
-                        disableGameGrid();
-                        setTimeout(() => {
-                            questionsAnswered = 0;
-                            currentStep = 0;
-                            renderQuestion1();
-                        }, 2000);
-                    }
-                }, 1000);
-            }
-            
-            function stopGameTimer() {
-                if (gameTimer) { clearInterval(gameTimer); gameTimer = null; }
-            }
-            
-            function updateGameTimer() {
-                const timerEl = $('gameTimer');
-                if (timerEl) {
-                    timerEl.textContent = `⏱ ${gameTimeLeft}s remaining`;
-                    if (gameTimeLeft <= 3) timerEl.classList.add('urgent');
-                    else timerEl.classList.remove('urgent');
+            function handleGameClick() {
+                if (!gameState.active || !gameState.waitingForClick || !gameState.canClick) return;
+                gameState.canClick = false;
+                gameState.waitingForClick = false;
+                clearInterval(gameState.timer);
+                
+                const round = gameState.round;
+                const isSkipRound = (round === SKIP_ROUND);
+                const emojiEl = $('gEmoji');
+                
+                if (isSkipRound) {
+                    // They clicked on skip round = WRONG
+                    emojiEl.classList.add('clicked');
+                    handleRoundResult(false, true);
+                } else {
+                    // They clicked on click round = CORRECT
+                    emojiEl.classList.add('clicked');
+                    handleRoundResult(true, true);
                 }
             }
             
-            function disableGameGrid() {
-                const cells = document.querySelectorAll('.game-cell');
-                cells.forEach(c => c.style.pointerEvents = 'none');
+            function handleRoundResult(success, clicked) {
+                const round = gameState.round;
+                gameState.score.push({ round, success, clicked });
+                
+                // Update score dots
+                const dots = $('gScore').querySelectorAll('.score-dot');
+                if (dots[round - 1]) {
+                    dots[round - 1].classList.add(success ? 'correct' : 'wrong');
+                    if (!clicked && round === SKIP_ROUND && success) dots[round - 1].classList.add('skip');
+                }
+                
+                if (!success) { gameLose('Wrong move!'); return; }
+                
+                // Hide emoji
+                setTimeout(() => {
+                    const emojiEl = $('gEmoji');
+                    emojiEl.classList.add('leaving');
+                    setTimeout(() => { emojiEl.style.display = 'none'; }, 200);
+                }, 300);
+                
+                // Next round
+                setTimeout(() => startNextRound(), 600);
+            }
+            
+            function gameLose(reason) {
+                gameState.active = false;
+                clearInterval(gameState.timer);
+                const emojiEl = $('gEmoji');
+                if (emojiEl) { emojiEl.style.display = 'none'; }
+                
+                statusMsg.textContent = '✗ ' + reason + ' Restarting questions...';
+                statusMsg.className = 'status-msg error';
+                
+                dynamicContent.innerHTML = '<div class="game-card" style="text-align:center;"><div class="game-result"><div class="game-result-icon">😞</div><div class="game-result-text" style="color:var(--danger);">Challenge Failed</div><div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;">'+reason+'</div><div style="font-size:0.75rem;color:var(--text-tertiary);">Restarting authentication...</div></div></div>';
+                
+                setTimeout(() => { currentStep = 0; renderQuestion1(); }, 2500);
+            }
+            
+            function gameWin() {
+                gameState.active = false;
+                clearInterval(gameState.timer);
+                currentStep = 3; updateSteps();
+                statusMsg.textContent = '✓ Game passed!';
+                statusMsg.className = 'status-msg success';
+                
+                dynamicContent.innerHTML = '<div class="game-card" style="text-align:center;"><div class="game-result"><div class="game-result-icon">🎉</div><div class="game-result-text" style="color:var(--success);">Challenge Complete!</div><div style="font-size:0.85rem;color:var(--text-secondary);">All rounds passed successfully</div></div></div>';
+                
+                setTimeout(grantAccess, 800);
             }
             
             // ==================== GRANT ACCESS ====================
             function grantAccess() {
-                currentStep = 3;
-                updateSteps();
+                currentStep = 3; updateSteps();
                 statusMsg.textContent = 'Authentication complete!';
                 statusMsg.className = 'status-msg success';
                 
-                // Show confetti
-                spawnConfetti();
+                // Confetti
+                const colors = ['#6c47ff','#00c6ff','#22c55e','#f59e0b','#ef4444','#ec4899','#8b5cf6','#06b6d4'];
+                for (let i = 0; i < 40; i++) {
+                    const piece = document.createElement('div'); piece.className = 'confetti-piece';
+                    piece.style.left = Math.random() * 100 + '%'; piece.style.top = (Math.random() * 60 + 40) + '%';
+                    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    piece.style.width = (Math.random() * 8 + 6) + 'px'; piece.style.height = (Math.random() * 8 + 6) + 'px';
+                    piece.style.animationDelay = Math.random() * 0.5 + 's'; piece.style.animationDuration = (Math.random() * 1 + 1.5) + 's';
+                    document.body.appendChild(piece); setTimeout(() => piece.remove(), 2000);
+                }
                 
-                // Show success overlay
                 setTimeout(() => { successOverlay.classList.add('active'); }, 500);
-                
-                // Redirect
                 setTimeout(() => { window.location.href = REDIRECT_URL; }, 2200);
             }
             
-            function spawnConfetti() {
-                const colors = ['#6c47ff','#00c6ff','#22c55e','#f59e0b','#ef4444','#ec4899','#8b5cf6','#06b6d4'];
-                for (let i = 0; i < 40; i++) {
-                    const piece = document.createElement('div');
-                    piece.className = 'confetti-piece';
-                    piece.style.left = Math.random() * 100 + '%';
-                    piece.style.top = (Math.random() * 60 + 40) + '%';
-                    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    piece.style.width = (Math.random() * 8 + 6) + 'px';
-                    piece.style.height = (Math.random() * 8 + 6) + 'px';
-                    piece.style.animationDelay = Math.random() * 0.5 + 's';
-                    piece.style.animationDuration = (Math.random() * 1 + 1.5) + 's';
-                    document.body.appendChild(piece);
-                    setTimeout(() => piece.remove(), 2000);
-                }
-            }
-            
-            // ==================== THEME TOGGLE ====================
+            // ==================== INIT ====================
             const headerCard = document.querySelector('.lock-header-card');
             let lastTap = 0;
             headerCard.addEventListener('click', (e) => {
                 const now = Date.now();
-                if (now - lastTap < 300) {
-                    const current = document.body.classList.contains('theme-dark') ? 'dark' : 'light';
-                    setTheme(current === 'dark' ? 'light' : 'dark');
-                }
+                if (now - lastTap < 300) { const cur = document.body.classList.contains('theme-dark') ? 'dark' : 'light'; setTheme(cur === 'dark' ? 'light' : 'dark'); }
                 lastTap = now;
             });
             
-            // ==================== INITIALIZE ====================
             loadAuthData();
-            
         })();
     </script>
 </body>

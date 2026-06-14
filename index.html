@@ -45,6 +45,10 @@
         }
         .screen.hidden { display: none; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pop { 0%{transform:scale(0.7)}60%{transform:scale(1.08)}100%{transform:scale(1)} }
+        @keyframes bounceIn { 0%{transform:scale(0);opacity:0}50%{transform:scale(1.15)}100%{transform:scale(1);opacity:1} }
+        @keyframes pulse { 0%,100%{transform:scale(1)}50%{transform:scale(1.08)} }
+        @keyframes timerBar { from { width: 100%; } to { width: 0%; } }
 
         .input-label {
             font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
@@ -70,9 +74,10 @@
         }
         .password-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108,71,255,0.1); }
         .password-input::placeholder { color: #b0b0b0; }
-        .emoji-overlay {
+        .emoji-display {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             font-size: 1.4rem; letter-spacing: 4px; pointer-events: none; z-index: 1;
+            display: flex; gap: 2px; justify-content: center;
         }
 
         .btn {
@@ -92,24 +97,67 @@
         .msg.red { color: var(--danger); }
         .msg.green { color: var(--success); }
 
-        /* Game - minimal */
-        .game-area {
-            position: fixed; inset: 0; background: var(--bg);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 50;
+        /* ==================== GAME ==================== */
+        .game-fullscreen {
+            position: fixed; inset: 0; background: #0d0d0d;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; z-index: 50;
         }
-        .game-emoji {
-            font-size: 5rem; cursor: pointer; position: absolute;
-            animation: popIn 0.3s ease; transition: opacity 0.2s ease;
-            -webkit-tap-highlight-color: transparent;
+        .game-round-info {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            color: #888; font-size: 0.75rem; text-transform: uppercase;
+            letter-spacing: 2px; z-index: 10;
         }
-        .game-emoji:active { transform: scale(0.85); }
-        .game-emoji.hidden { opacity: 0; pointer-events: none; }
-        @keyframes popIn { 0%{transform:scale(0);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1} }
+        .game-dots {
+            position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 12px; z-index: 10;
+        }
+        .game-dot {
+            width: 12px; height: 12px; border-radius: 50%;
+            border: 2px solid #333; background: transparent;
+            transition: all 0.3s ease;
+        }
+        .game-dot.done-green { border-color: #22c55e; background: #22c55e; }
+        .game-dot.done-gold { border-color: #f59e0b; background: #f59e0b; }
+        .game-dot.current { border-color: #fff; background: transparent; animation: pulse 1s infinite; }
+
+        .emoji-target {
+            position: absolute; font-size: 5rem; cursor: pointer;
+            animation: bounceIn 0.4s ease; transition: opacity 0.2s ease;
+            z-index: 20; -webkit-tap-highlight-color: transparent;
+            user-select: none; -webkit-user-select: none;
+        }
+        .emoji-target:active { transform: scale(0.85); }
+        .emoji-target.hidden { opacity: 0; pointer-events: none; }
+
+        .game-timer {
+            position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%);
+            width: 200px; height: 4px; background: #222; border-radius: 2px;
+            overflow: hidden; z-index: 10;
+        }
+        .game-timer-fill {
+            height: 100%; background: #fff; border-radius: 2px;
+            width: 100%; animation: timerBar 2s linear forwards;
+        }
+        .game-timer-fill.warning { background: #f59e0b; }
+        .game-timer-fill.danger { background: #ef4444; }
+
+        .game-feedback {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 1.2rem; font-weight: 700; z-index: 30; pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .game-result {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; z-index: 40;
+        }
+        .game-result-icon { font-size: 4rem; display: block; margin-bottom: 12px; }
+        .game-result-text { font-size: 1rem; font-weight: 600; color: #fff; }
 
         .done-circle {
             width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--success);
-            display: flex; align-items: center; justify-content: center;
+            display: flex; align-items: center; justify-content: center; animation: pop 0.5s ease;
         }
         .done-circle svg { width: 22px; height: 22px; stroke: var(--success); fill: none; stroke-width: 3; }
         .done-text { font-size: 0.8rem; color: var(--text-tertiary); }
@@ -117,13 +165,14 @@
         @media (max-width: 380px) {
             .screen { gap: 22px; padding: 0 4px; max-width: 100%; }
             .q-text { font-size: 0.9rem; }
-            .game-emoji { font-size: 3.5rem; }
+            .emoji-target { font-size: 3.5rem; }
+            .game-timer { width: 150px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ========== USERNAME ========== -->
+    <!-- ========== SCREEN 1: USERNAME ========== -->
     <div class="screen" id="usernameScreen">
         <span class="input-label">Username</span>
         <input type="text" class="text-input" id="usernameInput" placeholder="Enter your username" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
@@ -131,24 +180,37 @@
         <span class="msg" id="usernameMsg"></span>
     </div>
 
-    <!-- ========== QUESTIONS ========== -->
+    <!-- ========== SCREEN 2: QUESTIONS ========== -->
     <div class="screen hidden" id="questionScreen">
         <span class="q-hint" id="qNumber">Question 1/2</span>
         <span class="q-text" id="qText">...</span>
         <div class="password-wrap">
-            <div class="emoji-overlay" id="emojiOverlay"></div>
+            <div class="emoji-display" id="emojiDisplay"></div>
             <input type="password" class="password-input" id="answerInput" placeholder="Type your answer" autocomplete="off" autocorrect="off" spellcheck="false">
         </div>
         <span class="msg" id="qMsg"></span>
         <button class="btn" id="submitAnswer">Submit</button>
     </div>
 
-    <!-- ========== GAME ========== -->
-    <div class="game-area hidden" id="gameArea">
-        <div class="game-emoji" id="gameEmoji">🤪</div>
+    <!-- ========== SCREEN 3: GAME ========== -->
+    <div class="screen hidden" id="gameScreen">
+        <div class="game-fullscreen" id="gameFullscreen">
+            <span class="game-round-info" id="gameRoundInfo">Round 1/5</span>
+            <div class="game-dots" id="gameDots">
+                <div class="game-dot current" id="dot1"></div>
+                <div class="game-dot" id="dot2"></div>
+                <div class="game-dot" id="dot3"></div>
+                <div class="game-dot" id="dot4"></div>
+                <div class="game-dot" id="dot5"></div>
+            </div>
+            <div class="emoji-target" id="emojiTarget">🤪</div>
+            <div class="game-timer"><div class="game-timer-fill" id="gameTimerFill"></div></div>
+            <div class="game-feedback" id="gameFeedback"></div>
+            <div class="game-result hidden" id="gameResult"></div>
+        </div>
     </div>
 
-    <!-- ========== DONE ========== -->
+    <!-- ========== SCREEN 4: DONE ========== -->
     <div class="screen hidden" id="doneScreen">
         <div class="done-circle">
             <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
@@ -158,125 +220,304 @@
 
     <script>
         (function() {
-            const $ = id => document.getElementById(id);
+            const $ = (id) => document.getElementById(id);
             const FAIL_IMAGE = 'https://i.pinimg.com/736x/57/a1/db/57a1db5bc5af78df0b5e0aa228678206.jpg';
-            const EMOJI = '🤪';
 
-            // ==================== AUTH DATA ====================
+            // ==================== LOAD AUTH DATA ====================
             let AUTH_DATA = { users: [] };
+
             async function loadAuthData() {
-                try { const r = await fetch('auth-data.json'); if (r.ok) { const d = await r.json(); if (d?.users) AUTH_DATA = d; } } catch(e) {}
+                try {
+                    const res = await fetch('auth-data.json');
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data && data.users) AUTH_DATA = data;
+                    }
+                } catch (e) {}
             }
-            function findUser(u) { return AUTH_DATA.users.find(x => x.username.toLowerCase() === u.trim().toLowerCase()) || null; }
+
+            function findUser(username) {
+                return AUTH_DATA.users.find(u => u.username.toLowerCase() === username.trim().toLowerCase()) || null;
+            }
 
             // ==================== STATE ====================
-            let currentUser = null, questions = [], currentQIndex = 0, attempts = 0;
+            let currentUser = null;
+            let questions = [];
+            let currentQIndex = 0;
+            let attempts = 0;
             const MAX_ATTEMPTS = 3;
 
-            // Pattern: click, click, skip, click, click
-            const PATTERN = ['click','click','skip','click','click'];
-            let gameRound = 0, gameTimer = null;
-
             // ==================== SCREENS ====================
-            const usernameScreen = $('usernameScreen'), questionScreen = $('questionScreen');
-            const gameArea = $('gameArea'), doneScreen = $('doneScreen');
-            const usernameInput = $('usernameInput'), usernameBtn = $('usernameBtn'), usernameMsg = $('usernameMsg');
+            const usernameScreen = $('usernameScreen');
+            const questionScreen = $('questionScreen');
+            const gameScreen = $('gameScreen');
+            const doneScreen = $('doneScreen');
+            const usernameInput = $('usernameInput');
+            const usernameBtn = $('usernameBtn');
+            const usernameMsg = $('usernameMsg');
 
-            // ==================== USERNAME ====================
-            usernameInput.addEventListener('input', () => { usernameBtn.disabled = usernameInput.value.trim().length < 2; usernameMsg.textContent = ''; usernameMsg.className = 'msg'; });
-            usernameInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !usernameBtn.disabled) startQuestions(); });
+            // ==================== USERNAME SCREEN ====================
+            usernameInput.addEventListener('input', () => {
+                usernameBtn.disabled = usernameInput.value.trim().length < 2;
+                usernameMsg.textContent = '';
+                usernameMsg.className = 'msg';
+            });
+            usernameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !usernameBtn.disabled) startQuestions();
+            });
             usernameBtn.addEventListener('click', startQuestions);
 
             function startQuestions() {
                 const name = usernameInput.value.trim().toLowerCase();
                 if (name.length < 2) return;
                 const user = findUser(name);
-                if (!user) { usernameMsg.textContent = 'username not found'; usernameMsg.className = 'msg red'; return; }
+                if (!user) {
+                    usernameMsg.textContent = 'username not found';
+                    usernameMsg.className = 'msg red';
+                    return;
+                }
                 currentUser = user;
-                questions = [{ q: user.question1, a: user.answer1 }, { q: user.question2, a: user.answer2 }];
-                currentQIndex = 0; attempts = 0;
-                usernameScreen.classList.add('hidden'); questionScreen.classList.remove('hidden');
+                questions = [
+                    { q: user.question1, answer: user.answer1 },
+                    { q: user.question2, answer: user.answer2 }
+                ];
+                currentQIndex = 0;
+                attempts = 0;
+                usernameScreen.classList.add('hidden');
+                questionScreen.classList.remove('hidden');
                 loadQuestion();
             }
-            function fail() { window.location.href = FAIL_IMAGE; }
-            function win() { gameArea.classList.add('hidden'); doneScreen.classList.remove('hidden'); setTimeout(() => { window.location.href = 'home.html'; }, 1000); }
 
-            // ==================== QUESTIONS ====================
-            const qNumber = $('qNumber'), qText = $('qText'), answerInput = $('answerInput');
-            const emojiOverlay = $('emojiOverlay'), qMsg = $('qMsg'), submitAnswer = $('submitAnswer');
+            function failRedirect() {
+                window.location.href = FAIL_IMAGE;
+            }
+
+            // ==================== QUESTION SCREEN ====================
+            const qNumber = $('qNumber');
+            const qText = $('qText');
+            const answerInput = $('answerInput');
+            const emojiDisplay = $('emojiDisplay');
+            const qMsg = $('qMsg');
+            const submitAnswer = $('submitAnswer');
+            const FACE_EMOJI = '🤪';
 
             function loadQuestion() {
-                if (currentQIndex >= 2) { startGame(); return; }
+                if (currentQIndex >= questions.length) {
+                    startGame();
+                    return;
+                }
                 const q = questions[currentQIndex];
                 qNumber.textContent = `Question ${currentQIndex + 1}/2`;
                 qText.textContent = q.q;
-                answerInput.value = ''; emojiOverlay.textContent = '';
-                qMsg.textContent = ''; qMsg.className = 'msg';
-                attempts = 0; answerInput.focus();
+                answerInput.value = '';
+                emojiDisplay.innerHTML = '';
+                qMsg.textContent = '';
+                qMsg.className = 'msg';
+                attempts = 0;
+                answerInput.focus();
             }
-            answerInput.addEventListener('input', () => { emojiOverlay.textContent = EMOJI.repeat(answerInput.value.length); });
-            answerInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); checkAnswer(); } });
+
+            // Update emoji overlay as user types
+            answerInput.addEventListener('input', () => {
+                const len = answerInput.value.length;
+                emojiDisplay.innerHTML = FACE_EMOJI.repeat(len);
+            });
+
+            answerInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); checkAnswer(); }
+            });
             submitAnswer.addEventListener('click', checkAnswer);
 
             function checkAnswer() {
-                const q = questions[currentQIndex], ans = answerInput.value.trim();
-                if (!ans) return;
-                if (ans === q.a) {
-                    qMsg.textContent = 'correct'; qMsg.className = 'msg green';
-                    emojiOverlay.textContent = '🎉';
-                    setTimeout(() => { currentQIndex++; loadQuestion(); }, 400);
+                const q = questions[currentQIndex];
+                const userAns = answerInput.value.trim();
+                if (userAns === '') return;
+
+                if (userAns === q.answer) {
+                    qMsg.textContent = 'correct';
+                    qMsg.className = 'msg green';
+                    emojiDisplay.innerHTML = '<span style="font-size:2rem;">🎉</span>';
+                    setTimeout(() => { currentQIndex++; loadQuestion(); }, 500);
                 } else {
-                    attempts++; qMsg.textContent = 'wrong answer'; qMsg.className = 'msg red';
-                    emojiOverlay.textContent = '❌';
-                    if (attempts >= MAX_ATTEMPTS) { emojiOverlay.textContent = '💀'; setTimeout(fail, 600); return; }
-                    setTimeout(() => { answerInput.value = ''; emojiOverlay.textContent = ''; qMsg.textContent = ''; qMsg.className = 'msg'; answerInput.focus(); }, 400);
+                    attempts++;
+                    qMsg.textContent = 'wrong answer';
+                    qMsg.className = 'msg red';
+                    emojiDisplay.innerHTML = '<span style="font-size:2rem;">❌</span>';
+                    if (attempts >= MAX_ATTEMPTS) {
+                        emojiDisplay.innerHTML = '<span style="font-size:2rem;">💀</span>';
+                        setTimeout(() => failRedirect(), 700);
+                        return;
+                    }
+                    setTimeout(() => { answerInput.value = ''; emojiDisplay.innerHTML = ''; qMsg.textContent = ''; qMsg.className = 'msg'; answerInput.focus(); }, 500);
                 }
             }
 
-            // ==================== GAME ====================
-            const gameEmoji = $('gameEmoji');
+            // ==================== EMOJI PATTERN GAME ====================
+            const gameRoundInfo = $('gameRoundInfo');
+            const gameDotsEl = $('gameDots');
+            const emojiTarget = $('emojiTarget');
+            const gameTimerFill = $('gameTimerFill');
+            const gameFeedback = $('gameFeedback');
+            const gameResult = $('gameResult');
+
+            // Pattern: CLICK, CLICK, SKIP, CLICK, CLICK
+            const WIN_PATTERN = ['click', 'click', 'skip', 'click', 'click'];
+            let gameCurrentRound = 0;
+            let gameRoundActive = false;
+            let gameRoundTimer = null;
+            let gamePlayerActions = [];
 
             function startGame() {
                 questionScreen.classList.add('hidden');
-                gameArea.classList.remove('hidden');
-                gameRound = 0;
-                nextRound();
+                gameScreen.classList.remove('hidden');
+                gameCurrentRound = 0;
+                gamePlayerActions = [];
+                gameResult.classList.add('hidden');
+                gameResult.innerHTML = '';
+                resetDots();
+                nextGameRound();
             }
 
-            function nextRound() {
-                if (gameRound >= 5) { win(); return; }
-                const x = 40 + Math.random() * 20; // 40-60%
-                const y = 35 + Math.random() * 30; // 35-65%
-                gameEmoji.style.left = x + '%';
-                gameEmoji.style.top = y + '%';
-                gameEmoji.classList.remove('hidden');
-                gameEmoji.style.animation = 'none'; gameEmoji.offsetHeight; gameEmoji.style.animation = 'popIn 0.3s ease';
-
-                clearTimeout(gameTimer);
-                gameTimer = setTimeout(() => {
-                    if (gameRound < 5) handleRound('timeout');
-                }, 1800);
+            function resetDots() {
+                for (let i = 1; i <= 5; i++) {
+                    const dot = $('dot' + i);
+                    dot.className = 'game-dot';
+                }
             }
 
-            gameEmoji.addEventListener('click', () => {
-                if (gameRound >= 5) return;
-                clearTimeout(gameTimer);
-                handleRound('click');
+            function updateDot(round, status) {
+                const dot = $('dot' + (round + 1));
+                if (!dot) return;
+                dot.classList.remove('current', 'done-green', 'done-gold');
+                if (status === 'green') dot.classList.add('done-green');
+                if (status === 'gold') dot.classList.add('done-gold');
+                if (status === 'current') dot.classList.add('current');
+            }
+
+            function nextGameRound() {
+                if (gameCurrentRound >= 5) {
+                    endGame();
+                    return;
+                }
+
+                // Update dots
+                resetDots();
+                for (let i = 0; i < gameCurrentRound; i++) {
+                    const prevAction = gamePlayerActions[i];
+                    updateDot(i, prevAction === 'click' ? 'green' : 'gold');
+                }
+                updateDot(gameCurrentRound, 'current');
+
+                gameRoundInfo.textContent = `Round ${gameCurrentRound + 1}/5`;
+                gameFeedback.textContent = '';
+                gameFeedback.style.color = '#fff';
+                
+                // Random position near center
+                const offsetX = (Math.random() - 0.5) * 120;
+                const offsetY = (Math.random() - 0.5) * 100;
+                emojiTarget.style.left = `calc(50% + ${offsetX}px)`;
+                emojiTarget.style.top = `calc(50% + ${offsetY}px)`;
+                emojiTarget.style.transform = 'translate(-50%, -50%)';
+                emojiTarget.classList.remove('hidden');
+                emojiTarget.style.opacity = '1';
+
+                // Reset timer
+                gameTimerFill.style.animation = 'none';
+                gameTimerFill.offsetHeight;
+                gameTimerFill.style.animation = 'timerBar 2s linear forwards';
+                gameTimerFill.className = 'game-timer-fill';
+                
+                // Warning at 1s
+                setTimeout(() => { gameTimerFill.classList.add('warning'); }, 1000);
+                // Danger at 1.5s
+                setTimeout(() => { gameTimerFill.classList.add('danger'); }, 1500);
+
+                gameRoundActive = true;
+
+                // Auto-timeout after 2s
+                clearTimeout(gameRoundTimer);
+                gameRoundTimer = setTimeout(() => {
+                    if (gameRoundActive) {
+                        handleRoundResult('timeout');
+                    }
+                }, 2000);
+            }
+
+            emojiTarget.addEventListener('click', () => {
+                if (!gameRoundActive) return;
+                handleRoundResult('click');
             });
 
-            function handleRound(action) {
-                const expected = PATTERN[gameRound];
-                let ok = false;
-                if (expected === 'click' && action === 'click') ok = true;
-                if (expected === 'skip' && action === 'timeout') ok = true;
+            function handleRoundResult(action) {
+                gameRoundActive = false;
+                clearTimeout(gameRoundTimer);
+                emojiTarget.classList.add('hidden');
+                
+                const expected = WIN_PATTERN[gameCurrentRound];
+                let isCorrect = false;
 
-                gameEmoji.classList.add('hidden');
-                gameRound++;
+                if (expected === 'click' && action === 'click') isCorrect = true;
+                if (expected === 'skip' && action === 'timeout') isCorrect = true;
 
-                if (ok) {
-                    nextRound();
+                gamePlayerActions.push(action === 'click' ? 'click' : 'skip');
+
+                if (isCorrect) {
+                    updateDot(gameCurrentRound, action === 'click' ? 'green' : 'gold');
+                    gameFeedback.textContent = action === 'click' ? '✓' : '✓';
+                    gameFeedback.style.color = '#22c55e';
+                    gameFeedback.style.fontSize = '2rem';
+                    gameCurrentRound++;
+                    setTimeout(() => nextGameRound(), 400);
                 } else {
-                    fail();
+                    // Wrong action
+                    updateDot(gameCurrentRound, 'red');
+                    const dot = $('dot' + (gameCurrentRound + 1));
+                    if (dot) { dot.style.borderColor = '#ef4444'; dot.style.background = '#ef4444'; }
+                    gameFeedback.textContent = '✗';
+                    gameFeedback.style.color = '#ef4444';
+                    gameFeedback.style.fontSize = '2rem';
+                    
+                    setTimeout(() => {
+                        showGameResult(false);
+                    }, 500);
+                }
+            }
+
+            function endGame() {
+                gameRoundActive = false;
+                clearTimeout(gameRoundTimer);
+                emojiTarget.classList.add('hidden');
+                
+                // Check if player followed the pattern perfectly
+                let perfect = true;
+                for (let i = 0; i < 5; i++) {
+                    const expected = WIN_PATTERN[i];
+                    const actual = gamePlayerActions[i] || 'skip';
+                    if (expected === 'click' && actual !== 'click') perfect = false;
+                    if (expected === 'skip' && actual !== 'skip') perfect = false;
+                }
+
+                showGameResult(perfect);
+            }
+
+            function showGameResult(won) {
+                gameResult.classList.remove('hidden');
+                if (won) {
+                    gameResult.innerHTML = `
+                        <span class="game-result-icon">🎯</span>
+                        <span class="game-result-text">Nice!</span>
+                    `;
+                    setTimeout(() => {
+                        gameScreen.classList.add('hidden');
+                        doneScreen.classList.remove('hidden');
+                        setTimeout(() => { window.location.href = 'home.html'; }, 1200);
+                    }, 1500);
+                } else {
+                    gameResult.innerHTML = `
+                        <span class="game-result-icon">💀</span>
+                        <span class="game-result-text">Failed!</span>
+                    `;
+                    setTimeout(() => failRedirect(), 1500);
                 }
             }
 

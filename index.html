@@ -21,6 +21,7 @@
             --primary-hover: #5835e8;
             --success: #057642;
             --danger: #d11124;
+            --game-bg: #1a1a2e;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -39,8 +40,8 @@
         }
 
         .screen {
-            width: 100%; max-width: 360px; display: flex;
-            flex-direction: column; align-items: center; gap: 28px;
+            width: 100%; max-width: 340px; display: flex;
+            flex-direction: column; align-items: center; gap: 32px;
             animation: fadeIn 0.35s ease;
         }
         .screen.hidden { display: none; }
@@ -54,13 +55,13 @@
         }
         .input-label {
             font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 1.2px; color: var(--text-tertiary);
+            letter-spacing: 1.2px; color: var(--text-tertiary); text-align: center;
         }
         .text-input {
             width: 100%; padding: 14px 18px; border-radius: 14px;
             border: 1.5px solid var(--border); background: var(--surface);
             color: var(--text); font-size: 1rem; font-family: var(--font);
-            outline: none; transition: all 0.2s ease;
+            outline: none; transition: all 0.2s ease; text-align: center;
         }
         .text-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108,71,255,0.1); }
         .text-input::placeholder { color: #b0b0b0; }
@@ -75,118 +76,111 @@
         .btn:hover { background: var(--primary-hover); }
         .btn:disabled { opacity: 0.4; pointer-events: none; }
 
-        /* Question */
+        /* Question - centered */
         .question-box {
-            width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px;
+            width: 100%; display: flex; flex-direction: column; align-items: center; gap: 16px;
         }
         .q-hint {
-            font-size: 0.65rem; color: var(--text-tertiary);
-            text-transform: uppercase; letter-spacing: 1px;
+            font-size: 0.62rem; color: var(--text-tertiary);
+            text-transform: uppercase; letter-spacing: 1.5px;
         }
         .q-text {
-            font-size: 1rem; font-weight: 600; color: var(--text);
-            text-align: center; line-height: 1.4;
+            font-size: 1.05rem; font-weight: 600; color: var(--text);
+            text-align: center; line-height: 1.45; padding: 0 8px;
         }
 
-        /* Answer dots */
-        .answer-dots { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        /* Answer dots - centered */
+        .answer-dots { display: flex; gap: 10px; justify-content: center; }
         .answer-dot {
             width: 12px; height: 12px; border-radius: 50%;
             border: 2px solid #d1d5db; background: transparent;
             transition: all 0.2s ease;
         }
-        .answer-dot.filled {
-            border-color: var(--primary); background: var(--primary);
-            animation: pop 0.2s ease;
-        }
-        .answer-dot.correct {
-            border-color: var(--success); background: var(--success);
-            box-shadow: 0 0 8px rgba(5,118,66,0.3);
-        }
-        .answer-dot.wrong {
-            border-color: var(--danger); background: var(--danger);
-            box-shadow: 0 0 8px rgba(209,17,36,0.3);
-            animation: shake 0.4s ease;
-        }
+        .answer-dot.filled { border-color: var(--primary); background: var(--primary); animation: pop 0.2s ease; }
+        .answer-dot.correct { border-color: var(--success); background: var(--success); box-shadow: 0 0 8px rgba(5,118,66,0.3); }
+        .answer-dot.wrong { border-color: var(--danger); background: var(--danger); box-shadow: 0 0 8px rgba(209,17,36,0.3); animation: shake 0.4s ease; }
 
         /* Hidden input */
-        .hidden-input {
-            position: absolute; opacity: 0; height: 0; width: 0; pointer-events: none;
-        }
+        .hidden-input { position: absolute; opacity: 0; height: 0; width: 0; pointer-events: none; }
 
-        /* Input grid - supports letters + numbers */
-        .input-grid {
-            display: grid; grid-template-columns: repeat(5, 1fr);
-            gap: 8px; width: 100%; background: var(--surface);
+        /* Number grid */
+        .num-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 10px; width: 100%; background: var(--surface);
             border: 1px solid var(--border); border-radius: 16px;
             padding: 14px;
         }
-        .grid-btn {
-            aspect-ratio: 1; border-radius: 10px;
+        .num-btn {
+            aspect-ratio: 1; border-radius: 12px;
             border: 1px solid var(--border); background: var(--bg);
-            color: var(--text); font-size: 0.95rem; font-weight: 600;
+            color: var(--text); font-size: 1.35rem; font-weight: 600;
             cursor: pointer; transition: all 0.15s ease;
             display: flex; align-items: center; justify-content: center;
             font-family: var(--font); -webkit-tap-highlight-color: transparent;
-            text-transform: lowercase;
         }
-        .grid-btn:hover { background: #e8e6e0; border-color: #c0bfbc; }
-        .grid-btn:active { transform: scale(0.93); background: #ddd; }
-        .grid-btn.flash-ok {
-            background: #e9f7ef !important; border-color: var(--success) !important;
-            color: var(--success) !important; animation: pop 0.3s ease;
-        }
-        .grid-btn.flash-no {
-            background: #fdecea !important; border-color: var(--danger) !important;
-            color: var(--danger) !important; animation: shake 0.3s ease;
-        }
-        .grid-btn.del-btn {
-            background: transparent; border-color: transparent; color: var(--text-tertiary);
-            font-size: 0.85rem; aspect-ratio: auto; grid-column: span 1;
-        }
-        .grid-btn.del-btn:hover { background: var(--bg); border-color: var(--border); color: var(--danger); }
-        .grid-btn.space-btn {
-            grid-column: span 3; aspect-ratio: auto; font-size: 0.65rem;
-            text-transform: uppercase; letter-spacing: 1px;
-        }
+        .num-btn:hover { background: #e8e6e0; border-color: #c0bfbc; }
+        .num-btn:active { transform: scale(0.93); background: #ddd; }
+        .num-btn.flash-ok { background: #e9f7ef !important; border-color: var(--success) !important; color: var(--success) !important; animation: pop 0.3s ease; }
+        .num-btn.flash-no { background: #fdecea !important; border-color: var(--danger) !important; color: var(--danger) !important; animation: shake 0.3s ease; }
+        .num-btn.placeholder { border: none; background: transparent; pointer-events: none; }
+        .num-btn.del-btn { background: transparent; border-color: transparent; color: var(--text-tertiary); font-size: 1rem; }
+        .num-btn.del-btn:hover { background: var(--bg); border-color: var(--border); color: var(--danger); }
 
-        /* Action row */
         .action-row { display: flex; gap: 8px; width: 100%; }
         .action-btn {
             flex: 1; padding: 10px; border-radius: 12px; border: 1px solid var(--border);
-            background: var(--surface); color: var(--text-tertiary); font-size: 0.7rem;
+            background: var(--surface); color: var(--text-tertiary); font-size: 0.68rem;
             font-weight: 600; cursor: pointer; font-family: var(--font);
             transition: all 0.2s ease; text-align: center;
         }
         .action-btn:hover { background: #f9fafb; color: var(--text-secondary); }
 
-        /* Messages with colors */
-        .msg {
-            font-size: 0.72rem; font-weight: 500; min-height: 18px;
-            text-align: center; transition: all 0.3s ease;
-        }
+        .msg { font-size: 0.7rem; font-weight: 500; min-height: 16px; text-align: center; transition: all 0.3s ease; }
         .msg.red { color: var(--danger); }
         .msg.green { color: var(--success); }
         .msg.gray { color: var(--text-tertiary); }
 
-        /* Done */
+        /* Game screen */
+        .game-container {
+            width: 100%; background: var(--game-bg); border-radius: 20px;
+            padding: 20px 16px; display: flex; flex-direction: column;
+            align-items: center; gap: 16px; color: #e0e0e0;
+        }
+        .game-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: #888; }
+        .game-target {
+            font-size: 3rem; font-weight: 800; color: #fff;
+            animation: pop 0.3s ease;
+        }
+        .game-score { font-size: 0.75rem; color: #aaa; }
+        .game-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 8px; width: 100%;
+        }
+        .game-btn {
+            aspect-ratio: 1; border-radius: 12px; border: 1.5px solid #2a2a40;
+            background: #111122; color: #ccc; font-size: 1.3rem; font-weight: 600;
+            cursor: pointer; transition: all 0.12s ease; display: flex;
+            align-items: center; justify-content: center; font-family: var(--font);
+        }
+        .game-btn:active { transform: scale(0.9); background: #1a1a30; }
+        .game-btn.correct-pick { background: #0a2a10 !important; border-color: #22c55e !important; color: #22c55e !important; }
+        .game-btn.wrong-pick { background: #2a0a0a !important; border-color: #ef4444 !important; color: #ef4444 !important; }
+        .game-msg { font-size: 0.7rem; color: #888; min-height: 16px; text-align: center; }
+
         .done-circle {
-            width: 44px; height: 44px; border-radius: 50%;
-            border: 2px solid var(--success); display: flex;
-            align-items: center; justify-content: center;
-            animation: pop 0.5s ease;
+            width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--success);
+            display: flex; align-items: center; justify-content: center; animation: pop 0.5s ease;
         }
-        .done-circle svg {
-            width: 22px; height: 22px; stroke: var(--success);
-            fill: none; stroke-width: 3;
-        }
+        .done-circle svg { width: 22px; height: 22px; stroke: var(--success); fill: none; stroke-width: 3; }
         .done-text { font-size: 0.8rem; color: var(--text-tertiary); }
 
         @media (max-width: 380px) {
-            .screen { gap: 22px; padding: 0 4px; }
-            .input-grid { gap: 6px; padding: 10px; }
-            .grid-btn { border-radius: 8px; font-size: 0.85rem; }
-            .q-text { font-size: 0.9rem; }
+            .screen { gap: 24px; padding: 0 4px; max-width: 100%; }
+            .num-grid { gap: 8px; padding: 10px; }
+            .num-btn { border-radius: 10px; font-size: 1.2rem; }
+            .q-text { font-size: 0.95rem; }
+            .game-btn { font-size: 1.1rem; border-radius: 10px; }
+            .game-target { font-size: 2.2rem; }
         }
     </style>
 </head>
@@ -211,56 +205,22 @@
             <span class="msg" id="qMsg"></span>
         </div>
 
-        <input type="text" class="hidden-input" id="hiddenInput" autocomplete="off">
+        <input type="text" class="hidden-input" id="hiddenInput" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
 
-        <div class="input-grid" id="inputGrid">
-            <!-- Row 1: 1-5 -->
-            <button class="grid-btn" data-char="1">1</button>
-            <button class="grid-btn" data-char="2">2</button>
-            <button class="grid-btn" data-char="3">3</button>
-            <button class="grid-btn" data-char="4">4</button>
-            <button class="grid-btn" data-char="5">5</button>
-            <!-- Row 2: 6-0 -->
-            <button class="grid-btn" data-char="6">6</button>
-            <button class="grid-btn" data-char="7">7</button>
-            <button class="grid-btn" data-char="8">8</button>
-            <button class="grid-btn" data-char="9">9</button>
-            <button class="grid-btn" data-char="0">0</button>
-            <!-- Row 3: a-e -->
-            <button class="grid-btn" data-char="a">a</button>
-            <button class="grid-btn" data-char="b">b</button>
-            <button class="grid-btn" data-char="c">c</button>
-            <button class="grid-btn" data-char="d">d</button>
-            <button class="grid-btn" data-char="e">e</button>
-            <!-- Row 4: f-j -->
-            <button class="grid-btn" data-char="f">f</button>
-            <button class="grid-btn" data-char="g">g</button>
-            <button class="grid-btn" data-char="h">h</button>
-            <button class="grid-btn" data-char="i">i</button>
-            <button class="grid-btn" data-char="j">j</button>
-            <!-- Row 5: k-o -->
-            <button class="grid-btn" data-char="k">k</button>
-            <button class="grid-btn" data-char="l">l</button>
-            <button class="grid-btn" data-char="m">m</button>
-            <button class="grid-btn" data-char="n">n</button>
-            <button class="grid-btn" data-char="o">o</button>
-            <!-- Row 6: p-t -->
-            <button class="grid-btn" data-char="p">p</button>
-            <button class="grid-btn" data-char="q">q</button>
-            <button class="grid-btn" data-char="r">r</button>
-            <button class="grid-btn" data-char="s">s</button>
-            <button class="grid-btn" data-char="t">t</button>
-            <!-- Row 7: u-y -->
-            <button class="grid-btn" data-char="u">u</button>
-            <button class="grid-btn" data-char="v">v</button>
-            <button class="grid-btn" data-char="w">w</button>
-            <button class="grid-btn" data-char="x">x</button>
-            <button class="grid-btn" data-char="y">y</button>
-            <!-- Row 8: z, space, delete -->
-            <button class="grid-btn" data-char="z">z</button>
-            <button class="grid-btn space-btn" data-char=" ">space</button>
-            <button class="grid-btn del-btn" id="delBtn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 4H8l-7 8 7 8h13a2 2 0 002-2V6a2 2 0 00-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
+        <div class="num-grid" id="numGrid">
+            <button class="num-btn" data-num="1">1</button>
+            <button class="num-btn" data-num="2">2</button>
+            <button class="num-btn" data-num="3">3</button>
+            <button class="num-btn" data-num="4">4</button>
+            <button class="num-btn" data-num="5">5</button>
+            <button class="num-btn" data-num="6">6</button>
+            <button class="num-btn" data-num="7">7</button>
+            <button class="num-btn" data-num="8">8</button>
+            <button class="num-btn" data-num="9">9</button>
+            <button class="num-btn placeholder"></button>
+            <button class="num-btn" data-num="0">0</button>
+            <button class="num-btn del-btn" id="delBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 4H8l-7 8 7 8h13a2 2 0 002-2V6a2 2 0 00-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
             </button>
         </div>
 
@@ -270,7 +230,18 @@
         </div>
     </div>
 
-    <!-- ========== SCREEN 3: DONE ========== -->
+    <!-- ========== SCREEN 3: GAME ========== -->
+    <div class="screen hidden" id="gameScreen">
+        <div class="game-container">
+            <span class="game-title">Quick Game</span>
+            <div class="game-target" id="gameTarget">7</div>
+            <span class="game-score" id="gameScore">Score: 0/5</span>
+            <div class="game-grid" id="gameGrid"></div>
+            <span class="game-msg" id="gameMsg">Tap the matching number</span>
+        </div>
+    </div>
+
+    <!-- ========== SCREEN 4: DONE ========== -->
     <div class="screen hidden" id="doneScreen">
         <div class="done-circle">
             <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
@@ -282,6 +253,9 @@
         (function() {
             const $ = (id) => document.getElementById(id);
 
+            // ==================== FAIL IMAGE ====================
+            const FAIL_IMAGE = 'https://i.pinimg.com/736x/57/a1/db/57a1db5bc5af78df0b5e0aa228678206.jpg';
+
             // ==================== LOAD AUTH DATA ====================
             let AUTH_DATA = { users: [] };
 
@@ -290,18 +264,13 @@
                     const res = await fetch('auth-data.json');
                     if (res.ok) {
                         const data = await res.json();
-                        if (data && data.users) {
-                            AUTH_DATA = data;
-                        }
+                        if (data && data.users) AUTH_DATA = data;
                     }
-                } catch (e) {
-                    console.log('Could not load auth-data.json');
-                }
+                } catch (e) { console.log('No auth-data.json'); }
             }
 
             function findUser(username) {
-                const name = username.trim().toLowerCase();
-                return AUTH_DATA.users.find(u => u.username.toLowerCase() === name) || null;
+                return AUTH_DATA.users.find(u => u.username.toLowerCase() === username.trim().toLowerCase()) || null;
             }
 
             // ==================== STATE ====================
@@ -312,10 +281,15 @@
             let isProcessing = false;
             let attempts = 0;
             const MAX_ATTEMPTS = 3;
+            let gameScore = 0;
+            let gameTarget = 0;
+            let gameNumbers = [];
+            const GAME_ROUNDS = 5;
 
             // ==================== SCREENS ====================
             const usernameScreen = $('usernameScreen');
             const questionScreen = $('questionScreen');
+            const gameScreen = $('gameScreen');
             const doneScreen = $('doneScreen');
             const usernameInput = $('usernameInput');
             const usernameBtn = $('usernameBtn');
@@ -323,38 +297,29 @@
 
             // ==================== USERNAME SCREEN ====================
             usernameInput.addEventListener('input', () => {
-                const val = usernameInput.value.trim();
-                usernameBtn.disabled = val.length < 2;
+                usernameBtn.disabled = usernameInput.value.trim().length < 2;
                 usernameMsg.textContent = '';
                 usernameMsg.className = 'msg';
             });
-
             usernameInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !usernameBtn.disabled) startQuestions();
             });
-
             usernameBtn.addEventListener('click', startQuestions);
 
             function startQuestions() {
                 const name = usernameInput.value.trim().toLowerCase();
                 if (name.length < 2) return;
-
                 const user = findUser(name);
-
                 if (!user) {
                     usernameMsg.textContent = 'username not found';
                     usernameMsg.className = 'msg red';
                     return;
                 }
-
                 currentUser = user;
-
-                // Build 2 questions from user data
                 questions = [
                     { q: user.question1, answer: user.answer1 },
                     { q: user.question2, answer: user.answer2 }
                 ];
-
                 currentQIndex = 0;
                 attempts = 0;
                 usernameScreen.classList.add('hidden');
@@ -363,41 +328,41 @@
                 focusHiddenInput();
             }
 
+            // ==================== FAIL REDIRECT ====================
+            function failRedirect() {
+                window.location.href = FAIL_IMAGE;
+            }
+
             // ==================== QUESTION SCREEN ====================
             const qNumber = $('qNumber');
             const qText = $('qText');
             const answerDots = $('answerDots');
             const qMsg = $('qMsg');
             const hiddenInput = $('hiddenInput');
-            const inputGrid = $('inputGrid');
+            const numGrid = $('numGrid');
             const delBtn = $('delBtn');
             const qClearBtn = $('qClearBtn');
             const qKeyboardBtn = $('qKeyboardBtn');
 
             function loadQuestion() {
                 if (currentQIndex >= questions.length) {
-                    showDone();
+                    startGame();
                     return;
                 }
-
-                const question = questions[currentQIndex];
+                const q = questions[currentQIndex];
                 qNumber.textContent = `Question ${currentQIndex + 1}/2`;
-                qText.textContent = question.q;
-                
-                // Create answer dots matching answer length
+                qText.textContent = q.q;
                 answerDots.innerHTML = '';
-                for (let i = 0; i < question.answer.length; i++) {
+                for (let i = 0; i < q.answer.length; i++) {
                     const dot = document.createElement('div');
                     dot.className = 'answer-dot';
                     answerDots.appendChild(dot);
                 }
-                
                 enteredAnswer = [];
                 isProcessing = false;
                 attempts = 0;
                 qMsg.textContent = '';
                 qMsg.className = 'msg';
-                
                 updateDots();
                 focusHiddenInput();
             }
@@ -414,207 +379,178 @@
                 });
             }
 
-            function flashButton(char, type) {
-                const btn = inputGrid.querySelector(`[data-char="${char}"]`);
+            function flashButton(num, type) {
+                const btn = numGrid.querySelector(`[data-num="${num}"]`);
                 if (!btn) return;
                 btn.classList.add(type === 'ok' ? 'flash-ok' : 'flash-no');
                 setTimeout(() => btn.classList.remove('flash-ok', 'flash-no'), 400);
             }
 
             function checkAnswer() {
-                const question = questions[currentQIndex];
-                if (enteredAnswer.length !== question.answer.length) return;
-
+                const q = questions[currentQIndex];
+                if (enteredAnswer.length !== q.answer.length) return;
                 isProcessing = true;
-
-                const userAnswer = enteredAnswer.join('');
-                const correctAnswer = question.answer;
-
-                if (userAnswer === correctAnswer) {
+                const userAns = enteredAnswer.join('');
+                
+                if (userAns === q.answer) {
                     updateDots('correct');
                     qMsg.textContent = 'correct';
                     qMsg.className = 'msg green';
-                    
-                    // Flash correct characters
-                    correctAnswer.split('').forEach(c => flashButton(c, 'ok'));
-                    
-                    setTimeout(() => {
-                        currentQIndex++;
-                        loadQuestion();
-                    }, 600);
-
+                    q.answer.split('').forEach(c => flashButton(c, 'ok'));
+                    setTimeout(() => { currentQIndex++; loadQuestion(); }, 500);
                 } else {
                     updateDots('wrong');
                     attempts++;
                     qMsg.textContent = 'wrong answer';
                     qMsg.className = 'msg red';
-                    
-                    // Flash matching chars green, wrong chars red
                     enteredAnswer.forEach((c, i) => {
-                        if (c === correctAnswer[i]) flashButton(c, 'ok');
+                        if (c === q.answer[i]) flashButton(c, 'ok');
                         else flashButton(c, 'no');
                     });
-
                     shakeDots();
-
                     if (attempts >= MAX_ATTEMPTS) {
-                        qMsg.textContent = 'too many attempts, resetting...';
-                        qMsg.className = 'msg red';
-                        disableGrid(true);
-                        setTimeout(() => {
-                            disableGrid(false);
-                            enteredAnswer = [];
-                            updateDots();
-                            qMsg.textContent = '';
-                            qMsg.className = 'msg';
-                            isProcessing = false;
-                            attempts = 0;
-                        }, 2500);
-                    } else {
-                        setTimeout(() => {
-                            enteredAnswer = [];
-                            updateDots();
-                            isProcessing = false;
-                        }, 500);
+                        setTimeout(() => failRedirect(), 600);
+                        return;
                     }
+                    setTimeout(() => { enteredAnswer = []; updateDots(); isProcessing = false; }, 400);
                 }
             }
 
             function shakeDots() {
-                const dots = answerDots.querySelectorAll('.answer-dot');
-                dots.forEach(d => {
-                    d.style.animation = 'none';
-                    d.offsetHeight;
-                    d.style.animation = 'shake 0.4s ease';
+                answerDots.querySelectorAll('.answer-dot').forEach(d => {
+                    d.style.animation = 'none'; d.offsetHeight; d.style.animation = 'shake 0.4s ease';
                 });
             }
 
-            function disableGrid(disabled) {
-                const btns = inputGrid.querySelectorAll('.grid-btn');
-                btns.forEach(b => {
-                    b.style.opacity = disabled ? '0.35' : '1';
-                    b.style.pointerEvents = disabled ? 'none' : 'auto';
-                });
-            }
-
-            function addChar(c) {
+            function addDigit(d) {
                 if (isProcessing) return;
-                const question = questions[currentQIndex];
-                if (enteredAnswer.length >= question.answer.length) return;
-
-                enteredAnswer.push(c);
+                if (enteredAnswer.length >= questions[currentQIndex].answer.length) return;
+                enteredAnswer.push(d);
                 updateDots();
-
-                if (enteredAnswer.length === question.answer.length) {
-                    setTimeout(() => checkAnswer(), 250);
+                if (enteredAnswer.length === questions[currentQIndex].answer.length) {
+                    setTimeout(checkAnswer, 200);
                 }
             }
 
-            function removeChar() {
-                if (isProcessing) return;
-                if (enteredAnswer.length === 0) return;
+            function removeDigit() {
+                if (isProcessing || enteredAnswer.length === 0) return;
                 enteredAnswer.pop();
                 updateDots();
                 qMsg.textContent = '';
                 qMsg.className = 'msg';
             }
 
-            // ==================== KEYBOARD ====================
-            function focusHiddenInput() {
-                hiddenInput.focus();
-                hiddenInput.click();
-            }
+            function focusHiddenInput() { hiddenInput.focus(); hiddenInput.click(); }
 
             hiddenInput.addEventListener('input', () => {
-                const val = hiddenInput.value;
-                if (val.length > 0) {
-                    const last = val.charAt(val.length - 1).toLowerCase();
-                    if (/^[a-z0-9 ]$/.test(last)) {
-                        addChar(last);
-                    }
-                }
+                const v = hiddenInput.value, last = v.charAt(v.length - 1);
+                if (/^\d$/.test(last)) addDigit(last);
                 hiddenInput.value = '';
             });
-
             hiddenInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Backspace' || e.key === 'Delete') {
-                    e.preventDefault();
-                    removeChar();
-                    hiddenInput.value = '';
-                }
+                if (e.key === 'Backspace' || e.key === 'Delete') { e.preventDefault(); removeDigit(); hiddenInput.value = ''; }
             });
 
-            // ==================== EVENT LISTENERS ====================
-            inputGrid.addEventListener('click', (e) => {
-                const btn = e.target.closest('.grid-btn');
-                if (!btn) return;
-                
-                const char = btn.dataset.char;
-                if (char !== undefined) {
-                    addChar(char);
-                    btn.style.transform = 'scale(0.9)';
-                    setTimeout(() => btn.style.transform = '', 100);
-                }
+            numGrid.addEventListener('click', (e) => {
+                const btn = e.target.closest('.num-btn');
+                if (!btn || btn.classList.contains('placeholder')) return;
+                if (btn.dataset.num !== undefined) { addDigit(btn.dataset.num); btn.style.transform = 'scale(0.9)'; setTimeout(() => btn.style.transform = '', 100); }
             });
+            delBtn.addEventListener('click', (e) => { e.stopPropagation(); removeDigit(); });
+            qClearBtn.addEventListener('click', () => { enteredAnswer = []; updateDots(); qMsg.textContent = ''; qMsg.className = 'msg'; isProcessing = false; });
+            qKeyboardBtn.addEventListener('click', (e) => { e.stopPropagation(); focusHiddenInput(); });
 
-            delBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                removeChar();
-            });
-
-            qClearBtn.addEventListener('click', () => {
-                enteredAnswer = [];
-                updateDots();
-                qMsg.textContent = '';
-                qMsg.className = 'msg';
-                isProcessing = false;
-            });
-
-            qKeyboardBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                focusHiddenInput();
-            });
-
-            // Physical keyboard
             document.addEventListener('keydown', (e) => {
                 if (questionScreen.classList.contains('hidden')) return;
                 if (isProcessing) return;
+                if (/^\d$/.test(e.key)) { e.preventDefault(); addDigit(e.key); }
+                if (e.key === 'Backspace' || e.key === 'Delete') { e.preventDefault(); removeDigit(); }
+            });
 
-                const key = e.key.toLowerCase();
-                if (/^[a-z0-9 ]$/.test(key) && key.length === 1) {
-                    e.preventDefault();
-                    addChar(key);
+            // ==================== GAME SCREEN ====================
+            const gameTargetEl = $('gameTarget');
+            const gameScoreEl = $('gameScore');
+            const gameGrid = $('gameGrid');
+            const gameMsgEl = $('gameMsg');
+            let gameRoundsDone = 0;
+            let gameCanClick = true;
+
+            function startGame() {
+                questionScreen.classList.add('hidden');
+                gameScreen.classList.remove('hidden');
+                gameScore = 0;
+                gameRoundsDone = 0;
+                gameCanClick = true;
+                gameScoreEl.textContent = 'Score: 0/5';
+                gameMsgEl.textContent = 'Tap the matching number';
+                gameMsgEl.style.color = '#888';
+                nextGameRound();
+            }
+
+            function nextGameRound() {
+                if (gameRoundsDone >= GAME_ROUNDS) {
+                    showDone();
+                    return;
                 }
-                if (e.key === 'Backspace' || e.key === 'Delete') {
-                    e.preventDefault();
-                    removeChar();
+                gameCanClick = true;
+                gameTarget = Math.floor(Math.random() * 9) + 1;
+                gameTargetEl.textContent = gameTarget;
+                gameTargetEl.style.animation = 'none'; gameTargetEl.offsetHeight; gameTargetEl.style.animation = 'pop 0.3s ease';
+                gameScoreEl.textContent = `Score: ${gameScore}/${GAME_ROUNDS}`;
+
+                // Generate 9 unique numbers with target included
+                const nums = new Set();
+                nums.add(gameTarget);
+                while (nums.size < 9) {
+                    nums.add(Math.floor(Math.random() * 9) + 1);
                 }
-                if (e.key === 'Escape') {
-                    e.preventDefault();
-                    enteredAnswer = [];
-                    updateDots();
+                gameNumbers = [...nums].sort(() => Math.random() - 0.5);
+
+                gameGrid.innerHTML = gameNumbers.map(n => 
+                    `<button class="game-btn" data-num="${n}">${n}</button>`
+                ).join('');
+            }
+
+            gameGrid.addEventListener('click', (e) => {
+                if (!gameCanClick) return;
+                const btn = e.target.closest('.game-btn');
+                if (!btn) return;
+                const num = parseInt(btn.dataset.num);
+                
+                if (num === gameTarget) {
+                    gameCanClick = false;
+                    btn.classList.add('correct-pick');
+                    gameScore++;
+                    gameMsgEl.textContent = 'correct!';
+                    gameMsgEl.style.color = '#22c55e';
+                    gameRoundsDone++;
+                    gameScoreEl.textContent = `Score: ${gameScore}/${GAME_ROUNDS}`;
+                    setTimeout(nextGameRound, 500);
+                } else {
+                    btn.classList.add('wrong-pick');
+                    gameMsgEl.textContent = 'wrong!';
+                    gameMsgEl.style.color = '#ef4444';
+                    gameRoundsDone++;
+                    gameScoreEl.textContent = `Score: ${gameScore}/${GAME_ROUNDS}`;
+                    setTimeout(nextGameRound, 500);
                 }
             });
 
-            // Auto-focus on mobile
+            // ==================== DONE ====================
+            function showDone() {
+                gameScreen.classList.add('hidden');
+                doneScreen.classList.remove('hidden');
+                setTimeout(() => { window.location.href = 'home.html'; }, 1200);
+            }
+
+            // Mobile keyboard
             if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
                 document.body.addEventListener('click', () => {
                     if (!questionScreen.classList.contains('hidden')) focusHiddenInput();
                 }, { once: false });
             }
 
-            // ==================== DONE ====================
-            function showDone() {
-                questionScreen.classList.add('hidden');
-                doneScreen.classList.remove('hidden');
-                setTimeout(() => {
-                    window.location.href = 'home.html';
-                }, 1000);
-            }
-
-            // ==================== INIT ====================
             loadAuthData();
-
         })();
     </script>
 </body>

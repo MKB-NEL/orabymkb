@@ -3,386 +3,576 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>OrabyMKB · Secure Access</title>
-    <meta name="description" content="OrabyMKB - Secure access to your file hub">
-    <meta name="theme-color" content="#6c47ff">
+    <title>Access</title>
+    <meta name="theme-color" content="#0d0d0d">
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
     
     <style>
         :root {
-            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-            --radius-sm: 0.375rem; --radius-md: 0.5rem; --radius-lg: 0.75rem;
-            --radius-xl: 1rem; --radius-2xl: 1.5rem; --radius-full: 9999px;
+            --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
         }
-        .theme-light {
-            --bg-main: #f4f2ee; --bg-surface: #ffffff; --bg-hover: #f9fafb;
-            --bg-input: #eef3f8; --border: #e5e7eb; --border-light: #f0f0f0;
-            --text-primary: #191919; --text-secondary: #595856; --text-tertiary: #868482;
-            --primary: #6c47ff; --primary-hover: #5835e8; --primary-light: #f0ebff;
-            --secondary: #3b82f6; --success: #057642; --success-bg: #e9f7ef;
-            --danger: #d11124; --danger-bg: #fdecea; --warning: #b85c00;
-            --card-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            width: 100%; height: 100%; overflow: hidden;
+            font-family: var(--font); background: #08080c; color: #ccc;
+            -webkit-font-smoothing: antialiased; user-select: none;
+            -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
-        .theme-dark {
-            --bg-main: #1a1a2e; --bg-surface: #16213e; --bg-hover: #1a2744;
-            --bg-input: #0f3460; --border: #2a3a5e; --border-light: #1e2d4a;
-            --text-primary: #e8e8e8; --text-secondary: #b0b0b0; --text-tertiary: #8a8a8a;
-            --primary: #8b6cff; --primary-hover: #7b5ce8; --primary-light: #1e1a3a;
-            --secondary: #60a5fa; --success: #22c55e; --success-bg: #0a2a1a;
-            --danger: #ef4444; --danger-bg: #2a0a0a; --warning: #f59e0b;
-            --card-shadow: 0 0 0 1px rgba(255,255,255,0.05);
+
+        body {
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; padding: 20px;
         }
-        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-        html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-size:16px;scroll-behavior:smooth}
-        body{font-family:var(--font-family);background:var(--bg-main);color:var(--text-primary);line-height:1.5;min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;transition:background var(--transition-base),color var(--transition-base);padding:1rem;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-        button{cursor:pointer;font-family:inherit;border:none;background:transparent}button:focus-visible{outline:2px solid var(--primary);outline-offset:2px}input{font-family:inherit;font-size:inherit}
-        ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}
 
-        @keyframes spin{to{transform:rotate(360deg)}}@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes modalIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}@keyframes toastUp{from{transform:translate(-50%,20px);opacity:0}to{transform:translate(-50%,0);opacity:1}}@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}@keyframes popIn{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}@keyframes confetti{0%{transform:translateY(0)rotate(0deg);opacity:1}100%{transform:translateY(-200px)rotate(720deg);opacity:0}}@keyframes emojiPop{0%{transform:scale(0.3)translate(-50%,-50%);opacity:0}60%{transform:scale(1.2)translate(-50%,-50%);opacity:1}100%{transform:scale(1)translate(-50%,-50%);opacity:1}}@keyframes emojiOut{0%{transform:scale(1)translate(-50%,-50%);opacity:1}100%{transform:scale(0.3)translate(-50%,-50%);opacity:0}}@keyframes emojiClick{0%{transform:scale(1)translate(-50%,-50%)}50%{transform:scale(1.4)translate(-50%,-50%)}100%{transform:scale(0)translate(-50%,-50%)}}@keyframes pulseGlow{0%,100%{box-shadow:0 0 5px rgba(108,71,255,0.3)}50%{box-shadow:0 0 25px rgba(108,71,255,0.7)}}@keyframes shakeX{0%,100%{transform:translateX(-50%)}20%{transform:translateX(calc(-50% - 10px))}40%{transform:translateX(calc(-50% + 10px))}60%{transform:translateX(calc(-50% - 6px))}80%{transform:translateX(calc(-50% + 6px))}}@keyframes shine{0%{transform:translateX(-100%)translateY(-100%)}100%{transform:translateX(100%)translateY(100%)}}
+        .screen {
+            width: 100%; max-width: 360px; display: flex;
+            flex-direction: column; align-items: center; gap: 32px;
+            animation: fadeIn 0.4s ease;
+        }
+        .screen.hidden { display: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)} }
+        @keyframes pop { 0%{transform:scale(0.6)}60%{transform:scale(1.1)}100%{transform:scale(1)} }
 
-        .lock-wrapper{width:100%;max-width:440px;display:flex;flex-direction:column;align-items:center;gap:1.5rem;animation:fadeIn 0.4s ease-out}
+        /* Username Screen */
+        .input-group {
+            width: 100%; display: flex; flex-direction: column; gap: 8px;
+        }
+        .input-label {
+            font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 1.5px; color: #555;
+        }
+        .text-input {
+            width: 100%; padding: 14px 18px; border-radius: 16px;
+            border: 1.5px solid #1a1a24; background: #0e0e14;
+            color: #e0e0e0; font-size: 1rem; font-family: var(--font);
+            outline: none; transition: all 0.2s ease;
+        }
+        .text-input:focus { border-color: #6c47ff; box-shadow: 0 0 0 3px rgba(108,71,255,0.12); }
+        .text-input::placeholder { color: #333; }
 
-        .lock-header-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-2xl);padding:1.5rem 1.25rem;box-shadow:var(--card-shadow);text-align:center;width:100%}
-        .lock-logo{width:56px;height:56px;background:linear-gradient(135deg,#6c47ff,#00c6ff);border-radius:var(--radius-lg);margin:0 auto 0.75rem;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.2rem;box-shadow:0 4px 16px rgba(108,71,255,0.3);position:relative;overflow:hidden}
-        .lock-logo::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent 40%,rgba(255,255,255,0.2) 50%,transparent 60%);animation:shine 3s ease-in-out infinite}
-        .lock-logo span{position:relative;z-index:1}
-        .lock-brand{font-size:1.2rem;font-weight:700;letter-spacing:-0.3px;color:var(--text-primary);margin-bottom:0.25rem}
-        .lock-subtitle{font-size:0.8125rem;color:var(--text-tertiary);font-weight:400}
+        .btn {
+            width: 100%; padding: 14px; border-radius: 16px; border: none;
+            font-weight: 600; font-size: 0.9rem; font-family: var(--font);
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: #6c47ff; color: #fff; }
+        .btn-primary:hover { background: #7b5ce8; }
+        .btn-primary:disabled { opacity: 0.35; pointer-events: none; }
 
-        .step-indicator{display:flex;align-items:center;gap:0.5rem;justify-content:center}
-        .step-dot{width:10px;height:10px;border-radius:50%;background:var(--border);transition:all var(--transition-fast)}.step-dot.active{background:var(--primary);box-shadow:0 0 8px rgba(108,71,255,0.4);width:12px;height:12px}.step-dot.done{background:var(--success)}.step-line{width:24px;height:2px;background:var(--border);border-radius:1px}.step-line.done{background:var(--success)}
+        /* Question Screen */
+        .question-box {
+            width: 100%; display: flex; flex-direction: column; align-items: center; gap: 24px;
+        }
+        .q-text {
+            font-size: 1.05rem; font-weight: 600; color: #ddd;
+            text-align: center; line-height: 1.4;
+        }
+        .q-hint {
+            font-size: 0.65rem; color: #555; text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-        .question-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-2xl);padding:1.5rem;box-shadow:var(--card-shadow);width:100%;animation:fadeIn 0.3s ease-out}
-        .question-number{font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--primary);font-weight:700;margin-bottom:0.5rem}
-        .question-text{font-size:1rem;font-weight:600;color:var(--text-primary);margin-bottom:1rem;line-height:1.4}
-        .question-input{width:100%;padding:0.75rem 1rem;border:1.5px solid var(--border);border-radius:var(--radius-lg);font-size:0.95rem;background:var(--bg-input);color:var(--text-primary);outline:none;font-family:var(--font-family);transition:all var(--transition-fast)}.question-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,71,255,0.1);background:var(--bg-surface)}.question-input.error{border-color:var(--danger);box-shadow:0 0 0 3px rgba(209,17,36,0.1);animation:shake 0.5s ease}.question-input.success{border-color:var(--success);box-shadow:0 0 0 3px rgba(5,118,66,0.1)}
-        .question-error{font-size:0.78rem;color:var(--danger);margin-top:0.5rem;display:none}.question-error.show{display:block}
+        /* Hidden answer - dots */
+        .answer-dots {
+            display: flex; gap: 10px; justify-content: center;
+        }
+        .answer-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            border: 1.5px solid #222; background: transparent;
+            transition: all 0.2s ease;
+        }
+        .answer-dot.filled {
+            border-color: #6c47ff; background: #6c47ff;
+            animation: pop 0.25s ease;
+        }
+        .answer-dot.correct {
+            border-color: #22c55e; background: #22c55e;
+            box-shadow: 0 0 10px rgba(34,197,94,0.4);
+        }
+        .answer-dot.wrong {
+            border-color: #ef4444; background: #ef4444;
+            box-shadow: 0 0 10px rgba(239,68,68,0.4);
+            animation: shake 0.4s ease;
+        }
 
-        .btn{display:inline-flex;align-items:center;justify-content:center;gap:0.35rem;padding:0.65rem 1.25rem;border-radius:var(--radius-full);font-weight:600;font-size:0.875rem;transition:all var(--transition-fast);white-space:nowrap;font-family:var(--font-family);width:100%}.btn:active{transform:scale(0.97)}
-        .btn-primary{background:linear-gradient(135deg,#6c47ff,#5835e8);color:#fff;box-shadow:0 2px 8px rgba(108,71,255,0.3)}.btn-primary:hover{box-shadow:0 4px 16px rgba(108,71,255,0.45)}.btn-primary:disabled{opacity:0.5;cursor:not-allowed;box-shadow:none}
-        .btn-outline{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}.btn-outline:hover{background:var(--primary-light)}
+        /* Hidden input */
+        .hidden-input {
+            position: absolute; opacity: 0; height: 0; width: 0; pointer-events: none;
+        }
 
-        /* Game Styles */
-        .game-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-2xl);padding:1.5rem;box-shadow:var(--card-shadow);width:100%;text-align:center;animation:fadeIn 0.3s ease-out;position:relative;overflow:hidden}
-        .game-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem}
-        .game-round{font-size:0.75rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px}
-        .game-timer{font-size:0.85rem;font-weight:600;color:var(--text-secondary)}.game-timer.urgent{color:var(--danger);animation:pulse 0.8s infinite}
-        .game-score{display:flex;gap:0.5rem;justify-content:center;margin-bottom:1rem}
-        .score-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);transition:all var(--transition-fast)}.score-dot.correct{background:var(--success);border-color:var(--success)}.score-dot.wrong{background:var(--danger);border-color:var(--danger)}.score-dot.skip{background:var(--warning);border-color:var(--warning)}
-        
-        .game-arena{position:relative;width:100%;height:220px;background:var(--bg-input);border-radius:var(--radius-xl);overflow:hidden;margin-bottom:0.75rem;cursor:pointer}
-        .game-arena.skip-round{border:3px solid var(--warning);animation:pulseGlow 1.5s infinite}
-        .game-arena.click-round{border:3px solid var(--primary)}
-        
-        .game-emoji{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;pointer-events:none;animation:emojiPop 0.3s ease-out}
-        .game-emoji.leaving{animation:emojiOut 0.2s ease-in forwards}
-        .game-emoji.clicked{animation:emojiClick 0.3s ease-out forwards}
-        .game-emoji.was-skip{animation:emojiPop 0.3s ease-out;filter:grayscale(0.5);opacity:0.7}
-        
-        .game-hint{font-size:0.75rem;color:var(--text-secondary);margin-bottom:0.5rem;min-height:1.2rem}
-        .game-hint.skip-hint{color:var(--warning);font-weight:600}
-        .game-hint.click-hint{color:var(--primary);font-weight:600}
-        
-        .game-instruction{font-size:0.8rem;color:var(--text-tertiary);margin-bottom:0.5rem}
-        .game-result{text-align:center;padding:1rem;animation:fadeIn 0.3s ease-out}.game-result-icon{font-size:48px;margin-bottom:0.5rem}.game-result-text{font-weight:700;font-size:1rem;margin-bottom:0.25rem}
+        /* Number grid */
+        .num-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 10px; width: 100%;
+        }
+        .num-btn {
+            aspect-ratio: 1; border-radius: 16px;
+            border: 1.5px solid #15151f; background: #0c0c14;
+            color: #ccc; font-size: 1.4rem; font-weight: 600;
+            cursor: pointer; transition: all 0.15s ease;
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font); -webkit-tap-highlight-color: transparent;
+        }
+        .num-btn:hover { background: #12121d; border-color: #252540; }
+        .num-btn:active { transform: scale(0.93); background: #1a1a2a; }
+        .num-btn.flash-ok {
+            background: #0a1a0a !important; border-color: #22c55e !important;
+            color: #22c55e !important; animation: pop 0.3s ease;
+        }
+        .num-btn.flash-no {
+            background: #1a0a0a !important; border-color: #ef4444 !important;
+            color: #ef4444 !important; animation: shake 0.3s ease;
+        }
+        .num-btn.placeholder { border: none; background: transparent; pointer-events: none; }
+        .num-btn.del-btn {
+            background: transparent; border-color: transparent; color: #444; font-size: 1.1rem;
+        }
+        .num-btn.del-btn:hover { background: #12121d; border-color: #252540; color: #ef4444; }
 
-        .status-msg{text-align:center;font-size:0.8125rem;font-weight:500;min-height:1.25rem;color:var(--text-tertiary);transition:all 0.3s ease}.status-msg.success{color:var(--success)}.status-msg.error{color:var(--danger)}
+        /* Action row */
+        .action-row {
+            display: flex; gap: 8px; width: 100%;
+        }
+        .action-btn {
+            flex: 1; padding: 10px; border-radius: 12px; border: 1px solid #1a1a24;
+            background: transparent; color: #555; font-size: 0.72rem; font-weight: 600;
+            cursor: pointer; font-family: var(--font); transition: all 0.2s ease;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+        .action-btn:hover { background: #11111a; color: #888; border-color: #252540; }
 
-        .toast-container{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);z-index:400;display:flex;flex-direction:column;gap:0.5rem;pointer-events:none}
-        .toast{padding:0.75rem 1.25rem;border-radius:var(--radius-md);font-size:0.8125rem;font-weight:500;box-shadow:0 4px 12px rgba(0,0,0,0.15);animation:toastUp .3s ease-out;display:flex;align-items:center;gap:0.5rem;pointer-events:auto}.toast.success{background:var(--success-bg);color:var(--success);border:1px solid #a7f3d0}.toast.error{background:var(--danger-bg);color:var(--danger);border:1px solid #fecaca}
+        /* Subtle message */
+        .subtle-msg {
+            font-size: 0.68rem; color: #444; min-height: 18px;
+            text-align: center; transition: all 0.3s ease;
+        }
+        .subtle-msg.ok { color: #22c55e; }
+        .subtle-msg.no { color: #ef4444; }
 
-        .success-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:500;opacity:0;pointer-events:none;transition:opacity 0.4s ease}.success-overlay.active{opacity:1;pointer-events:all}
-        .success-card{background:var(--bg-surface);border-radius:var(--radius-2xl);padding:2rem;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:modalIn 0.4s ease-out}
-        .success-icon{width:72px;height:72px;border-radius:50%;background:var(--success);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;animation:popIn 0.5s ease;font-size:36px;color:#fff}
-        .success-text{font-size:1.15rem;font-weight:700;color:var(--text-primary);margin-bottom:0.35rem}.success-subtext{font-size:0.8125rem;color:var(--text-tertiary)}
-        .success-spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;margin:1rem auto 0}
+        /* Done screen */
+        .done-screen {
+            display: flex; flex-direction: column; align-items: center; gap: 16px;
+        }
+        .done-circle {
+            width: 48px; height: 48px; border-radius: 50%;
+            border: 2px solid #22c55e; display: flex; align-items: center;
+            justify-content: center; animation: pop 0.5s ease;
+        }
+        .done-circle svg { width: 24px; height: 24px; stroke: #22c55e; fill: none; stroke-width: 3; }
+        .done-text { font-size: 0.85rem; color: #666; }
 
-        .confetti-piece{position:fixed;width:10px;height:10px;border-radius:2px;z-index:501;pointer-events:none;animation:confetti 1.5s ease-out forwards}
-        .loading-state{text-align:center;padding:2rem;color:var(--text-tertiary)}.loading-spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.6s linear infinite;margin:0 auto 0.75rem}
-
-        @media(max-width:480px){body{padding:0.75rem;align-items:flex-start;padding-top:2rem}.lock-wrapper{gap:1rem;max-width:100%}.lock-header-card{padding:1.25rem 1rem;border-radius:var(--radius-xl)}.lock-logo{width:44px;height:44px;font-size:1rem}.question-card,.game-card{padding:1.15rem;border-radius:var(--radius-xl)}.question-text{font-size:0.9rem}.question-input{font-size:0.875rem;padding:0.65rem 0.85rem}.btn{font-size:0.8125rem;padding:0.55rem 1rem}.game-arena{height:180px}.game-emoji{font-size:64px}}
-        @media(max-width:360px){body{padding:0.5rem;padding-top:1rem}.lock-header-card{padding:1rem 0.75rem}.question-card,.game-card{padding:1rem}.game-arena{height:150px}.game-emoji{font-size:50px}}
+        @media (max-width: 380px) {
+            .screen { gap: 24px; padding: 0 8px; }
+            .num-grid { gap: 8px; }
+            .num-btn { border-radius: 14px; font-size: 1.2rem; }
+            .q-text { font-size: 0.95rem; }
+        }
     </style>
 </head>
-<body class="theme-light">
-    <div class="lock-wrapper" id="lockWrapper">
-        <div class="lock-header-card">
-            <div class="lock-logo"><span>OM</span></div>
-            <div class="lock-brand">OrabyMKB</div>
-            <div class="lock-subtitle">Secure authentication required</div>
-        </div>
+<body>
 
-        <div class="step-indicator" id="stepIndicator">
-            <div class="step-dot active" data-step="0"></div><div class="step-line"></div>
-            <div class="step-dot" data-step="1"></div><div class="step-line"></div>
-            <div class="step-dot" data-step="2"></div><div class="step-line"></div>
-            <div class="step-dot" data-step="3"></div>
+    <!-- ========== SCREEN 1: USERNAME ========== -->
+    <div class="screen" id="usernameScreen">
+        <div class="input-group">
+            <span class="input-label">Username</span>
+            <input type="text" class="text-input" id="usernameInput" placeholder="Enter your username" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
         </div>
-
-        <div id="dynamicContent">
-            <div class="loading-state"><div class="loading-spinner"></div><span>Loading authentication...</span></div>
-        </div>
-        <div class="status-msg" id="statusMsg"></div>
+        <button class="btn btn-primary" id="usernameBtn" disabled>Continue</button>
+        <span class="subtle-msg" id="usernameMsg"></span>
     </div>
 
-    <div class="success-overlay" id="successOverlay">
-        <div class="success-card">
-            <div class="success-icon"><span class="iconify" data-icon="ph:check-bold"></span></div>
-            <div class="success-text">Access Granted</div>
-            <div class="success-subtext">Redirecting to OrabyMKB...</div>
-            <div class="success-spinner"></div>
+    <!-- ========== SCREEN 2: QUESTIONS ========== -->
+    <div class="screen hidden" id="questionScreen">
+        <div class="question-box">
+            <span class="q-hint" id="qNumber">Question 1/4</span>
+            <span class="q-text" id="qText">...</span>
+            <div class="answer-dots" id="answerDots"></div>
+            <span class="subtle-msg" id="qMsg"></span>
+        </div>
+
+        <!-- Hidden input for keyboard -->
+        <input type="text" class="hidden-input" id="hiddenInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off">
+
+        <div class="num-grid" id="numGrid">
+            <button class="num-btn" data-num="1">1</button>
+            <button class="num-btn" data-num="2">2</button>
+            <button class="num-btn" data-num="3">3</button>
+            <button class="num-btn" data-num="4">4</button>
+            <button class="num-btn" data-num="5">5</button>
+            <button class="num-btn" data-num="6">6</button>
+            <button class="num-btn" data-num="7">7</button>
+            <button class="num-btn" data-num="8">8</button>
+            <button class="num-btn" data-num="9">9</button>
+            <button class="num-btn placeholder"></button>
+            <button class="num-btn" data-num="0">0</button>
+            <button class="num-btn del-btn" id="delBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 4H8l-7 8 7 8h13a2 2 0 002-2V6a2 2 0 00-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
+            </button>
+        </div>
+
+        <div class="action-row">
+            <button class="action-btn" id="qClearBtn">clear</button>
+            <button class="action-btn" id="qKeyboardBtn">keyboard</button>
         </div>
     </div>
-    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ========== SCREEN 3: DONE ========== -->
+    <div class="screen hidden" id="doneScreen">
+        <div class="done-screen">
+            <div class="done-circle">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="done-text">redirecting...</div>
+        </div>
+    </div>
 
     <script>
         (function() {
-            // ==================== CONFIG ====================
-            const AUTH_DATA_URL = 'auth-data.json';
-            const REDIRECT_URL = 'home.html';
-            const GAME_ROUNDS = 5;
-            const EMOJI_VISIBILITY_MS = 2000;
-            const SKIP_ROUND = 3; // Round 3 = SKIP (don't click!)
-            // Pattern: [click, click, skip, click, click] = [1,1,0,1,1]
-            const WIN_PATTERN = [true, true, false, true, true];
-            
-            const FACE_EMOJIS = ['😀','😃','😄','😁','😅','😂','🤣','😊','😇','🙂','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳','🥸','😎','🤓','🧐','😕','😟','🙁','😮','😯','😲','😳','🥺','😦','😧','😨','😰','😥','😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡','👻','👽','👾','🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿','😾'];
-            
-            // ==================== DOM ====================
             const $ = (id) => document.getElementById(id);
-            const dynamicContent = $('dynamicContent');
-            const stepIndicator = $('stepIndicator');
-            const statusMsg = $('statusMsg');
-            const successOverlay = $('successOverlay');
-            const toastContainer = $('toastContainer');
-            
+
+            // ==================== USER DATABASE ====================
+            // Each user has: username, questions (array of {q, answer: [digits]})
+            const USERS = {
+                'oraby': {
+                    questions: [
+                        { q: 'Year of birth?', answer: ['1', '9', '9', '5'] },
+                        { q: 'Month of birth? (MM)', answer: ['0', '7'] },
+                        { q: 'Lucky number?', answer: ['2', '3'] },
+                        { q: 'Access code?', answer: ['2', '5', '8', '0'] },
+                    ]
+                },
+                'admin': {
+                    questions: [
+                        { q: 'System year?', answer: ['2', '0', '2', '4'] },
+                        { q: 'Root digits?', answer: ['1', '0'] },
+                        { q: 'Security pin?', answer: ['7', '7', '7'] },
+                        { q: 'Master key?', answer: ['9', '1', '1'] },
+                    ]
+                },
+                'mkb': {
+                    questions: [
+                        { q: 'Birth day? (DD)', answer: ['1', '5'] },
+                        { q: 'Favorite digit?', answer: ['7'] },
+                        { q: 'Code part 1?', answer: ['3', '6'] },
+                        { q: 'Code part 2?', answer: ['9', '0'] },
+                    ]
+                }
+            };
+
+            // Default questions for unknown users
+            const DEFAULT_QUESTIONS = [
+                { q: 'Enter PIN part 1', answer: ['1', '2', '3'] },
+                { q: 'Enter PIN part 2', answer: ['4', '5', '6'] },
+                { q: 'Enter PIN part 3', answer: ['7', '8'] },
+                { q: 'Enter PIN part 4', answer: ['9', '0'] },
+            ];
+
             // ==================== STATE ====================
-            let authData = null, currentUser = null, currentStep = 0;
-            let gameState = { round: 0, score: [], emojis: [], timer: null, timeLeft: 0, active: false, waitingForClick: false, canClick: true };
-            
-            // ==================== HELPERS ====================
-            function shuffle(a) { const arr = [...a]; for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
-            function showToast(msg, type) { const t = document.createElement('div'); t.className = 'toast ' + (type||'info'); t.innerHTML = '<span>'+msg+'</span>'; toastContainer.appendChild(t); setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(10px)'; t.style.transition='all 0.25s'; setTimeout(() => t.remove(), 250); }, 2500); }
-            async function simpleHash(input) { const encoder = new TextEncoder(); const data = encoder.encode(input.trim().toLowerCase()); const hashBuffer = await crypto.subtle.digest('SHA-256', data); const hashArray = Array.from(new Uint8Array(hashBuffer)); return hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); }
-            
-            function setTheme(theme) { document.body.classList.remove('theme-light','theme-dark'); document.body.classList.add('theme-'+theme); localStorage.setItem('orabymkb-lock-theme', theme); }
-            const savedTheme = localStorage.getItem('orabymkb-lock-theme') || 'light'; setTheme(savedTheme);
-            
-            function updateSteps() {
-                const dots = stepIndicator.querySelectorAll('.step-dot'), lines = stepIndicator.querySelectorAll('.step-line');
-                dots.forEach((dot, i) => { dot.classList.remove('active','done'); if (i < currentStep) dot.classList.add('done'); if (i === currentStep) dot.classList.add('active'); });
-                lines.forEach((line, i) => { line.classList.toggle('done', i < currentStep); });
-            }
-            
-            // ==================== LOAD AUTH ====================
-            async function loadAuthData() {
-                try {
-                    const res = await fetch(AUTH_DATA_URL);
-                    if (!res.ok) throw new Error('Failed to load');
-                    authData = await res.json();
-                    if (!authData.users || !authData.users.length) throw new Error('No users');
-                    currentUser = authData.users[0];
-                    renderQuestion1();
-                } catch(e) {
-                    dynamicContent.innerHTML = '<div class="question-card" style="text-align:center;"><div style="font-size:2rem;margin-bottom:0.5rem;">⚠️</div><div style="font-weight:600;">Auth Error</div><div style="font-size:0.8rem;color:var(--text-secondary);">'+e.message+'</div><button class="btn btn-outline" onclick="location.reload()" style="margin-top:1rem;width:auto;display:inline-flex;">Retry</button></div>';
-                }
-            }
-            
-            // ==================== QUESTION 1 ====================
-            function renderQuestion1() { currentStep = 0; updateSteps(); statusMsg.textContent = ''; statusMsg.className = 'status-msg';
-                dynamicContent.innerHTML = '<div class="question-card" id="q1Card"><div class="question-number">Question 1 of 2</div><div class="question-text">'+currentUser.question1+'</div><input type="text" class="question-input" id="a1Input" placeholder="Type your answer..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"><div class="question-error" id="q1Err">Incorrect answer.</div><button class="btn btn-primary" id="subQ1" style="margin-top:0.75rem;"><span class="iconify" data-icon="ph:arrow-right" data-width="18"></span> Continue</button></div>';
-                const inp = $('a1Input'), btn = $('subQ1'), err = $('q1Err');
-                btn.onclick = async () => { const a = inp.value.trim(); if (!a) { inp.classList.add('error'); setTimeout(() => inp.classList.remove('error'),500); return; } btn.disabled = true; btn.innerHTML = '<span style="display:inline-block;width:18px;height:18px;border:2px solid white;border-radius:50%;border-top-color:transparent;animation:spin 0.6s linear infinite;"></span>'; const h = await simpleHash(a); if (h === currentUser.answer1) { inp.classList.add('success'); err.classList.remove('show'); statusMsg.textContent = '✓ Correct!'; statusMsg.className = 'status-msg success'; setTimeout(renderQuestion2, 600); } else { inp.classList.add('error'); err.classList.add('show'); statusMsg.textContent = '✗ Wrong'; statusMsg.className = 'status-msg error'; setTimeout(() => inp.classList.remove('error'),500); inp.value = ''; inp.focus(); btn.disabled = false; btn.innerHTML = '<span class="iconify" data-icon="ph:arrow-right" data-width="18"></span> Continue'; } };
-                inp.onkeypress = (e) => { if (e.key === 'Enter') btn.click(); };
-                setTimeout(() => inp.focus(), 300);
-            }
-            
-            // ==================== QUESTION 2 ====================
-            function renderQuestion2() { currentStep = 1; updateSteps(); statusMsg.textContent = ''; statusMsg.className = 'status-msg';
-                dynamicContent.innerHTML = '<div class="question-card" id="q2Card"><div class="question-number">Question 2 of 2</div><div class="question-text">'+currentUser.question2+'</div><input type="text" class="question-input" id="a2Input" placeholder="Type your answer..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"><div class="question-error" id="q2Err">Incorrect answer.</div><button class="btn btn-primary" id="subQ2" style="margin-top:0.75rem;"><span class="iconify" data-icon="ph:arrow-right" data-width="18"></span> Continue</button></div>';
-                const inp = $('a2Input'), btn = $('subQ2'), err = $('q2Err');
-                btn.onclick = async () => { const a = inp.value.trim(); if (!a) { inp.classList.add('error'); setTimeout(() => inp.classList.remove('error'),500); return; } btn.disabled = true; btn.innerHTML = '<span style="display:inline-block;width:18px;height:18px;border:2px solid white;border-radius:50%;border-top-color:transparent;animation:spin 0.6s linear infinite;"></span>'; const h = await simpleHash(a); if (h === currentUser.answer2) { inp.classList.add('success'); err.classList.remove('show'); statusMsg.textContent = '✓ Correct!'; statusMsg.className = 'status-msg success'; setTimeout(renderGame, 700); } else { inp.classList.add('error'); err.classList.add('show'); statusMsg.textContent = '✗ Wrong'; statusMsg.className = 'status-msg error'; setTimeout(() => inp.classList.remove('error'),500); inp.value = ''; inp.focus(); btn.disabled = false; btn.innerHTML = '<span class="iconify" data-icon="ph:arrow-right" data-width="18"></span> Continue'; } };
-                inp.onkeypress = (e) => { if (e.key === 'Enter') btn.click(); };
-                setTimeout(() => inp.focus(), 300);
-            }
-            
-            // ==================== GAME ====================
-            function renderGame() {
-                currentStep = 2; updateSteps(); statusMsg.textContent = ''; statusMsg.className = 'status-msg';
-                gameState = { round: 0, score: [], emojis: shuffle(FACE_EMOJIS).slice(0, GAME_ROUNDS + 2), timer: null, timeLeft: EMOJI_VISIBILITY_MS / 1000, active: true, waitingForClick: false, canClick: true };
-                
-                dynamicContent.innerHTML = '<div class="game-card" id="gameCard"><div class="game-header"><span class="game-round" id="gRound">Round 1/'+GAME_ROUNDS+'</span><span class="game-timer" id="gTimer">⏱ '+gameState.timeLeft+'s</span></div><div class="game-score" id="gScore">'+[...Array(GAME_ROUNDS)].map(() => '<div class="score-dot"></div>').join('')+'</div><div class="game-arena" id="gArena"><div class="game-emoji" id="gEmoji"></div></div><div class="game-hint" id="gHint">Watch the emoji...</div><div class="game-instruction">Tap the emoji when it appears — EXCEPT on Round 3!</div></div>';
-                
-                $('gEmoji').style.display = 'none';
-                $('gArena').onclick = handleGameClick;
-                startNextRound();
-            }
-            
-            function startNextRound() {
-                if (!gameState.active) return;
-                gameState.round++;
-                gameState.canClick = true;
-                gameState.waitingForClick = true;
-                
-                if (gameState.round > GAME_ROUNDS) { gameWin(); return; }
-                
-                const round = gameState.round;
-                const isSkipRound = (round === SKIP_ROUND);
-                const emoji = gameState.emojis[round - 1];
-                
-                // Update UI
-                $('gRound').textContent = 'Round ' + round + '/' + GAME_ROUNDS;
-                $('gTimer').textContent = '⏱ ' + (EMOJI_VISIBILITY_MS / 1000) + 's';
-                $('gTimer').classList.remove('urgent');
-                $('gHint').textContent = 'Watch carefully...';
-                $('gHint').className = 'game-hint';
-                $('gArena').className = 'game-arena ' + (isSkipRound ? 'skip-round' : 'click-round');
-                
-                // Show emoji
-                const emojiEl = $('gEmoji');
-                emojiEl.textContent = emoji;
-                emojiEl.className = 'game-emoji';
-                emojiEl.style.display = 'block';
-                emojiEl.style.left = (45 + Math.random() * 10) + '%';
-                emojiEl.style.top = (40 + Math.random() * 20) + '%';
-                
-                if (isSkipRound) {
-                    emojiEl.classList.add('was-skip');
-                    $('gHint').textContent = '⚠️ DO NOT CLICK! Skip this round!';
-                    $('gHint').className = 'game-hint skip-hint';
-                }
-                
-                // Timer
-                gameState.timeLeft = EMOJI_VISIBILITY_MS / 1000;
-                clearInterval(gameState.timer);
-                gameState.timer = setInterval(() => {
-                    gameState.timeLeft = Math.max(0, gameState.timeLeft - 0.1);
-                    $('gTimer').textContent = '⏱ ' + gameState.timeLeft.toFixed(1) + 's';
-                    if (gameState.timeLeft <= 1) $('gTimer').classList.add('urgent');
-                    if (gameState.timeLeft <= 0) {
-                        clearInterval(gameState.timer);
-                        if (gameState.waitingForClick) {
-                            // Time expired
-                            if (isSkipRound) {
-                                // Correct! They didn't click (which is right for skip)
-                                handleRoundResult(true, false);
-                            } else {
-                                // Wrong! They didn't click when they should have
-                                handleRoundResult(false, false);
-                            }
-                        }
-                    }
-                }, 100);
-            }
-            
-            function handleGameClick() {
-                if (!gameState.active || !gameState.waitingForClick || !gameState.canClick) return;
-                gameState.canClick = false;
-                gameState.waitingForClick = false;
-                clearInterval(gameState.timer);
-                
-                const round = gameState.round;
-                const isSkipRound = (round === SKIP_ROUND);
-                const emojiEl = $('gEmoji');
-                
-                if (isSkipRound) {
-                    // They clicked on skip round = WRONG
-                    emojiEl.classList.add('clicked');
-                    handleRoundResult(false, true);
-                } else {
-                    // They clicked on click round = CORRECT
-                    emojiEl.classList.add('clicked');
-                    handleRoundResult(true, true);
-                }
-            }
-            
-            function handleRoundResult(success, clicked) {
-                const round = gameState.round;
-                gameState.score.push({ round, success, clicked });
-                
-                // Update score dots
-                const dots = $('gScore').querySelectorAll('.score-dot');
-                if (dots[round - 1]) {
-                    dots[round - 1].classList.add(success ? 'correct' : 'wrong');
-                    if (!clicked && round === SKIP_ROUND && success) dots[round - 1].classList.add('skip');
-                }
-                
-                if (!success) { gameLose('Wrong move!'); return; }
-                
-                // Hide emoji
-                setTimeout(() => {
-                    const emojiEl = $('gEmoji');
-                    emojiEl.classList.add('leaving');
-                    setTimeout(() => { emojiEl.style.display = 'none'; }, 200);
-                }, 300);
-                
-                // Next round
-                setTimeout(() => startNextRound(), 600);
-            }
-            
-            function gameLose(reason) {
-                gameState.active = false;
-                clearInterval(gameState.timer);
-                const emojiEl = $('gEmoji');
-                if (emojiEl) { emojiEl.style.display = 'none'; }
-                
-                statusMsg.textContent = '✗ ' + reason + ' Restarting questions...';
-                statusMsg.className = 'status-msg error';
-                
-                dynamicContent.innerHTML = '<div class="game-card" style="text-align:center;"><div class="game-result"><div class="game-result-icon">😞</div><div class="game-result-text" style="color:var(--danger);">Challenge Failed</div><div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;">'+reason+'</div><div style="font-size:0.75rem;color:var(--text-tertiary);">Restarting authentication...</div></div></div>';
-                
-                setTimeout(() => { currentStep = 0; renderQuestion1(); }, 2500);
-            }
-            
-            function gameWin() {
-                gameState.active = false;
-                clearInterval(gameState.timer);
-                currentStep = 3; updateSteps();
-                statusMsg.textContent = '✓ Game passed!';
-                statusMsg.className = 'status-msg success';
-                
-                dynamicContent.innerHTML = '<div class="game-card" style="text-align:center;"><div class="game-result"><div class="game-result-icon">🎉</div><div class="game-result-text" style="color:var(--success);">Challenge Complete!</div><div style="font-size:0.85rem;color:var(--text-secondary);">All rounds passed successfully</div></div></div>';
-                
-                setTimeout(grantAccess, 800);
-            }
-            
-            // ==================== GRANT ACCESS ====================
-            function grantAccess() {
-                currentStep = 3; updateSteps();
-                statusMsg.textContent = 'Authentication complete!';
-                statusMsg.className = 'status-msg success';
-                
-                // Confetti
-                const colors = ['#6c47ff','#00c6ff','#22c55e','#f59e0b','#ef4444','#ec4899','#8b5cf6','#06b6d4'];
-                for (let i = 0; i < 40; i++) {
-                    const piece = document.createElement('div'); piece.className = 'confetti-piece';
-                    piece.style.left = Math.random() * 100 + '%'; piece.style.top = (Math.random() * 60 + 40) + '%';
-                    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    piece.style.width = (Math.random() * 8 + 6) + 'px'; piece.style.height = (Math.random() * 8 + 6) + 'px';
-                    piece.style.animationDelay = Math.random() * 0.5 + 's'; piece.style.animationDuration = (Math.random() * 1 + 1.5) + 's';
-                    document.body.appendChild(piece); setTimeout(() => piece.remove(), 2000);
-                }
-                
-                setTimeout(() => { successOverlay.classList.add('active'); }, 500);
-                setTimeout(() => { window.location.href = REDIRECT_URL; }, 2200);
-            }
-            
-            // ==================== INIT ====================
-            const headerCard = document.querySelector('.lock-header-card');
-            let lastTap = 0;
-            headerCard.addEventListener('click', (e) => {
-                const now = Date.now();
-                if (now - lastTap < 300) { const cur = document.body.classList.contains('theme-dark') ? 'dark' : 'light'; setTheme(cur === 'dark' ? 'light' : 'dark'); }
-                lastTap = now;
+            let currentUser = null;
+            let currentQuestions = [];
+            let currentQIndex = 0;
+            let enteredAnswer = [];
+            let isProcessing = false;
+            let attempts = 0;
+            const MAX_ATTEMPTS = 3;
+
+            // ==================== SCREENS ====================
+            const usernameScreen = $('usernameScreen');
+            const questionScreen = $('questionScreen');
+            const doneScreen = $('doneScreen');
+            const usernameInput = $('usernameInput');
+            const usernameBtn = $('usernameBtn');
+            const usernameMsg = $('usernameMsg');
+
+            // ==================== USERNAME SCREEN ====================
+            usernameInput.addEventListener('input', () => {
+                const val = usernameInput.value.trim();
+                usernameBtn.disabled = val.length < 2;
+                usernameMsg.textContent = '';
+                usernameMsg.className = 'subtle-msg';
             });
-            
-            loadAuthData();
+
+            usernameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !usernameBtn.disabled) {
+                    startQuestions();
+                }
+            });
+
+            usernameBtn.addEventListener('click', startQuestions);
+
+            function startQuestions() {
+                const name = usernameInput.value.trim().toLowerCase();
+                if (name.length < 2) return;
+
+                currentUser = name;
+                
+                // Find user or use default
+                if (USERS[name]) {
+                    currentQuestions = USERS[name].questions;
+                } else {
+                    // Shuffle default questions for variety
+                    currentQuestions = [...DEFAULT_QUESTIONS].sort(() => Math.random() - 0.5);
+                }
+
+                currentQIndex = 0;
+                attempts = 0;
+                usernameScreen.classList.add('hidden');
+                questionScreen.classList.remove('hidden');
+                loadQuestion();
+                focusHiddenInput();
+            }
+
+            // ==================== QUESTION SCREEN ====================
+            const qNumber = $('qNumber');
+            const qText = $('qText');
+            const answerDots = $('answerDots');
+            const qMsg = $('qMsg');
+            const hiddenInput = $('hiddenInput');
+            const numGrid = $('numGrid');
+            const delBtn = $('delBtn');
+            const qClearBtn = $('qClearBtn');
+            const qKeyboardBtn = $('qKeyboardBtn');
+
+            function loadQuestion() {
+                if (currentQIndex >= currentQuestions.length) {
+                    // All questions answered correctly
+                    showDone();
+                    return;
+                }
+
+                const question = currentQuestions[currentQIndex];
+                qNumber.textContent = `Question ${currentQIndex + 1}/${currentQuestions.length}`;
+                qText.textContent = question.q;
+                
+                // Create answer dots
+                answerDots.innerHTML = '';
+                for (let i = 0; i < question.answer.length; i++) {
+                    const dot = document.createElement('div');
+                    dot.className = 'answer-dot';
+                    answerDots.appendChild(dot);
+                }
+                
+                enteredAnswer = [];
+                isProcessing = false;
+                attempts = 0;
+                qMsg.textContent = '';
+                qMsg.className = 'subtle-msg';
+                
+                updateDots();
+                focusHiddenInput();
+            }
+
+            function updateDots(state) {
+                const dots = answerDots.querySelectorAll('.answer-dot');
+                dots.forEach((dot, i) => {
+                    dot.classList.remove('filled', 'correct', 'wrong');
+                    if (i < enteredAnswer.length) {
+                        dot.classList.add('filled');
+                        if (state === 'correct') dot.classList.add('correct');
+                        if (state === 'wrong') dot.classList.add('wrong');
+                    }
+                });
+            }
+
+            function flashButton(num, type) {
+                const btn = numGrid.querySelector(`[data-num="${num}"]`);
+                if (!btn) return;
+                btn.classList.add(type === 'ok' ? 'flash-ok' : 'flash-no');
+                setTimeout(() => btn.classList.remove('flash-ok', 'flash-no'), 400);
+            }
+
+            function checkAnswer() {
+                const question = currentQuestions[currentQIndex];
+                if (enteredAnswer.length !== question.answer.length) return;
+
+                isProcessing = true;
+
+                let allCorrect = true;
+                for (let i = 0; i < question.answer.length; i++) {
+                    if (enteredAnswer[i] !== question.answer[i]) {
+                        allCorrect = false;
+                        break;
+                    }
+                }
+
+                if (allCorrect) {
+                    updateDots('correct');
+                    qMsg.textContent = '';
+                    qMsg.className = 'subtle-msg';
+                    
+                    question.answer.forEach(d => flashButton(d, 'ok'));
+                    
+                    setTimeout(() => {
+                        currentQIndex++;
+                        loadQuestion();
+                    }, 600);
+
+                } else {
+                    updateDots('wrong');
+                    attempts++;
+                    
+                    enteredAnswer.forEach((d, i) => {
+                        if (d === question.answer[i]) flashButton(d, 'ok');
+                        else flashButton(d, 'no');
+                    });
+
+                    shakeDots();
+
+                    if (attempts >= MAX_ATTEMPTS) {
+                        qMsg.textContent = 'too many tries';
+                        qMsg.className = 'subtle-msg no';
+                        disableGrid(true);
+                        setTimeout(() => {
+                            disableGrid(false);
+                            enteredAnswer = [];
+                            updateDots();
+                            qMsg.textContent = '';
+                            qMsg.className = 'subtle-msg';
+                            isProcessing = false;
+                            attempts = 0;
+                        }, 2000);
+                    } else {
+                        setTimeout(() => {
+                            enteredAnswer = [];
+                            updateDots();
+                            isProcessing = false;
+                        }, 500);
+                    }
+                }
+            }
+
+            function shakeDots() {
+                const dots = answerDots.querySelectorAll('.answer-dot');
+                dots.forEach(d => {
+                    d.style.animation = 'none';
+                    d.offsetHeight;
+                    d.style.animation = 'shake 0.4s ease';
+                });
+            }
+
+            function disableGrid(disabled) {
+                const btns = numGrid.querySelectorAll('.num-btn:not(.placeholder)');
+                btns.forEach(b => {
+                    b.style.opacity = disabled ? '0.3' : '1';
+                    b.style.pointerEvents = disabled ? 'none' : 'auto';
+                });
+            }
+
+            function addDigit(d) {
+                if (isProcessing) return;
+                const question = currentQuestions[currentQIndex];
+                if (enteredAnswer.length >= question.answer.length) return;
+
+                enteredAnswer.push(d);
+                updateDots();
+
+                if (enteredAnswer.length === question.answer.length) {
+                    setTimeout(() => checkAnswer(), 250);
+                }
+            }
+
+            function removeDigit() {
+                if (isProcessing) return;
+                if (enteredAnswer.length === 0) return;
+                enteredAnswer.pop();
+                updateDots();
+                qMsg.textContent = '';
+                qMsg.className = 'subtle-msg';
+            }
+
+            // ==================== KEYBOARD ====================
+            function focusHiddenInput() {
+                hiddenInput.focus();
+                hiddenInput.click();
+            }
+
+            hiddenInput.addEventListener('input', () => {
+                const val = hiddenInput.value;
+                const last = val.charAt(val.length - 1);
+                if (/^\d$/.test(last)) addDigit(last);
+                hiddenInput.value = '';
+            });
+
+            hiddenInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' || e.key === 'Delete') {
+                    e.preventDefault();
+                    removeDigit();
+                    hiddenInput.value = '';
+                }
+            });
+
+            // ==================== EVENT LISTENERS ====================
+            numGrid.addEventListener('click', (e) => {
+                const btn = e.target.closest('.num-btn');
+                if (!btn || btn.classList.contains('placeholder')) return;
+                const num = btn.dataset.num;
+                if (num !== undefined) {
+                    addDigit(num);
+                    btn.style.transform = 'scale(0.9)';
+                    setTimeout(() => btn.style.transform = '', 100);
+                }
+            });
+
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeDigit();
+            });
+
+            qClearBtn.addEventListener('click', () => {
+                enteredAnswer = [];
+                updateDots();
+                qMsg.textContent = '';
+                qMsg.className = 'subtle-msg';
+                isProcessing = false;
+            });
+
+            qKeyboardBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                focusHiddenInput();
+            });
+
+            // Physical keyboard
+            document.addEventListener('keydown', (e) => {
+                if (questionScreen.classList.contains('hidden')) return;
+                if (isProcessing) return;
+
+                if (/^\d$/.test(e.key)) {
+                    e.preventDefault();
+                    addDigit(e.key);
+                }
+                if (e.key === 'Backspace' || e.key === 'Delete') {
+                    e.preventDefault();
+                    removeDigit();
+                }
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    enteredAnswer = [];
+                    updateDots();
+                }
+            });
+
+            // Auto-focus on mobile
+            if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+                document.body.addEventListener('click', () => {
+                    if (!questionScreen.classList.contains('hidden')) focusHiddenInput();
+                }, { once: false });
+            }
+
+            // ==================== DONE ====================
+            function showDone() {
+                questionScreen.classList.add('hidden');
+                doneScreen.classList.remove('hidden');
+                setTimeout(() => {
+                    window.location.href = 'home.html';
+                }, 1200);
+            }
+
         })();
     </script>
 </body>

@@ -239,10 +239,19 @@
 
     <script>
         (function() {
+            // ==================== SUPPRESS EXTENSION ERRORS ====================
+            const originalDefineProperty = Object.defineProperty;
+            Object.defineProperty = function(obj, prop, descriptor) {
+                try { return originalDefineProperty.call(Object, obj, prop, descriptor); }
+                catch (e) { if (e instanceof TypeError && e.message.includes('Cannot redefine property')) return obj; throw e; }
+            };
+            window.addEventListener('error', function(e) { if (e.message && e.message.includes('Cannot redefine property')) { e.preventDefault(); e.stopPropagation(); return false; } });
+            window.addEventListener('unhandledrejection', function(e) { if (e.reason && e.reason.message && e.reason.message.includes('Cannot redefine property')) { e.preventDefault(); e.stopPropagation(); return false; } });
+
             const SUPABASE_URL = "https://kdrgdnrwibuqpvikjapx.supabase.co";
             const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkcmdkbnJ3aWJ1cXB2aWtqYXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNjE4ODMsImV4cCI6MjA5NjkzNzg4M30.9wEbcIDziq9xDWZQ_BF0X-p25g4SQkuCCQV-5fhDnbY";
             const STORAGE_BUCKET = "exams";
-            const GROUPS_TABLE = "file_groups"; // Supabase table for groups
+            const GROUPS_TABLE = "file_groups";
             
             let supabase;
             try { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false, autoRefreshToken: false }, global: { headers: { 'X-Client-Info': 'orabymkb' } } }); } catch(e) { console.error('Supabase init:', e); }
@@ -255,7 +264,7 @@
             const subjectModal = $('subjectModal'), subjectFileName = $('subjectFileName'), modalSubjectInput = $('modalSubjectInput'), confirmSubjectBtn = $('confirmSubject'), subjectModalClose = $('subjectModalClose');
             const groupPreviewOverlay = $('groupPreviewOverlay'), groupPreviewTitle = $('groupPreviewTitle'), groupPreviewGrid = $('groupPreviewGrid'), groupPreviewClose = $('groupPreviewClose');
             
-            let allFiles = [], fileSubjects = {}, fileGroups = {}, filteredFiles = [], currentView = 'feed', tableSort = { field: 'name', direction: 'asc' }, searchTimeout, pendingFiles = null;
+            let allFiles = [], fileGroups = {}, groupFilesSet = new Set(), filteredFiles = [], currentView = 'feed', tableSort = { field: 'name', direction: 'asc' }, searchTimeout, pendingFiles = null;
             
             function showToast(m, t) { const d = document.createElement('div'); d.className = 'toast ' + (t||'success'); d.innerHTML = '<span>'+m+'</span>'; toastContainer.appendChild(d); setTimeout(() => { d.style.opacity='0'; d.style.transform='translateY(10px)'; d.style.transition='all 0.25s'; setTimeout(() => d.remove(), 250); }, 3000); }
             function formatSize(b) { if(!b||b===0) return '0 B'; const k=1024,s=['B','KB','MB','GB']; const i=Math.floor(Math.log(b)/Math.log(k)); return parseFloat((b/Math.pow(k,i)).toFixed(1))+' '+s[i]; }
@@ -269,7 +278,7 @@
             function sanitize(n){return n.replace(/[^a-zA-Z0-9._-]/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'')}
             function getPublicUrl(fn){if(!supabase)return'';const{data}=supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fn);return data?.publicUrl||''}
             
-            // ==================== FETCH FILES & GROUPS FROM SUPABASE ====================
+            // ==================== FETCH FILES & GROUPS ====================
             async function fetchFiles(){
                 if(!supabase)return;
                 try{
@@ -277,18 +286,35 @@
                     if(error)throw error;
                     allFiles=(data||[]).filter(f=>f&&f.name&&!f.name.endsWith('/'));
                     await fetchGroups();
-                    applyFilters();
-                }catch(err){console.error(err);allFiles=[];applyFilters()}
+                    buildDisplayList();
+                }catch(err){console.error(err);allFiles=[];buildDisplayList();}
             }
             
             async function fetchGroups(){
                 if(!supabase)return;
                 try{
                     const{data,error}=await supabase.from(GROUPS_TABLE).select('*').order('created_at',{ascending:false});
-                    if(error)throw error;
-                    fileGroups={};
-                    (data||[]).forEach(g=>{fileGroups[g.id]=g});
-                }catch(err){console.error('Groups fetch error:',err);fileGroups={};}
+                    if(error){
+                        // Table might not exist yet - that's okay, just use empty groups
+                        console.warn('Groups table not found (this is normal if not created yet)');
+                        fileGroups={};groupFilesSet=new Set();
+                        return;
+                    }
+                    fileGroups={};groupFilesSet=new Set();
+                    (data||[]).forEach(g=>{
+                        fileGroups[g.id]=g;
+                        (g.files||[]).forEach(fn=>groupFilesSet.add(fn));
+                    });
+                }catch(err){
+                    console.warn('Groups fetch skipped (table may not exist)');
+                    fileGroups={};groupFilesSet=new Set();
+                }
+            }
+            
+            // Build display list: groups as single items + ungrouped files
+            function buildDisplayList(){
+                updateStats();
+                applyFilters();
             }
             
             async function createGroup(title, fileNames){
@@ -298,6 +324,7 @@
                     const{data,error}=await supabase.from(GROUPS_TABLE).insert([groupData]).select().single();
                     if(error)throw error;
                     fileGroups[data.id]=data;
+                    fileNames.forEach(fn=>groupFilesSet.add(fn));
                     return data.id;
                 }catch(err){console.error('Create group error:',err);return null;}
             }
@@ -305,6 +332,8 @@
             async function deleteGroup(groupId){
                 if(!supabase)return;
                 try{
+                    const group=fileGroups[groupId];
+                    if(group){(group.files||[]).forEach(fn=>groupFilesSet.delete(fn));}
                     const{error}=await supabase.from(GROUPS_TABLE).delete().eq('id',groupId);
                     if(error)throw error;
                     delete fileGroups[groupId];
@@ -321,7 +350,7 @@
             function updateStats(){navFileCount.textContent=allFiles.length}
             
             async function copyFileUrl(fn){try{await navigator.clipboard.writeText(getPublicUrl(fn));showToast('Link copied!','success')}catch(e){const t=document.createElement('textarea');t.value=getPublicUrl(fn);document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);showToast('Link copied!','success')}}
-            function openFilePreview(fn){const url=getPublicUrl(fn);const s=getGroupForFile(fn)?.title||'';const g=getGroupForFile(fn);const params=new URLSearchParams({file:fn,url:url});if(g)params.set('group',g.id);window.location.href='view.html?'+params.toString()}
+            function openFilePreview(fn){const url=getPublicUrl(fn);const g=getGroupForFile(fn);const params=new URLSearchParams({file:fn,url:url});if(g)params.set('group',g.id);window.location.href='view.html?'+params.toString()}
             
             async function deleteFile(fn){
                 if(!supabase||!confirm('Delete "'+fn+'"? This cannot be undone.'))return;
@@ -329,8 +358,11 @@
                     const group=getGroupForFile(fn);
                     const{error}=await supabase.storage.from(STORAGE_BUCKET).remove([fn]);
                     if(error)throw error;
-                    if(group&&group.files&&group.files.length<=1){await deleteGroup(group.id);}
-                    else if(group){const updatedFiles=group.files.filter(f=>f!==fn);await supabase.from(GROUPS_TABLE).update({files:updatedFiles}).eq('id',group.id);}
+                    if(group){
+                        const updatedFiles=(group.files||[]).filter(f=>f!==fn);
+                        if(updatedFiles.length===0){await deleteGroup(group.id);}
+                        else{await supabase.from(GROUPS_TABLE).update({files:updatedFiles}).eq('id',group.id);}
+                    }
                     showToast('Deleted '+fn,'success');await fetchFiles();
                 }catch(e){showToast('Delete failed: '+e.message,'error')}
             }
@@ -340,8 +372,7 @@
                 if(!group)return;
                 groupPreviewTitle.querySelector('span').textContent=group.title;
                 groupPreviewGrid.innerHTML='';
-                group.files.forEach(fn=>{
-                    const fileData=allFiles.find(f=>f.name===fn);
+                (group.files||[]).forEach(fn=>{
                     const cat=getCategory(fn);const url=getPublicUrl(fn);const isImage=cat==='image';
                     const item=document.createElement('div');item.className='group-preview-item';
                     item.onclick=()=>{groupPreviewOverlay.classList.remove('active');window.location.href='view.html?'+new URLSearchParams({file:fn,url:url,group:groupId}).toString()};
@@ -370,20 +401,101 @@
             async function processUploadQueue(files){if(!files||files.length===0)return;progressCard.classList.add('active');progressFill.style.width='0%';progressPercent.textContent='0%';progressLabel.textContent='Starting...';progressDetail.textContent='0 / '+files.length+' files';let ok=0,fail=0;const t=files.length;for(let i=0;i<t;i++){const f=files[i];try{progressLabel.textContent='Uploading: '+f.name;await uploadSingleFile(f);ok++}catch(e){fail++;showToast(f.name+': '+e.message,'error')}const p=((i+1)/t)*100;progressFill.style.width=p+'%';progressPercent.textContent=Math.round(p)+'%';progressDetail.textContent=(i+1)+' / '+t+' files'}progressLabel.textContent='Done!';progressFill.style.width='100%';progressPercent.textContent='100%';progressDetail.textContent=ok+' ok, '+fail+' failed';if(ok>0)showToast(ok+' file(s) uploaded!','success');setTimeout(()=>{progressCard.classList.remove('active');progressFill.style.width='0%'},2500);await fetchFiles()}
             function handleFiles(files){if(!files||files.length===0)return;openSubjectModal(Array.from(files))}
             
-            function applyFilters(){const s=(searchInput.value||'').trim().toLowerCase();if(s){filteredFiles=allFiles.filter(f=>(f.name||'').toLowerCase().includes(s)||typeLabel(f.name).toLowerCase().includes(s)||(getGroupForFile(f.name)?.title||'').toLowerCase().includes(s))}else{filteredFiles=[...allFiles]}filteredFiles.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));if(currentView==='table')sortTableFiles();updateStats();renderCurrentView();renderRecentMini()}
-            function sortTableFiles(){filteredFiles.sort((a,b)=>{let c=0;switch(tableSort.field){case'name':c=(a.name||'').localeCompare(b.name||'');break;case'type':c=typeLabel(a.name).localeCompare(typeLabel(b.name));break;case'size':c=(a.metadata?.size||0)-(b.metadata?.size||0);break;case'date':c=new Date(a.created_at||0)-new Date(b.created_at||0);break}return tableSort.direction==='asc'?c:-c})}
+            function applyFilters(){
+                const s=(searchInput.value||'').trim().toLowerCase();
+                // Build display items: groups + ungrouped files
+                let displayItems=[];
+                const processedGroupIds=new Set();
+                
+                // Add groups as single items
+                for(const[gid,group]of Object.entries(fileGroups)){
+                    const firstFile=allFiles.find(f=>f.name===group.files[0]);
+                    if(firstFile){
+                        displayItems.push({type:'group',group:group,file:firstFile});
+                        processedGroupIds.add(gid);
+                    }
+                }
+                
+                // Add ungrouped files
+                allFiles.forEach(f=>{
+                    if(!groupFilesSet.has(f.name)){
+                        displayItems.push({type:'file',file:f});
+                    }
+                });
+                
+                // Filter by search
+                if(s){
+                    displayItems=displayItems.filter(item=>{
+                        if(item.type==='group'){
+                            return (item.group.title||'').toLowerCase().includes(s);
+                        }else{
+                            return (item.file.name||'').toLowerCase().includes(s)||typeLabel(item.file.name).toLowerCase().includes(s);
+                        }
+                    });
+                }
+                
+                // Sort
+                displayItems.sort((a,b)=>{
+                    const da=a.type==='group'?(a.group.created_at||0):(a.file.created_at||0);
+                    const db=b.type==='group'?(b.group.created_at||0):(b.file.created_at||0);
+                    return new Date(db)-new Date(da);
+                });
+                
+                filteredFiles=displayItems;
+                updateStats();
+                renderCurrentView();
+                renderRecentMini();
+            }
+            
+            function sortTableFiles(){/* table sort handled in renderTableView */}
             
             function renderCurrentView(){const h=filteredFiles.length>0;emptyState.style.display=h?'none':'block';switch(currentView){case'feed':renderFeedView();break;case'grid':renderGridView();break;case'table':renderTableView();break}}
             
             function renderFeedView(){feedView.style.display='block';gridView.style.display='none';tableView.style.display='none';if(filteredFiles.length===0){feedView.innerHTML='';return}
-            feedView.innerHTML=filteredFiles.map((f,i)=>{const fn=f.name||'?',sz=f.metadata?.size||0,d=formatFullDate(f.created_at),cat=getCategory(fn),ic=getIcon(fn),sn=esc(fn),tl=typeLabel(fn),ru=getPublicUrl(fn),grp=getGroupForFile(fn);const displayTitle=grp?grp.title:fn;const isGroup=!!grp;return'<div class="file-card" style="animation-delay:'+Math.min(i*0.03,0.5)+'s" onclick="'+(isGroup?'window.OrabyMKB.openGroup(\''+grp.id+'\')':'window.OrabyMKB.openPreview(\''+sn+'\')')+'"><div class="card-header"><div class="card-icon '+(isGroup?'group':cat)+'"><i class="'+(isGroup?'bx bx-collection':ic)+'"></i></div><div class="card-meta"><div class="card-title">'+esc(displayTitle)+'</div><div class="card-subtitle"><span>'+tl+'</span><span>·</span><span>'+formatSize(sz)+'</span><span>·</span><span>'+d+'</span></div>'+(isGroup?'<span class="card-group-badge"><i class="bx bx-collection"></i> '+grp.files.length+' files</span>':'')+'</div></div><div class="card-actions" onclick="event.stopPropagation();"><button class="card-action-btn" onclick="window.OrabyMKB.copyUrl(\''+sn+'\')"><i class="bx bx-link"></i> <span>Copy</span></button><button class="card-action-btn" onclick="'+(isGroup?'window.OrabyMKB.openGroup(\''+grp.id+'\')':'window.OrabyMKB.openPreview(\''+sn+'\')')+'"><i class="bx bx-show"></i> <span>View</span></button><button class="card-action-btn" onclick="window.open(\''+esc(ru)+'\',\'_blank\')"><i class="bx bx-open-in-new"></i> <span>Raw</span></button><button class="card-action-btn danger" onclick="window.OrabyMKB.deleteFile(\''+sn+'\')"><i class="bx bx-trash"></i> <span>Delete</span></button></div></div>'}).join('')}
+            feedView.innerHTML=filteredFiles.map((item,i)=>{
+                if(item.type==='group'){
+                    const grp=item.group,f=item.file,sz=f.metadata?.size||0,d=formatFullDate(grp.created_at||f.created_at),sn=esc(f.name),tl=typeLabel(f.name),ru=getPublicUrl(f.name);
+                    return'<div class="file-card" style="animation-delay:'+Math.min(i*0.03,0.5)+'s" onclick="window.OrabyMKB.openGroup(\''+grp.id+'\')"><div class="card-header"><div class="card-icon group"><i class="bx bx-collection"></i></div><div class="card-meta"><div class="card-title">'+esc(grp.title)+'</div><div class="card-subtitle"><span>'+tl+'</span><span>·</span><span>'+formatSize(sz)+'</span><span>·</span><span>'+d+'</span></div><span class="card-group-badge"><i class="bx bx-collection"></i> '+grp.files.length+' files</span></div></div><div class="card-actions" onclick="event.stopPropagation();"><button class="card-action-btn" onclick="window.OrabyMKB.openGroup(\''+grp.id+'\')"><i class="bx bx-show"></i> <span>View</span></button><button class="card-action-btn danger" onclick="window.OrabyMKB.deleteGroupFiles(\''+grp.id+'\')"><i class="bx bx-trash"></i> <span>Delete</span></button></div></div>';
+                }else{
+                    const f=item.file,fn=f.name||'?',sz=f.metadata?.size||0,d=formatFullDate(f.created_at),cat=getCategory(fn),ic=getIcon(fn),sn=esc(fn),tl=typeLabel(fn),ru=getPublicUrl(fn);
+                    return'<div class="file-card" style="animation-delay:'+Math.min(i*0.03,0.5)+'s" onclick="window.OrabyMKB.openPreview(\''+sn+'\')"><div class="card-header"><div class="card-icon '+cat+'"><i class="'+ic+'"></i></div><div class="card-meta"><div class="card-title">'+sn+'</div><div class="card-subtitle"><span>'+tl+'</span><span>·</span><span>'+formatSize(sz)+'</span><span>·</span><span>'+d+'</span></div></div></div><div class="card-actions" onclick="event.stopPropagation();"><button class="card-action-btn" onclick="window.OrabyMKB.copyUrl(\''+sn+'\')"><i class="bx bx-link"></i> <span>Copy</span></button><button class="card-action-btn" onclick="window.OrabyMKB.openPreview(\''+sn+'\')"><i class="bx bx-show"></i> <span>View</span></button><button class="card-action-btn" onclick="window.open(\''+esc(ru)+'\',\'_blank\')"><i class="bx bx-open-in-new"></i> <span>Raw</span></button><button class="card-action-btn danger" onclick="window.OrabyMKB.deleteFile(\''+sn+'\')"><i class="bx bx-trash"></i> <span>Delete</span></button></div></div>';
+                }
+            }).join('')}
             
             function renderGridView(){feedView.style.display='none';gridView.style.display='grid';tableView.style.display='none';if(filteredFiles.length===0){gridView.innerHTML='';return}
-            gridView.innerHTML=filteredFiles.map(f=>{const fn=f.name||'?',sz=f.metadata?.size||0,d=formatDate(f.created_at),cat=getCategory(fn),ic=getIcon(fn),sn=esc(fn),ru=getPublicUrl(fn),grp=getGroupForFile(fn);const displayTitle=grp?grp.title:fn;const isGroup=!!grp;return'<div class="grid-card" ondblclick="'+(isGroup?'window.OrabyMKB.openGroup(\''+grp.id+'\')':'window.OrabyMKB.openPreview(\''+sn+'\')')+'" title="Double-click to preview"><div class="grid-icon '+(isGroup?'group':cat)+'"><i class="'+(isGroup?'bx bx-collection':ic)+'"></i></div><div class="grid-name">'+esc(displayTitle)+'</div>'+(isGroup?'<span class="card-group-badge" style="font-size:0.6rem;">'+grp.files.length+' files</span>':'')+'<div class="grid-meta">'+formatSize(sz)+' · '+d+'</div><div class="grid-actions"><button class="btn-sm-icon" onclick="event.stopPropagation();window.OrabyMKB.copyUrl(\''+sn+'\')"><i class="bx bx-link"></i></button><button class="btn-sm-icon" onclick="event.stopPropagation();'+(isGroup?'window.OrabyMKB.openGroup(\''+grp.id+'\')':'window.OrabyMKB.openPreview(\''+sn+'\')')+'"><i class="bx bx-show"></i></button><button class="btn-sm-icon" onclick="event.stopPropagation();window.open(\''+esc(ru)+'\',\'_blank\')"><i class="bx bx-open-in-new"></i></button><button class="btn-sm-icon danger" onclick="event.stopPropagation();window.OrabyMKB.deleteFile(\''+sn+'\')"><i class="bx bx-trash"></i></button></div></div>'}).join('')}
+            gridView.innerHTML=filteredFiles.map(item=>{
+                if(item.type==='group'){
+                    const grp=item.group,f=item.file,sz=f.metadata?.size||0,d=formatDate(grp.created_at||f.created_at);
+                    return'<div class="grid-card" ondblclick="window.OrabyMKB.openGroup(\''+grp.id+'\')" title="Double-click to preview"><div class="grid-icon group"><i class="bx bx-collection"></i></div><div class="grid-name">'+esc(grp.title)+'</div><span class="card-group-badge" style="font-size:0.6rem;">'+grp.files.length+' files</span><div class="grid-meta">'+formatSize(sz)+' · '+d+'</div><div class="grid-actions"><button class="btn-sm-icon" onclick="event.stopPropagation();window.OrabyMKB.openGroup(\''+grp.id+'\')"><i class="bx bx-show"></i></button><button class="btn-sm-icon danger" onclick="event.stopPropagation();window.OrabyMKB.deleteGroupFiles(\''+grp.id+'\')"><i class="bx bx-trash"></i></button></div></div>';
+                }else{
+                    const f=item.file,fn=f.name||'?',sz=f.metadata?.size||0,d=formatDate(f.created_at),cat=getCategory(fn),ic=getIcon(fn),sn=esc(fn),ru=getPublicUrl(fn);
+                    return'<div class="grid-card" ondblclick="window.OrabyMKB.openPreview(\''+sn+'\')" title="Double-click to preview"><div class="grid-icon '+cat+'"><i class="'+ic+'"></i></div><div class="grid-name">'+sn+'</div><div class="grid-meta">'+formatSize(sz)+' · '+d+'</div><div class="grid-actions"><button class="btn-sm-icon" onclick="event.stopPropagation();window.OrabyMKB.copyUrl(\''+sn+'\')"><i class="bx bx-link"></i></button><button class="btn-sm-icon" onclick="event.stopPropagation();window.OrabyMKB.openPreview(\''+sn+'\')"><i class="bx bx-show"></i></button><button class="btn-sm-icon" onclick="event.stopPropagation();window.open(\''+esc(ru)+'\',\'_blank\')"><i class="bx bx-open-in-new"></i></button><button class="btn-sm-icon danger" onclick="event.stopPropagation();window.OrabyMKB.deleteFile(\''+sn+'\')"><i class="bx bx-trash"></i></button></div></div>';
+                }
+            }).join('')}
             
             function renderTableView(){feedView.style.display='none';gridView.style.display='none';tableView.style.display='block';if(filteredFiles.length===0){tableBody.innerHTML='';return}
-            document.querySelectorAll('.file-table th[data-sort]').forEach(th=>{th.classList.remove('sorted');const i=th.querySelector('i');if(i)i.className='bx bx-sort'});const sh=document.querySelector('.file-table th[data-sort="'+tableSort.field+'"]');if(sh){sh.classList.add('sorted');const i=sh.querySelector('i');if(i)i.className=tableSort.direction==='asc'?'bx bx-sort-up':'bx bx-sort-down'}
-            tableBody.innerHTML=filteredFiles.map(f=>{const fn=f.name||'?',sz=f.metadata?.size||0,d=formatFullDate(f.created_at),cat=getCategory(fn),ic=getIcon(fn),sn=esc(fn),tl=typeLabel(fn),ru=getPublicUrl(fn),grp=getGroupForFile(fn);const displayTitle=grp?grp.title:fn;const isGroup=!!grp;return'<tr onclick="'+(isGroup?'window.OrabyMKB.openGroup(\''+grp.id+'\')':'window.OrabyMKB.openPreview(\''+sn+'\')')+'"><td><div class="file-cell"><div class="table-file-icon '+(isGroup?'group':cat)+'"><i class="'+(isGroup?'bx bx-collection':ic)+'"></i></div><span title="'+esc(displayTitle)+'" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;">'+esc(displayTitle)+'</span></div></td><td>'+tl+'</td><td>'+formatSize(sz)+'</td><td>'+d+'</td><td><div class="actions-cell" onclick="event.stopPropagation();"><button class="btn-sm-icon" onclick="window.OrabyMKB.copyUrl(\''+sn+'\')"><i class="bx bx-link"></i></button><button class="btn-sm-icon" onclick="'+(isGroup?'window.OrabyMKB.openGroup(\''+grp.id+'\')':'window.OrabyMKB.openPreview(\''+sn+'\')')+'"><i class="bx bx-show"></i></button><button class="btn-sm-icon" onclick="window.open(\''+esc(ru)+'\',\'_blank\')"><i class="bx bx-open-in-new"></i></button><button class="btn-sm-icon danger" onclick="window.OrabyMKB.deleteFile(\''+sn+'\')"><i class="bx bx-trash"></i></button></div></td></tr>'}).join('')}
+            tableBody.innerHTML=filteredFiles.map(item=>{
+                if(item.type==='group'){
+                    const grp=item.group,f=item.file,sz=f.metadata?.size||0,d=formatFullDate(grp.created_at||f.created_at),tl=typeLabel(f.name);
+                    return'<tr onclick="window.OrabyMKB.openGroup(\''+grp.id+'\')"><td><div class="file-cell"><div class="table-file-icon group"><i class="bx bx-collection"></i></div><span title="'+esc(grp.title)+'" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;">'+esc(grp.title)+' ('+grp.files.length+' files)</span></div></td><td>Group</td><td>'+formatSize(sz)+'</td><td>'+d+'</td><td><div class="actions-cell" onclick="event.stopPropagation();"><button class="btn-sm-icon" onclick="window.OrabyMKB.openGroup(\''+grp.id+'\')"><i class="bx bx-show"></i></button><button class="btn-sm-icon danger" onclick="window.OrabyMKB.deleteGroupFiles(\''+grp.id+'\')"><i class="bx bx-trash"></i></button></div></td></tr>';
+                }else{
+                    const f=item.file,fn=f.name||'?',sz=f.metadata?.size||0,d=formatFullDate(f.created_at),cat=getCategory(fn),ic=getIcon(fn),sn=esc(fn),tl=typeLabel(fn),ru=getPublicUrl(fn);
+                    return'<tr onclick="window.OrabyMKB.openPreview(\''+sn+'\')"><td><div class="file-cell"><div class="table-file-icon '+cat+'"><i class="'+ic+'"></i></div><span title="'+sn+'" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;">'+sn+'</span></div></td><td>'+tl+'</td><td>'+formatSize(sz)+'</td><td>'+d+'</td><td><div class="actions-cell" onclick="event.stopPropagation();"><button class="btn-sm-icon" onclick="window.OrabyMKB.copyUrl(\''+sn+'\')"><i class="bx bx-link"></i></button><button class="btn-sm-icon" onclick="window.OrabyMKB.openPreview(\''+sn+'\')"><i class="bx bx-show"></i></button><button class="btn-sm-icon" onclick="window.open(\''+esc(ru)+'\',\'_blank\')"><i class="bx bx-open-in-new"></i></button><button class="btn-sm-icon danger" onclick="window.OrabyMKB.deleteFile(\''+sn+'\')"><i class="bx bx-trash"></i></button></div></td></tr>';
+                }
+            }).join('')}
+            
+            async function deleteGroupFiles(groupId){
+                const group=fileGroups[groupId];
+                if(!group||!confirm('Delete entire group "'+group.title+'"? This will delete ALL files in this group.'))return;
+                try{
+                    for(const fn of (group.files||[])){
+                        await supabase.storage.from(STORAGE_BUCKET).remove([fn]);
+                    }
+                    await deleteGroup(groupId);
+                    showToast('Group deleted','success');
+                    await fetchFiles();
+                }catch(e){showToast('Delete failed: '+e.message,'error')}
+            }
             
             function renderRecentMini(){const rf=allFiles.slice(0,5);if(rf.length===0){recentMini.innerHTML='<p style="color:var(--text-tertiary);font-size:0.75rem;text-align:center;padding:1rem;">No files yet</p>';return}
             recentMini.innerHTML=rf.map((f,i)=>{const fn=f.name||'?',d=formatDate(f.created_at),cat=getCategory(fn),ic=getIcon(fn),sn=esc(fn),grp=getGroupForFile(fn);const displayTitle=grp?grp.title:fn;const isGroup=!!grp;return'<div class="sidebar-mini-link" onclick="'+(isGroup?'window.OrabyMKB.openGroup(\''+grp.id+'\')':'window.OrabyMKB.openPreview(\''+sn+'\')')+'" title="Click to preview"><span class="sidebar-mini-link-num">#'+(i+1)+'</span><div class="sidebar-mini-icon '+(isGroup?'group':cat)+'"><i class="'+(isGroup?'bx bx-collection':ic)+'"></i></div><span class="sidebar-mini-link-text">'+esc(displayTitle)+'</span><span style="font-size:0.6rem;color:var(--text-tertiary);">'+d+'</span></div>'}).join('')}
@@ -402,14 +514,13 @@
             searchInput.addEventListener('input',()=>{clearTimeout(searchTimeout);searchTimeout=setTimeout(applyFilters,300)});
             refreshBtn.addEventListener('click',fetchFiles);
             $('themeToggle').addEventListener('click',()=>{const c=document.body.classList.contains('theme-dark')?'dark':'light';setTheme(c==='dark'?'light':'dark')});
-            document.querySelector('.file-table thead').addEventListener('click',(e)=>{const th=e.target.closest('th[data-sort]');if(!th)return;const f=th.dataset.sort;if(tableSort.field===f){tableSort.direction=tableSort.direction==='asc'?'desc':'asc'}else{tableSort.field=f;tableSort.direction='asc'}applyFilters()});
             subjectModalClose.addEventListener('click',closeSubjectModal);subjectModal.addEventListener('click',(e)=>{if(e.target===subjectModal)closeSubjectModal()});
             confirmSubjectBtn.addEventListener('click',confirmSubject);modalSubjectInput.addEventListener('keypress',(e)=>{if(e.key==='Enter')confirmSubject()});
             groupPreviewClose.addEventListener('click',closeGroupPreview);groupPreviewOverlay.addEventListener('click',(e)=>{if(e.target===groupPreviewOverlay)closeGroupPreview()});
             
             document.addEventListener('keydown',(e)=>{if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();searchInput.focus();searchInput.select()}if((e.ctrlKey||e.metaKey)&&e.key==='1'){e.preventDefault();switchView('feed')}if((e.ctrlKey||e.metaKey)&&e.key==='2'){e.preventDefault();switchView('grid')}if((e.ctrlKey||e.metaKey)&&e.key==='3'){e.preventDefault();switchView('table')}});
             
-            window.OrabyMKB={copyUrl:copyFileUrl,deleteFile:deleteFile,openPreview:openFilePreview,openGroup:openGroupPreview,refresh:fetchFiles};
+            window.OrabyMKB={copyUrl:copyFileUrl,deleteFile:deleteFile,deleteGroupFiles:deleteGroupFiles,openPreview:openFilePreview,openGroup:openGroupPreview,refresh:fetchFiles};
             
             const savedTheme=localStorage.getItem('orabymkb-theme')||'light';setTheme(savedTheme);
             fetchFiles();setInterval(fetchFiles,30000);
